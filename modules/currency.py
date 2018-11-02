@@ -105,7 +105,7 @@ free_money_channels = {}
 async def free_money_handler(client, message):
     if message.author.id == client.user.id:
         return
-    N = 30
+    N = 50
     try:
         e = free_money_channels[message.channel.id]
         if e != random.randint(1, N):
@@ -115,7 +115,7 @@ async def free_money_handler(client, message):
         free_money_channels.update({message.channel.id: random.randint(1, N)})
         return
     code = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
-    amount = random.randint(10, 500)
+    amount = random.randint(10, 200)
     await message.channel.send(
         "{0} coins has appeared! To collect, enter `collect-coins {1}`. Hurry, 60s left."
         .format(amount, code)
