@@ -14,10 +14,35 @@ Member = sa.Table(
     sa.Column('id', sa.BigInteger, primary_key=True, nullable=False),
     sa.Column('guild', sa.BigInteger, nullable=False),
     sa.Column('member', sa.BigInteger, nullable=False),
-    sa.Column('wallet', sa.BigInteger, default=0, nullable=False)
+    sa.Column('wallet', sa.BigInteger, default=0, nullable=False),
 )
 
-tables = [Member]
+Guild = sa.Table(
+    'guild', meta,
+    sa.Column('id', sa.BigInteger, primary_key=True, nullable=False),
+    sa.Column('guild', sa.BigInteger, nullable=False),
+    sa.Column('shop_roles', sa.JSON),
+)
+
+Waifu = sa.Table(
+    'waifu', meta,
+    sa.Column('id', sa.BigInteger, primary_key=True, nullable=False),
+    sa.Column('name', sa.String(length=100), nullable=False),
+    sa.Column('from', sa.String(length=100), nullable=False),
+    sa.Column('price', sa.BigInteger, nullable=False),
+    sa.Column('image_url', sa.String(length=100)),
+)
+
+PurchasedWaifu = sa.Table(
+    'purchased_waifu', meta,
+    sa.Column('member_id', sa.BigInteger, sa.ForeignKey('members.id', ondelete='CASCADE')),
+    sa.Column('waifu_id', sa.BigInteger, sa.ForeignKey('waifu.id', ondelete='CASCADE')),
+    sa.Column('guild', sa.BigInteger, nullable=False),
+    sa.Column('member', sa.BigInteger, nullable=False),
+    sa.Column('purchased_for', sa.BigInteger, nullable=False),
+)
+
+tables = [Member, Guild, Waifu, PurchasedWaifu]
 
 
 async def prepare_engine():
@@ -56,7 +81,8 @@ async def make_member_profile(members_list, self_id):
                 if member.id == self_id:
                     continue
                 exists_query = Member.select().where(
-                    Member.c.member == member.id)
+                    Member.c.member == member.id).where(
+                    Member.c.guild == member.guild.id)
                 cursor = await conn.execute(exists_query)
                 res = await cursor.fetchone()
                 if res is None:
@@ -69,6 +95,26 @@ async def make_member_profile(members_list, self_id):
             if len(create_query_values) > 0:
                 create_query = Member.insert().values(create_query_values)
                 await conn.execute(create_query)
+
+
+async def make_guild_entry(guilds_list):
+        engine = await prepare_engine()
+        async with engine.acquire() as conn:
+            create_query_values = []
+            for guild in guilds_list:
+                exists_query = Guild.select().where(
+                    Guild.c.guild == guild.id)
+                cursor = await conn.execute(exists_query)
+                res = await cursor.fetchone()
+                if res is None:
+                    create_query_values.append({
+                        'guild': guild.id,
+                    })
+                    logging.info('Creating entry for guild {}.'.format(guild.name))
+            if len(create_query_values) > 0:
+                create_query = Guild.insert().values(create_query_values)
+                await conn.execute(create_query)
+
 
 """
 async def insert_data(engine, table, values):

@@ -15,26 +15,29 @@ Handlers are called when each message is recieved.
 Prototype of 'handlers':
 [handler_1,]
 ...
-async def handler_1(message):
+async def handler_1(client, message):
     ...
 """
+from .admin import admin_functions
 from .devtest import devtest_functions
 from .general import general_functions
 from .currency import currency_functions, currency_handlers
+from .shop import shop_functions
+from .waifu import waifu_functions
 
 
 async def message_resolve(client, message, cmd_prefix):
     if message.content.startswith(cmd_prefix):
         args = message.content[1:].split(" ")
         if args[0] == 'help':
-            await print_help(client, message, *args[1:])
+            await print_help(client, message, *args)
         elif args[0] in functions.keys():
             await functions[args[0]][0](client, message, *args[1:])
     for handler in handlers:
-        handler(message)
+        await handler(client, message)
 
 
-async def print_help(message, *args):
+async def print_help(client, message, *args):
     if len(args) == 0:
         await message.channel.send("I think I am supposed to add a help message here...")
     elif args[0] in functions.keys():
@@ -57,8 +60,11 @@ functions = {
 functions = {}
 handlers = []
 
+functions.update(admin_functions)
 functions.update(general_functions)
 functions.update(devtest_functions)
 functions.update(currency_functions)
+functions.update(shop_functions)
+functions.update(waifu_functions)
 
 handlers += currency_handlers
