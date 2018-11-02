@@ -30,7 +30,7 @@ async def message_resolve(client, message, cmd_prefix):
     if message.content.startswith(cmd_prefix):
         args = message.content[1:].split(" ")
         if args[0] == 'help':
-            await print_help(client, message, *args)
+            await print_help(client, message, *args[1:])
         elif args[0] in functions.keys():
             await functions[args[0]][0](client, message, *args[1:])
     for handler in handlers:
@@ -42,9 +42,9 @@ async def print_help(client, message, *args):
         await message.channel.send("I think I am supposed to add a help message here...")
     elif args[0] in functions.keys():
         help_string = functions[args[0]][1]
-        if help_string is not None:
+        if help_string is None:
             help_string = "The developer says: fcuk off."
-        await message.channel.send("{0}: {1}".format(args[0], help_string))
+        await message.channel.send("`{0}`: {1}".format(args[0], help_string))
 
 """
 This is how 'functions' is implemented in a module file:

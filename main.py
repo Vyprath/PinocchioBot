@@ -2,13 +2,13 @@ import discord
 import logging
 import asyncio
 from modules import message_resolve
-from variables import TOKEN
+from variables import TOKEN, PREFIX
 import database
 
 
 logging.basicConfig(level=logging.INFO)
 loop = asyncio.get_event_loop()
-COMMAND_PREFIX = "!"
+COMMAND_PREFIX = PREFIX
 loop.create_task(database.prepare_tables())
 client = discord.Client(loop=loop)
 

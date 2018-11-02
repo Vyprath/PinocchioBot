@@ -1,5 +1,6 @@
 import os
 
+PREFIX = os.environ.get('PREFIX', '!')
 TOKEN = os.environ.get('TOKEN')
 if TOKEN is None:
     raise Exception('The TOKEN environmental variable is not set.')
