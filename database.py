@@ -28,7 +28,8 @@ Waifu = sa.Table(
     'waifu', meta,
     sa.Column('id', sa.BigInteger, primary_key=True, nullable=False),
     sa.Column('name', sa.String(length=200), nullable=False),
-    sa.Column('from', sa.String(length=200), nullable=False),
+    sa.Column('from_anime', sa.String(length=200), nullable=False),
+    sa.Column('gender', sa.String(length=1)),
     sa.Column('price', sa.BigInteger, nullable=False),
     sa.Column('image_url', sa.String(length=400)),
 )

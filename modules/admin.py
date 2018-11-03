@@ -1,6 +1,13 @@
 import database
 
 
+async def clean(client, message, *args):
+    if not message.author.guild_permissions.administrator:
+        await message.channel.send("This command is restricted, to be used only by gods.")
+        return
+    await message.channel.send("Not yet implemented... dev note: ez to implement. do it fast.")
+
+
 async def set_paid_roles(client, message, *args):
     if not message.author.guild_permissions.administrator:
         await message.channel.send("This command is restricted, to be used only by gods.")
@@ -67,5 +74,6 @@ To remove, run `@paidroles delete <role mention>`
 
 
 admin_functions = {
-    '@paidroles': (set_paid_roles, None)
+    '@paidroles': (set_paid_roles, None),
+    '@purge': (clean, "Purge X messages from this channel.")
 }

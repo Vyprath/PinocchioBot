@@ -8,7 +8,8 @@ async def _search(client, message, *args):
     search_string = '%' + ' '.join(args[1:]).lower().strip() + '%'
     async with engine.acquire() as conn:
         query = database.Waifu.select().where(
-            database.Waifu.c.name.ilike(search_string))
+            database.Waifu.c.name.ilike(search_string)).where(
+            database.Waifu.c.from_anime.ilike(search_string))
         cursor = await conn.execute(query)
         resp = await cursor.fetchall()
         if resp is None or len(resp) == 0:
@@ -19,7 +20,8 @@ async def _search(client, message, *args):
     for row in resp:
         resp_string += (
             "**{0}**: ID is {1}, from *{2}*. Costs **{3}** coins.\n".
-            format(row[1], row[0], row[2], row[3])
+            format(row[database.Waifu.c.name], row[database.Waifu.c.id],
+                   row[database.Waifu.c.from_anime], row[database.Waifu.c.price])
         )
         if len(resp_string) > 1600:
             await message.channel.send(resp_string)
@@ -51,17 +53,25 @@ async def _details(client, message, *args):
             database.PurchasedWaifu.c.guild == message.guild.id)
         cursor = await conn.execute(query)
         purchaser = await cursor.fetchone()
+    gender = resp[database.Waifu.c.gender]
+    if gender == "m":
+        gender = "Husbando"
+    elif gender == "f":
+        gender = "Waifu"
+    else:
+        gender = "?????"
     waifu_description = (
-        "Hi! I am a waifu from {0}. You need {1} to buy me!"
-        .format(resp[2], resp[database.Waifu.c.price]))
+        "Hi! I am a {2} from {0}. You need {1} to buy me!"
+        .format(resp[database.Waifu.c.from_anime], resp[database.Waifu.c.price], gender.lower()))
     embed = discord.Embed(
         title=resp[database.Waifu.c.name], description=waifu_description,
-        type='rich', color=0x000000)
+        type='rich', color=0x4f00f2)
     if resp[4] is not None:
         embed.set_image(url=resp[database.Waifu.c.image_url])
-    embed.add_field(name="From", value=resp[2])  # database.Waifu.c.from
+    embed.add_field(name="From", value=resp[database.Waifu.c.from_anime])
     embed.add_field(name="Cost", value=resp[database.Waifu.c.price])
     embed.add_field(name="ID", value=resp[database.Waifu.c.id])
+    embed.add_field(name="Gender", value=gender)
     if purchaser is not None:
         purchaser_user = message.guild.get_member(purchaser[database.PurchasedWaifu.c.member])
         purchased_for = purchaser[database.PurchasedWaifu.c.purchased_for]
