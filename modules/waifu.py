@@ -8,7 +8,7 @@ async def _search(client, message, *args):
     search_string = '%' + ' '.join(args[1:]).lower().strip() + '%'
     async with engine.acquire() as conn:
         query = database.Waifu.select().where(
-            database.Waifu.c.name.ilike(search_string)).where(
+            database.Waifu.c.name.ilike(search_string) |
             database.Waifu.c.from_anime.ilike(search_string))
         cursor = await conn.execute(query)
         resp = await cursor.fetchall()
