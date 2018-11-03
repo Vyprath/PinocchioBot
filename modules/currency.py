@@ -2,6 +2,7 @@ import database
 import random
 import string
 import asyncio
+import time
 # TODO: Handle in case profile not yet created.
 
 
@@ -100,11 +101,21 @@ async def transfer_money(client, message, *args):
 
 
 free_money_channels = {}
+passive_money_users = {}
 
 
 async def free_money_handler(client, message):
-    if message.author.id == client.user.id:
+    if message.author.id == client.user.id or message.author.bot:
         return
+    now = time.monotonic()
+    if message.author.id in passive_money_users.keys():
+        last = passive_money_users[message.author.id]
+        if now - last > 60:
+            passive_money_users[message.author.id] = now
+            engine = await database.prepare_engine()
+            await _add_money(engine, message.author, random.randint(10, 40))
+    else:
+        passive_money_users.update({message.author.id: now})
     N = 50
     try:
         e = free_money_channels[message.channel.id]

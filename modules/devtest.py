@@ -1,6 +1,6 @@
 async def hello_world(client, message, *args):
-    await message.channel.send("Heya, {0}. Your args: \"{1}\"".format(
-        message.author, ' '.join(args)
+    await message.channel.send("Heya, {0}. N(args) = {2}. Your args: \"{1}\"".format(
+        message.author, args, len(args),
     ))
     perms = message.author.guild_permissions
     admin = perms.administrator
