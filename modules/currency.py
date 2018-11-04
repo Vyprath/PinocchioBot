@@ -127,7 +127,7 @@ async def free_money_handler(client, message):
         return
     code = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
     amount = random.randint(10, 200)
-    await message.channel.send(
+    msg_1 = await message.channel.send(
         "{0} coins has appeared! To collect, enter `collect-coins {1}`. Hurry, 60s left."
         .format(amount, code)
     )
@@ -141,15 +141,18 @@ async def free_money_handler(client, message):
             msg = await client.wait_for('message', check=check, timeout=60)
             if msg.content == 'collect-coins {0}'.format(code):
                 coins_collector = msg.author
+                msg_4 = msg
         except asyncio.TimeoutError:
-            await message.channel.send("Error: Timeout.")
+            msg_2 = await message.channel.send("Error: Timeout.")
+            await message.channel.delete_messages([msg_1, msg_2])
             return
     engine = await database.prepare_engine()
     await _add_money(engine, coins_collector, amount)
-    await message.channel.send(
+    msg_3 = await message.channel.send(
         "User {0} has gained {1} coins!"
         .format(msg.author.mention, amount)
     )
+    await message.channel.delete_messages([msg_1, msg_3, msg_4])
 
 
 currency_functions = {
