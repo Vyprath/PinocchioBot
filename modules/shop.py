@@ -1,6 +1,58 @@
 from .currency import _remove_money, _fetch_wallet
 import database
+import discord
 import asyncio
+
+
+async def buy_colored_role(client, message, *args):
+    engine = await database.prepare_engine()
+    COST = 10000
+    await message.channel.send("Welcome to the custom colored role creator!")
+    wallet = await _fetch_wallet(engine, message.author)
+    if wallet - COST < 0:
+        await message.channel.send(
+            "Unfortunately you don't have enough money. Cost is {0} coins".format(COST))
+        return
+    await message.channel.send(
+        "Enter the color (Either enter a hex code like `0x00ff00`, or enter an 8-bit RGB sequence like `0 255 0`):")  # noqa
+
+    def check(m):
+        return (m.author.id != client.user.id and m.channel == message.channel)
+
+    try:
+        msg = await client.wait_for('message', check=check, timeout=180)
+        split = msg.content.split()
+        if len(split) == 1 and msg.content.startswith("0x") and len(msg.content) == 8:
+            color = discord.Color(int(msg.content[2:], 16))
+        else:
+            assert (len(split) == 3 and split[0].isdigit() and split[1].isdigit() and split[2].isdigit())  # noqa
+            r, g, b = [int(x) for x in split]
+            assert (0 <= r <= 255) and (0 <= g <= 255) and (0 <= b <= 255)
+            color = discord.Color.from_rgb(*[int(x) for x in split])
+        await message.channel.send("Good job, now enter a role name:")
+        msg = await client.wait_for('message', check=check, timeout=180)
+        role_name = msg.content
+        await message.channel.send(
+            "Creating '{0}' role with color {1}. You sure? Reply `yes`/`no`.".format(role_name, str(color)))  # noqa
+        msg = await client.wait_for('message', check=check, timeout=180)
+        if msg.content.lower().strip() == 'yes':
+            pass
+        elif msg.content.lower().strip() == 'no':
+            await message.channel.send("Ok, exiting.")
+            return
+        else:
+            raise AssertionError
+    except asyncio.TimeoutError:
+        await message.channel.send("Error: No response recieved. Timeout.")
+        return
+    except (AssertionError, ValueError):
+        await message.channel.send("Invalid text entered. Exiting...")
+        return
+    await _remove_money(engine, message.author, COST)
+    role = await message.guild.create_role(
+        name=role_name, color=color, reason="Bought this custom role.")
+    await message.author.add_roles(role, reason="Bought this custom role.")
+    await message.channel.send("Successfully bought you the role! :thumbsup:")
 
 
 async def paid_roles(client, message, *args):
@@ -64,5 +116,6 @@ Exit this menu by writing `exit-paid-roles`.
 
 
 shop_functions = {
-    'paidroles': (paid_roles, 'Get a role with $$$.')
+    'paidroles': (paid_roles, 'Get a role with $$$.'),
+    'customrole': (buy_colored_role, 'Get a custom colored role with $$$$$$.')
 }
