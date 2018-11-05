@@ -144,6 +144,7 @@ async def free_money_handler(client, message):
                 msg_4 = msg
         except asyncio.TimeoutError:
             msg_2 = await message.channel.send("Error: Timeout.")
+            await asyncio.sleep(3)
             await message.channel.delete_messages([msg_1, msg_2])
             return
     engine = await database.prepare_engine()
@@ -152,6 +153,7 @@ async def free_money_handler(client, message):
         "User {0} has gained {1} coins!"
         .format(msg.author.mention, amount)
     )
+    await asyncio.sleep(3)
     await message.channel.delete_messages([msg_1, msg_3, msg_4])
 
 

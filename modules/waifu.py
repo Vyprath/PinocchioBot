@@ -1,5 +1,6 @@
 import database
 import discord
+import asyncio
 from .currency import _fetch_wallet, _remove_money, _add_money
 
 
@@ -120,6 +121,25 @@ async def _buy(client, message, *args):
         if wallet - cost < 0:
             await message.channel.send("You do not have enough money :angry:")
             return
+        await message.channel.send("Want to buy for sure? Reply with `confirm` in 60s or `exit`.")
+
+        def check(m):
+            return (m.author.id != client.user.id and
+                    m.channel == message.channel and message.author == m.author)
+        sure = False
+        while not sure:
+            try:
+                msg = await client.wait_for('message', check=check, timeout=60)
+                if msg.content == 'confirm':
+                    sure = True
+                elif msg.content == 'exit':
+                    await message.channel.send("Okay, exiting...")
+                    return
+                else:
+                    await message.channel.send("Respond properly. Write `exit` to exit.")
+            except asyncio.TimeoutError:
+                await message.channel.send('Error: Timeout.')
+                return
         await _remove_money(engine, message.author, cost)
         fetch_query = database.Member.select().where(
             database.Member.c.member == message.author.id
@@ -153,10 +173,57 @@ async def waifu(client, message, *args):
 !waifu buy <name/id>
 !waifu sell <name/id> *not yet implemented
 !waifu trade <user to trade with> <waifu name/id> <price> *not yet implemented
+!harem
 """)
         return
 
 
+async def _harem(client, message, member):
+    engine = await database.prepare_engine()
+    async with engine.acquire() as conn:
+        query = database.PurchasedWaifu.select().where(
+            database.PurchasedWaifu.c.member == member.id
+        ).where(
+            database.PurchasedWaifu.c.guild == message.guild.id)
+        cursor = await conn.execute(query)
+        resp = await cursor.fetchall()
+        if resp is None or len(resp) == 0:
+            await message.channel.send(
+                "{0}#{1} does not have a harem. Lonely life :(".format(
+                    member.name, member.discriminator)
+            )
+            return
+        purchased_waifus = resp
+        waifu_ids = [x[database.PurchasedWaifu.c.waifu_id] for x in purchased_waifus]
+        query = database.Waifu.select().where(database.Waifu.c.id.in_(waifu_ids))
+        cursor = await conn.execute(query)
+        resp = await cursor.fetchall()
+        waifus = {x[database.Waifu.c.id]: x for x in resp}
+    resp_string = "{0} found in {1}'s locker:\n".format(len(purchased_waifus), member.name)
+    for row in purchased_waifus:
+        data = waifus[row[database.PurchasedWaifu.c.waifu_id]]
+        resp_string += (
+            "**{0}**: ID is {1}, from *{2}*. Bought for **{3}** coins.\n".
+            format(data[database.Waifu.c.name], data[database.Waifu.c.id],
+                   data[database.Waifu.c.from_anime], row[database.PurchasedWaifu.c.purchased_for])
+        )
+        if len(resp_string) > 1600:
+            await message.channel.send(resp_string)
+            resp_string = ""
+    resp_string += "\nTo view details, do `!waifu details <name/id>`"
+    await message.channel.send(resp_string)
+
+
+async def harem(client, message, *args):
+    if len(args) == 0:
+        await _harem(client, message, message.author)
+    elif len(args) == 1 and len(message.mentions) == 1:
+        await _harem(client, message, message.mentions[0])
+    else:
+        await message.channel.send("View your or others' harem list with `!harem [user mention]`.")
+
+
 waifu_functions = {
-    'waifu': (waifu, "For your loneliness.")
+    'waifu': (waifu, "For your loneliness."),
+    'harem': (harem, "Your waifu list. Now go, show off."),
 }
