@@ -8,7 +8,7 @@ async def _get_gif(search_string):
     async with aiohttp.ClientSession() as session:
         async with session.get(variables.GIF_SEARCH_URL(search_string)) as resp:
             gifs = await resp.text()
-            url = json.loads(gifs)['results'][0]['media'][0]['gif']['url']
+            url = json.loads(gifs)['results'][0]['media'][0]['tinygif']['url']
         async with session.get(url) as resp:
             gif = await resp.read()
         return gif
