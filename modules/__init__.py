@@ -24,6 +24,7 @@ from .general import general_functions
 from .currency import currency_functions, currency_handlers
 from .shop import shop_functions
 from .waifu import waifu_functions
+from .reactions import reactions_functions
 
 
 async def message_resolve(client, message, cmd_prefix):
@@ -66,5 +67,6 @@ functions.update(devtest_functions)
 functions.update(currency_functions)
 functions.update(shop_functions)
 functions.update(waifu_functions)
+functions.update(reactions_functions)
 
 handlers += currency_handlers

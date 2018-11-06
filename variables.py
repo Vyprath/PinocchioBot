@@ -1,5 +1,6 @@
 import os
 
+# Core
 PREFIX = os.environ.get('PREFIX', '!')
 TOKEN = os.environ.get('TOKEN')
 if TOKEN is None:
@@ -13,6 +14,15 @@ DB_NAME = os.environ.get('DB_NAME')
 if DB_USERNAME is None or DB_NAME is None:
     raise Exception('Environmental variables for database not set')
 ENGINE_URL = "postgresql://{0}:{1}@localhost:5432/{2}".format(DB_USERNAME, DB_PASSWORD, DB_NAME)
+
+
+# GIF (tenor.com)
+GIF_API_KEY = 'XV5HX3J1KYK7'
+GIF_ANON_ID = ''  # Set in main.py during runtime.
+GET_ANON_ID_URL = 'https://api.tenor.com/v1/anonid?key={}'.format(GIF_API_KEY)
+def GIF_SEARCH_URL(term, inline=False):  # noqa
+    return 'https://api.tenor.com/v1/random?q={0}&key={1}&limit={2}&anon_id={3}&media_filter=minimal'.format(  # noqa
+        term, GIF_API_KEY, 1, GIF_ANON_ID)
 
 
 # Bot

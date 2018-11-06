@@ -1,3 +1,5 @@
 # discord.py[voice] -- To be installed via the submodule folder.
 aiopg
 sqlalchemy
+aiohttp
+requests

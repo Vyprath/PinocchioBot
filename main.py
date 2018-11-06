@@ -2,16 +2,21 @@ import discord
 import logging
 import asyncio
 from modules import message_resolve
-from variables import TOKEN, PREFIX
+import variables
 import database
+import requests
+import json
 
 
 logging.basicConfig(level=logging.INFO)
 loop = asyncio.get_event_loop()
-COMMAND_PREFIX = PREFIX
 loop.create_task(database.prepare_tables())
 client = discord.Client(loop=loop)
-
+tenor_anon_id_request = requests.get(variables.GET_ANON_ID_URL)
+if tenor_anon_id_request.status_code == 200:
+    variables.GIF_ANON_ID = json.loads(tenor_anon_id_request.content)['anon_id']
+else:
+    raise Exception("Tenor not working.")
 
 @client.event
 async def on_ready():
@@ -22,7 +27,7 @@ async def on_ready():
 @client.event
 async def on_message(message):
     await database.make_guild_entry(client.guilds)
-    await message_resolve(client, message, COMMAND_PREFIX)
+    await message_resolve(client, message, variables.PREFIX)
 
 
 @client.event
@@ -35,4 +40,4 @@ async def on_guild_join(guild):
     await database.make_guild_entry([guild])
     await database.make_member_profile(guild.members, client.user.id)
 
-client.run(TOKEN)
+client.run(variables.TOKEN)
