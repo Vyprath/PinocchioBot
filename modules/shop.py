@@ -2,22 +2,24 @@ from .currency import _remove_money, _fetch_wallet
 import database
 import discord
 import asyncio
+from variables import CUSTOM_ROLE_COST
 
 
 async def buy_colored_role(client, message, *args):
     engine = await database.prepare_engine()
-    COST = 10000
     await message.channel.send("Welcome to the custom colored role creator!")
     wallet = await _fetch_wallet(engine, message.author)
-    if wallet - COST < 0:
+    if wallet - CUSTOM_ROLE_COST < 0:
         await message.channel.send(
-            "Unfortunately you don't have enough money. Cost is {0} coins".format(COST))
+            "Unfortunately you don't have enough money. Cost is {0} coins".format(CUSTOM_ROLE_COST))
         return
     await message.channel.send(
         "Enter the color (Either enter a hex code like `0x00ff00`, or enter an 8-bit RGB sequence like `0 255 0`):")  # noqa
 
     def check(m):
-        return (m.author.id != client.user.id and m.channel == message.channel)
+        return (m.author.id != client.user.id
+                and m.channel == message.channel
+                and m.author.id == message.author.id)
 
     try:
         msg = await client.wait_for('message', check=check, timeout=180)
@@ -48,7 +50,7 @@ async def buy_colored_role(client, message, *args):
     except (AssertionError, ValueError):
         await message.channel.send("Invalid text entered. Exiting...")
         return
-    await _remove_money(engine, message.author, COST)
+    await _remove_money(engine, message.author, CUSTOM_ROLE_COST)
     role = await message.guild.create_role(
         name=role_name, color=color, reason="Bought this custom role.")
     await message.author.add_roles(role, reason="Bought this custom role.")
@@ -87,7 +89,9 @@ Exit this menu by writing `exit-paid-roles`.
         )
 
         def check(m):
-            return m.channel == message.channel and m.author.id != client.user.id
+            return (m.channel == message.channel and
+                    m.author.id != client.user.id and
+                    m.author.id == message.author.id)
         try:
             role_id = None
             while role_id is None:

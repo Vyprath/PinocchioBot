@@ -2,11 +2,15 @@ import database
 import discord
 import asyncio
 from .currency import _fetch_wallet, _remove_money, _add_money
+from variables import SELL_WAIFU_DEPRECIATION
 
 
 async def _search(client, message, *args):
-    engine = await database.prepare_engine()
     search_string = '%' + ' '.join(args[1:]).lower().strip() + '%'
+    if len(search_string) < 5:
+        await message.channel.send("Please enter atleast 3 or more characters.")
+        return
+    engine = await database.prepare_engine()
     async with engine.acquire() as conn:
         query = database.Waifu.select().where(
             database.Waifu.c.name.ilike(search_string) |
@@ -17,6 +21,8 @@ async def _search(client, message, *args):
             await message.channel.send(
                 "Waifu not found! Contact developer, he will add it.")
             return
+        if len(resp) > 15:
+            resp = resp[:15]
     resp_string = "{0} found in the dungeon:\n".format(len(resp))
     for row in resp:
         resp_string += (
@@ -125,7 +131,7 @@ async def _buy(client, message, *args):
 
         def check(m):
             return (m.author.id != client.user.id and
-                    m.channel == message.channel and message.author == m.author)
+                    m.channel == message.channel and message.author.id == m.author.id)
         sure = False
         while not sure:
             try:
@@ -159,6 +165,68 @@ async def _buy(client, message, *args):
         await message.channel.send("Successfully bought waifu :thumbsup:. Don't lewd them!")
 
 
+async def _sell(client, message, *args):
+    engine = await database.prepare_engine()
+    async with engine.acquire() as conn:
+        if len(args) == 2 and args[1].isdigit():
+            search_id = int(args[1])
+            query = database.Waifu.select().where(
+                database.Waifu.c.id == search_id)
+        else:
+            search_string = '%' + ' '.join(args[1:]).lower().strip() + '%'
+            query = database.Waifu.select().where(
+                database.Waifu.c.name.ilike(search_string))
+        cursor = await conn.execute(query)
+        resp = await cursor.fetchone()
+        if resp is None:
+            await message.channel.send(
+                "Waifu not found! Don't sell your imaginary waifus.")
+            return
+        query = database.PurchasedWaifu.select().where(
+            database.PurchasedWaifu.c.waifu_id == resp[database.Waifu.c.id]
+        ).where(
+            database.PurchasedWaifu.c.guild == message.guild.id
+        ).where(
+            database.PurchasedWaifu.c.member == message.author.id)
+        cursor = await conn.execute(query)
+        purchased_waifu = await cursor.fetchone()
+        if purchased_waifu is None:
+            await message.channel.send(
+                "By what logic are you trying to sell a waifu you don't own? :rolling_eyes:")
+            return
+        cost = purchased_waifu[database.PurchasedWaifu.c.purchased_for] * SELL_WAIFU_DEPRECIATION
+        cost = int(cost)
+        await message.channel.send(
+            "Want to sell for sure? You will get back {0}% of the cost, {1} coins. Reply with `confirm` in 60s or `exit`.".format(  # noqa
+                SELL_WAIFU_DEPRECIATION * 100, cost))
+
+        def check(m):
+            return (m.author.id != client.user.id and
+                    m.channel == message.channel and message.author.id == m.author.id)
+        sure = False
+        while not sure:
+            try:
+                msg = await client.wait_for('message', check=check, timeout=60)
+                if msg.content == 'confirm':
+                    sure = True
+                elif msg.content == 'exit':
+                    await message.channel.send("Okay, exiting...")
+                    return
+                else:
+                    await message.channel.send("Respond properly. Write `exit` to exit.")
+            except asyncio.TimeoutError:
+                await message.channel.send('Error: Timeout.')
+                return
+        delete_query = database.PurchasedWaifu.delete().where(
+            database.PurchasedWaifu.c.waifu_id == purchased_waifu[database.PurchasedWaifu.c.waifu_id]  # noqa
+        ).where(
+            database.PurchasedWaifu.c.member_id == purchased_waifu[database.PurchasedWaifu.c.member_id]  # noqa
+        )
+        await conn.execute(delete_query)
+        await _add_money(engine, message.author, cost)
+        await message.channel.send("Successfully transferred waifu from your locker to the dungeon :thumbsup:.")  # noqa
+
+
 async def waifu(client, message, *args):
     if len(args) > 1 and args[0] == 'search':
         return await _search(client, message, *args)
@@ -166,14 +234,16 @@ async def waifu(client, message, *args):
         return await _details(client, message, *args)
     elif len(args) > 1 and args[0] == 'buy':
         return await _buy(client, message, *args)
+    elif len(args) > 1 and args[0] == 'sell':
+        return await _sell(client, message, *args)
     else:
         await message.channel.send("""Usage:
-!waifu search <name>
-!waifu details <name/id>
-!waifu buy <name/id>
-!waifu sell <name/id> *not yet implemented
-!waifu trade <user to trade with> <waifu name/id> <price> *not yet implemented
-!harem
+`!waifu search <name>`: Search for a waifu
+`!waifu details <name/id>`: Get the details for a waifu
+`!waifu buy <name/id>`: Buy a waifu
+`!waifu sell <name/id>`: Sell your waifu
+`!waifu trade <user to trade with> <waifu name/id> <price>`: Trade your waifus with someone **not yet implemented**
+`!harem`: Get your harem, aka your bought waifus.
 """)
         return
 

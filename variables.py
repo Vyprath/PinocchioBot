@@ -13,3 +13,8 @@ DB_NAME = os.environ.get('DB_NAME')
 if DB_USERNAME is None or DB_NAME is None:
     raise Exception('Environmental variables for database not set')
 ENGINE_URL = "postgresql://{0}:{1}@localhost:5432/{2}".format(DB_USERNAME, DB_PASSWORD, DB_NAME)
+
+
+# Bot
+CUSTOM_ROLE_COST = 10000
+SELL_WAIFU_DEPRECIATION = 0.6
