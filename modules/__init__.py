@@ -25,6 +25,7 @@ from .currency import currency_functions, currency_handlers
 from .shop import shop_functions
 from .waifu import waifu_functions
 from .reactions import reactions_functions
+from messages import HELP_MESSAGE
 
 
 async def message_resolve(client, message, cmd_prefix):
@@ -40,11 +41,19 @@ async def message_resolve(client, message, cmd_prefix):
 
 async def print_help(client, message, *args):
     if len(args) == 0:
-        await message.channel.send("I think I am supposed to add a help message here...")
+        text = ""
+        for line in HELP_MESSAGE.splitlines(True):
+            text += line
+            if len(text) > 1850:
+                await message.author.send(text)
+                text = ""
+        if text != "":
+            await message.author.send(text)
+        await message.channel.send("DM-ed the help message!")
     elif args[0] in functions.keys():
         help_string = functions[args[0]][1]
         if help_string is None:
-            help_string = "The developer says: fcuk off."
+            help_string = "No help message for this command."
         await message.channel.send("`{0}`: {1}".format(args[0], help_string))
 
 """

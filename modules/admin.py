@@ -33,8 +33,8 @@ async def set_paid_roles(client, message, *args):
         await message.channel.send(
             """
 Current paid roles are: ```{0}```\n
-To set, run `@paidroles set <role mention> <amount>`\n
-To remove, run `@paidroles delete <role mention>`
+To set, run `!@paidroles set <role mention> <amount>`\n
+To remove, run `!@paidroles delete <role mention>`
             """
             .format(shop_roles_string)
         )

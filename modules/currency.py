@@ -53,14 +53,18 @@ async def _remove_money(engine, member, amount):
 
 async def fetch_wallet(client, message, *args):
     engine = await database.prepare_engine()
-    if len(args) == 0:
+    if len(message.mentions) == 0:
         wallet = await _fetch_wallet(engine, message.author)
-        if wallet is None:
-            await database.make_member_profile([message.author], client.user.id)
-            wallet = await _fetch_wallet(engine, message.author)
         await message.channel.send(
-            "Heya, {0}. You have `{1}` coins in your wallet."
-            .format(message.author.mention, wallet)
+            "You have `{0}` coins in your wallet."
+            .format(wallet)
+            )
+    else:
+        member = message.mentions[0]
+        wallet = await _fetch_wallet(engine, member)
+        await message.channel.send(
+            "{1} has `{0}` coins in their wallet."
+            .format(wallet, member.name)
             )
 
 
