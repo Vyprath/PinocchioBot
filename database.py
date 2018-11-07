@@ -15,6 +15,7 @@ Member = sa.Table(
     sa.Column('guild', sa.BigInteger, nullable=False),
     sa.Column('member', sa.BigInteger, nullable=False),
     sa.Column('wallet', sa.BigInteger, default=0, nullable=False),
+    sa.Column('last_dailies', sa.DateTime),
 )
 
 Guild = sa.Table(

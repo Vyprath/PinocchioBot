@@ -3,6 +3,8 @@ import random
 import string
 import asyncio
 import time
+import datetime
+from variables import FREE_MONEY_SPAWN_LIMIT, DAILIES_AMOUNT
 # TODO: Handle in case profile not yet created.
 
 
@@ -104,6 +106,40 @@ async def transfer_money(client, message, *args):
     )
 
 
+async def dailies(client, message, *args):
+    engine = await database.prepare_engine()
+    async with engine.acquire() as conn:
+        fetch_query = database.Member.select().where(
+            database.Member.c.member == message.author.id
+        ).where(
+            database.Member.c.guild == message.guild.id
+        )
+        cursor = await conn.execute(fetch_query)
+        member = await cursor.fetchone()
+        last_dailies = member[database.Member.c.last_dailies]
+        if last_dailies is not None:
+            last_dailies = datetime.datetime.fromisoformat(str(last_dailies))
+        now = datetime.datetime.now()
+        _now_day = now.day if now.hour > 12 else now.day - 1
+        last_reset = datetime.datetime(now.year, now.month, _now_day, 12)
+        if last_dailies is None or last_dailies < last_reset:
+            update_query = database.Member.update().where(
+                database.Member.c.member == message.author.id
+            ).where(
+                database.Member.c.guild == message.guild.id
+            ).values(last_dailies=now.isoformat())
+            await conn.execute(update_query)
+            await _add_money(engine, message.author, DAILIES_AMOUNT)
+            await message.channel.send("Recieved {0} coins. :thumbsup:".format(DAILIES_AMOUNT))
+        else:
+            tdelta_hours = ((last_reset - last_dailies).seconds)//3600
+            tdelta_mins = ((last_reset - last_dailies).seconds)//60 - (tdelta_hours * 60)
+            await message.channel.send(
+                "Please wait {0} hours and {1} minutes more to get dailies.".format(
+                    tdelta_hours, tdelta_mins
+                ))
+
+
 free_money_channels = {}
 passive_money_users = {}
 
@@ -117,10 +153,10 @@ async def free_money_handler(client, message):
         if now - last > 60:
             passive_money_users[message.author.id] = now
             engine = await database.prepare_engine()
-            await _add_money(engine, message.author, random.randint(10, 40))
+            await _add_money(engine, message.author, random.randint(1, 20))
     else:
         passive_money_users.update({message.author.id: now})
-    N = 50
+    N = FREE_MONEY_SPAWN_LIMIT
     try:
         e = free_money_channels[message.channel.id]
         if e != random.randint(1, N):
@@ -165,5 +201,6 @@ currency_functions = {
     'wallet': (fetch_wallet, 'Check your wallet.'),
     'get-money': (get_money, 'Get yourself some coins.'),
     'transfer-money': (transfer_money, 'Transfer your money.'),
+    'dailies': (dailies, 'Come, collect your free money.'),
 }
 currency_handlers = [free_money_handler]
