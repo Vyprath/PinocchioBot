@@ -1,4 +1,4 @@
-from variables import COMMAND_PREFIX
+from variables import PREFIX
 
 
 HELP_MESSAGE = """
@@ -35,4 +35,4 @@ __*Usage* `{0}<command name>`:__ `{0}laugh`,`{0}cry`,`{0}blush`,`{0}confused`,`{
 `{0}get-money <amount>`: Get some money.
 `{0}@paidroles`: Set up paid roles.
 `{0}@purge <number of messages>`: Purge messages from the channel.
-""".format(COMMAND_PREFIX)
+""".format(PREFIX)
