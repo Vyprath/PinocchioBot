@@ -24,7 +24,7 @@ def gif(gif_name=None, action="",  requires_mention=False):
                 await message.channel.send("Usage: `!gif <search string>`")
                 return
             else:
-                search_str = ' '.join(*args)
+                search_str = ' '.join(args)
         if requires_mention:
             mention = message.mentions[0]
             mention_name = mention.name if mention.id != message.author.id else "themself ;-;"
@@ -39,6 +39,7 @@ def gif(gif_name=None, action="",  requires_mention=False):
 
 
 reactions_functions = {
+    'facepalm': (gif('facepalm', "*Facepalms*"), None),
     'cry': (gif('cry', "*Cries*"), None),
     'laugh': (gif('laugh', "*Laughs*"), None),
     'confused': (gif('confused', "*Confused*"), None),

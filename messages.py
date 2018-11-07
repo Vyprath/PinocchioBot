@@ -21,9 +21,10 @@ __**Pinocchio Bot Usage:**__
 
 **Reactions**
 __*Usage* `!<command name> <@user mention>`:__ `!hug`,`!kiss`,`!pat`,`!tickle`,`!bite`,`!kick`,
-`!slap`,`!punch`,`!poke`
+`!slap`,`!punch`,`!poke`.
 __*Usage* `!<command name>`:__ `!laugh`,`!cry`,`!blush`,`!confused`,`!jojo`,`!megumin`,`!satania`,
-`!pout`,`!dance`,`!nom`,`!lick`,`!think`,`!shrug`,`!owo`,`!eyeroll`,`!lewd`,`!stare`,`!triggered`
+`!pout`,`!dance`,`!nom`,`!lick`,`!think`,`!shrug`,`!owo`,`!eyeroll`,`!lewd`,`!stare`,`!triggered`,
+`!facepalm`.
 `!gif <search string>`: Search for a GIF.
 
 **Administration (Below commands require Admininstrator Permission)**
