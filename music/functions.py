@@ -37,7 +37,7 @@ Or ask everyone to leave the previous voice channel.
 
 async def _play_music(message, voice_client, guild_state):
     if len(guild_state.playlist) == 0:
-        await voice_client.disconnect()
+        await stop_bot(voice_client, message.guild.id)
     music = guild_state.playlist.pop(0)
     guild_state.now_playing = music
     source = discord.PCMVolumeTransformer(
@@ -52,6 +52,14 @@ async def _play_music(message, voice_client, guild_state):
     embed = music.get_embed()
     embed.remove_field(1)
     await message.channel.send("Now Playing", embed=embed)
+
+
+async def stop_bot(voice_client, guild_id):
+    if voice_client.is_playing():
+        voice_client.stop()
+    if guild_id in guild_states:
+        guild_states.pop(guild_id)
+    await voice_client.disconnect()
 
 
 async def play(client, message, *args):
@@ -89,18 +97,18 @@ async def play(client, message, *args):
 async def skip(client, message, *args):
     guild_state = get_guild_state(message.guild)
     voice_client = await ensure_in_voice_channel(message)
-    if not voice_client:
+    if voice_client is None:
         return
     if guild_state.now_playing is None:
         await message.channel.send("Not playing anything now.")
         return
     if len(guild_state.playlist) == 0:
         await message.channel.send("Skipped. Nothing remains in playlist. Exiting.")
-        await voice_client.stop()
-        await voice_client.disconnect()
+        await stop_bot(voice_client, message.guild.id)
     else:
         await message.channel.send("Skipped")
-        await voice_client.stop()
+        if voice_client.is_playing():
+            voice_client.stop()
         await _play_music(message, voice_client, guild_state)
 
 
@@ -109,25 +117,71 @@ async def leave(client, message, *args):
         await message.channel.send("This command is restricted, to be used only by gods.")
         return
     voice_client = message.guild.voice_client
-    if not voice_client:
+    if voice_client is None:
         await message.channel.send("Not connected to any voice channels.")
         return
-    guild_states.pop(message.guild.id)
-    await voice_client.stop()
-    await voice_client.disconnect()
+    await stop_bot(voice_client, message.guild.id)
+
+
+async def queue(client, message, *args):
+    voice_client = await ensure_in_voice_channel(message)
+    guild_state = get_guild_state(message.guild)
+    if not voice_client:
+        return
+    playlist = guild_state.playlist
+    if guild_state.now_playing is not None:
+        playlist.insert(0, guild_state.now_playing)
+    if playlist == []:
+        await message.channel.send("Playlist is empty.")
+    else:
+        msg = "Current Queue:\n"
+        duration = 0
+        for i, v in enumerate(playlist):
+            hours = duration//3600
+            mins = duration//60 - hours*60
+            secs = duration - mins*60 - hours*3600
+            plays_in_txt = (
+                "Plays in: {0:>02d}:{1:>02d}:{2:>02d}".format(hours, mins, secs)
+                if duration > 0 else "Now Playing")
+            msg += "{0}. **{1}** by *{2}*. Duration: {3}. {4}.\n".format(
+                i + 1, v.title, v.uploader, v.duration, plays_in_txt)
+            duration += v.duration
+            if len(msg) > 1800:
+                await message.channel.send(msg)
+                msg = ""
+        if msg != "":
+            await message.channel.send(msg)
+
+
+async def volume(client, message, *args):
+    voice_client = ensure_in_voice_channel(message)
+    if voice_client is None:
+        return
+    guild_state = get_guild_state(message.guild)
+    if len(args) != 1 or not args[0].isdigit() or not (1 <= int(args[0]) <= 200):
+        await message.channel.send("Usage: !volume <volume % between 1 to 200>")
+        return
+    volume = int(args[0])/100
+    guild_state.volume = volume
+    await message.channel.send(
+        "Set volume to {0}%. Please skip current song. :thumbsup:".format(args[0]))
 
 
 async def on_voice_state_update(member, before, after):
     voice_client = member.guild.voice_client
-    members_list = [x for x in voice_client.channel.members if not x.bot]
+    if voice_client:
+        members_list = [x for x in voice_client.channel.members if not x.bot]
+    else:
+        members_list = 0
     if voice_client is not None and len(members_list) == 0:
-        guild_states.pop(member.guild.id)
-        await voice_client.stop()
-        await voice_client.disconnect()
+        await stop_bot(voice_client, member.guild.id)
 
 
 music_functions = {
+    'p': (play, "Play some musix."),
     'play': (play, "Play some musix."),
     'leave': (leave, "Leave the voice channel."),
-    'skip': (skip, "Skip the current song.")
+    'skip': (skip, "Skip the current song."),
+    'queue': (queue, "View current queue."),
+    'volume': (volume, "Set volume (default 100%).")
 }

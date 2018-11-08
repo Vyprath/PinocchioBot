@@ -34,9 +34,11 @@ __*Usage* `{0}<command name>`:__ `{0}laugh`,`{0}cry`,`{0}blush`,`{0}confused`,`{
 **Lag Free Music** __(Donator-exclusive feature)__
 *NOTE: To use these commands, you have to donate to the bot.*
 *After donating, please contact <@252297314394308608> to enable this.*
-`{0}play`: Play some musix.
+`{0}play`/`{0}p`: Play some musix.
 `{0}leave`: Make the bot leave the music channel **Requires administrator permission**
 `{0}skip`: Skip the current song.
+`{0}queue`: Get current playlist.
+`{0}volume`: Set the volume. Default: 100.
 
 **Administration (Below commands require Admininstrator Permission)**
 `{0}get-money <amount>`: Get some money.
