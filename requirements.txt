@@ -3,3 +3,4 @@ aiopg
 sqlalchemy
 aiohttp
 requests
+youtube-dl

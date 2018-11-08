@@ -23,6 +23,7 @@ Guild = sa.Table(
     sa.Column('id', sa.BigInteger, primary_key=True, nullable=False),
     sa.Column('guild', sa.BigInteger, nullable=False),
     sa.Column('shop_roles', sa.JSON),
+    sa.Column('music_enabled', sa.Boolean)
 )
 
 Waifu = sa.Table(

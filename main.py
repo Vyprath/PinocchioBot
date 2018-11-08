@@ -1,11 +1,12 @@
 import discord
 import logging
 import asyncio
-from modules import message_resolve
 import variables
 import database
 import requests
 import json
+from modules import message_resolve
+from music import functions
 
 
 logging.basicConfig(level=logging.INFO)
@@ -17,6 +18,7 @@ if tenor_anon_id_request.status_code == 200:
     variables.GIF_ANON_ID = json.loads(tenor_anon_id_request.content)['anon_id']
 else:
     raise Exception("Tenor not working.")
+
 
 @client.event
 async def on_ready():
@@ -39,5 +41,10 @@ async def on_member_join(member):
 async def on_guild_join(guild):
     await database.make_guild_entry([guild])
     await database.make_member_profile(guild.members, client.user.id)
+
+
+@client.event
+async def on_voice_state_update(member, before, after):
+    await functions.on_voice_state_update(member, before, after)
 
 client.run(variables.TOKEN)

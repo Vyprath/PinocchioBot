@@ -31,6 +31,13 @@ __*Usage* `{0}<command name>`:__ `{0}laugh`,`{0}cry`,`{0}blush`,`{0}confused`,`{
 `{0}eyeroll`,`{0}lewd`,`{0}stare`,`{0}triggered`,`{0}facepalm`.
 `{0}gif <search string>`: Search for a GIF.
 
+**Lag Free Music** __(Donator-exclusive feature)__
+*NOTE: To use these commands, you have to donate to the bot.*
+*After donating, please contact <@252297314394308608> to enable this.*
+`{0}play`: Play some musix.
+`{0}leave`: Make the bot leave the music channel **Requires administrator permission**
+`{0}skip`: Skip the current song.
+
 **Administration (Below commands require Admininstrator Permission)**
 `{0}get-money <amount>`: Get some money.
 `{0}@paidroles`: Set up paid roles.
