@@ -119,7 +119,7 @@ async def leave(client, message, *args):
 
 async def on_voice_state_update(member, before, after):
     voice_client = member.guild.voice_client
-    if voice_client and len(voice_client.channel.members) == 0:
+    if voice_client is not None and len(voice_client.channel.members) == 0:
         guild_states.pop(member.guild.id)
         await voice_client.stop()
         await voice_client.disconnect()
