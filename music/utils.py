@@ -44,14 +44,14 @@ class MusicInfo:
         secs = self.duration - mins*60
         embed.add_field(
             name="Duration",
-            value="{0}:{1}".format(mins, secs))
+            value="{0:>02d}:{1:>02d}".format(mins, secs))
         if self.time_left:
             hours = self.time_left//3600
             mins = self.time_left//60 - hours*60
             secs = self.time_left - mins*60 - hours*3600
             embed.add_field(
                 name="Will Play In",
-                value="{0}:{1}:{2}".format(hours, mins, secs))
+                value="{0:>02d}:{1:>02d}:{2:>02d}".format(hours, mins, secs))
         if self.thumbnail:
             embed.set_thumbnail(url=self.thumbnail)
         embed.set_footer(text="Requested by: {0}".format(self.requested_by.name),
