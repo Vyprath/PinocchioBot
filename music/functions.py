@@ -112,6 +112,8 @@ async def leave(client, message, *args):
     if not voice_client:
         await message.channel.send("Not connected to any voice channels.")
         return
+    guild_states.pop(message.guild.id)
+    await voice_client.stop()
     await voice_client.disconnect()
 
 
