@@ -3,7 +3,6 @@ import discord
 import asyncio
 
 
-summoners = {}
 guild_states = {}
 
 
@@ -24,7 +23,6 @@ async def ensure_in_voice_channel(message):
         return None
     if voice_client is None:
         voice_client = await voice_state.channel.connect()
-        summoners.update({hash(voice_client): message.author})
         return voice_client
     elif voice_client.channel == voice_state.channel:
         return voice_client
@@ -32,8 +30,8 @@ async def ensure_in_voice_channel(message):
         await message.channel.send("""
 Bot is already connected to a voice channel.
 Make the bot leave previous voice channel with `!leave`. Requires **administrator** permission.
-Or ask {} to leave the previous voice channel.
-""".format(summoners[hash(voice_client)].name))
+Or ask everyone to leave the previous voice channel.
+""")
         return None
 
 
@@ -114,16 +112,12 @@ async def leave(client, message, *args):
     if not voice_client:
         await message.channel.send("Not connected to any voice channels.")
         return
-    summoners.pop(hash(voice_client))
     await voice_client.disconnect()
 
 
 async def on_voice_state_update(member, before, after):
     voice_client = member.guild.voice_client
-    if (voice_client and member in summoners.values() and
-        before.channel == voice_client.channel and
-            after.channel is None):
-        summoners.pop(hash(voice_client))
+    if voice_client and len(voice_client.channel.members) == 0:
         guild_states.pop(member.guild.id)
         await voice_client.stop()
         await voice_client.disconnect()
