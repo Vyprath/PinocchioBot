@@ -123,6 +123,9 @@ async def on_voice_state_update(member, before, after):
     if (voice_client and member in summoners.values() and
         before.channel == voice_client.channel and
             after.channel is None):
+        summoners.pop(hash(voice_client))
+        guild_states.pop(member.guild.id)
+        await voice_client.stop()
         await voice_client.disconnect()
 
 
