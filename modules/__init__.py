@@ -25,6 +25,7 @@ from .currency import currency_functions, currency_handlers
 from .shop import shop_functions
 from .waifu import waifu_functions
 from .reactions import reactions_functions
+from .fun import fun_functions
 from music import music_functions
 from messages import HELP_MESSAGE
 
@@ -77,6 +78,7 @@ functions.update(devtest_functions)
 functions.update(currency_functions)
 functions.update(shop_functions)
 functions.update(waifu_functions)
+functions.update(fun_functions)
 functions.update(reactions_functions)
 functions.update(music_functions)
 

@@ -36,8 +36,9 @@ Or ask everyone to leave the previous voice channel.
 
 
 async def _play_music(message, voice_client, guild_state):
-    if len(guild_state.playlist) == 0:
+    if len(guild_state.playlist) == 0 and guild_state.now_playing is None:
         await stop_bot(voice_client, message.guild.id)
+        return
     music = guild_state.playlist.pop(0)
     guild_state.now_playing = music
     source = discord.PCMVolumeTransformer(
@@ -48,14 +49,16 @@ async def _play_music(message, voice_client, guild_state):
             _play_music(message, voice_client, guild_state),
             voice_client.loop)
 
-    voice_client.play(source, after=after_finished)
     embed = music.get_embed()
     embed.remove_field(1)
     await message.channel.send("Now Playing", embed=embed)
+    if voice_client.is_playing():
+        voice_client.stop()
+    voice_client.play(source, after=after_finished)
 
 
 async def stop_bot(voice_client, guild_id):
-    if voice_client.is_playing():
+    if voice_client.is_playing() or voice_client.is_paused():
         voice_client.stop()
     if guild_id in guild_states:
         guild_states.pop(guild_id)
@@ -107,8 +110,6 @@ async def skip(client, message, *args):
         await stop_bot(voice_client, message.guild.id)
     else:
         await message.channel.send("Skipped")
-        if voice_client.is_playing():
-            voice_client.stop()
         await _play_music(message, voice_client, guild_state)
 
 
@@ -128,10 +129,10 @@ async def queue(client, message, *args):
     guild_state = get_guild_state(message.guild)
     if not voice_client:
         return
-    playlist = guild_state.playlist
+    playlist = guild_state.playlist.copy()
     if guild_state.now_playing is not None:
         playlist.insert(0, guild_state.now_playing)
-    if playlist == []:
+    if len(playlist) == 0:
         await message.channel.send("Playlist is empty.")
     else:
         msg = "Current Queue:\n"
@@ -154,12 +155,12 @@ async def queue(client, message, *args):
 
 
 async def volume(client, message, *args):
-    voice_client = ensure_in_voice_channel(message)
+    voice_client = await ensure_in_voice_channel(message)
     if voice_client is None:
         return
     guild_state = get_guild_state(message.guild)
-    if len(args) != 1 or not args[0].isdigit() or not (1 <= int(args[0]) <= 200):
-        await message.channel.send("Usage: !volume <volume % between 1 to 200>")
+    if len(args) != 1 or not args[0].isdigit() or not (1 <= int(args[0]) <= 100):
+        await message.channel.send("Usage: !volume <volume % between 1 to 100>")
         return
     volume = int(args[0])/100
     guild_state.volume = volume
@@ -167,7 +168,57 @@ async def volume(client, message, *args):
         "Set volume to {0}%. Please skip current song. :thumbsup:".format(args[0]))
 
 
+async def pause(client, message, *args):
+    voice_client = await ensure_in_voice_channel(message)
+    if voice_client is None:
+        return
+    if not voice_client.is_playing():
+        await message.channel.send("Not playing anything.")
+        return
+    voice_client.pause()
+    await message.channel.send("Paused music. :thumbsup:")
+
+
+async def resume(client, message, *args):
+    voice_client = await ensure_in_voice_channel(message)
+    if voice_client is None:
+        return
+    if not voice_client.is_paused():
+        await message.channel.send("Not paused.")
+        return
+    voice_client.resume()
+    await message.channel.send("Resumed music. :thumbsup:")
+
+
+async def status(client, message, *args):
+    voice_client = await ensure_in_voice_channel(message)
+    if voice_client is None:
+        return
+    guild_state = get_guild_state(message.guild)
+    if guild_state.now_playing is None and len(guild_state.playlist) == 0:
+        await message.channel.send("Not playing anything and queue is empty.")
+        return
+    embed = discord.Embed(title="Music Status", color=0x35fd24)
+    if guild_state.now_playing.thumbnail:
+        embed.set_thumbnail(url=guild_state.now_playing.thumbnail)
+    embed.add_field(name="Currently Playing", value=guild_state.now_playing.title, inline=False)
+    next_playing = "Nothing in queue."
+    if len(guild_state.playlist) > 0:
+        next_playing = guild_state.playlist[0].title
+    embed.add_field(name="Next Playing", value=next_playing, inline=False)
+    mins = guild_state.now_playing.duration//60
+    secs = guild_state.now_playing.duration - mins*60
+    embed.add_field(
+        name="Current Music Duration", value="{0:>02d}:{1:>02d}".format(mins, secs), inline=False)
+    req_by = guild_state.now_playing.requested_by
+    embed.set_footer(
+        text="Current one requested by: {0}".format(req_by.name), icon_url=req_by.avatar_url)
+    await message.channel.send(embed=embed)
+
+
 async def on_voice_state_update(member, before, after):
+    if member.bot:
+        return
     voice_client = member.guild.voice_client
     if voice_client:
         members_list = [x for x in voice_client.channel.members if not x.bot]
@@ -183,5 +234,8 @@ music_functions = {
     'leave': (leave, "Leave the voice channel."),
     'skip': (skip, "Skip the current song."),
     'queue': (queue, "View current queue."),
-    'volume': (volume, "Set volume (default 100%).")
+    'volume': (volume, "Set volume (default 100%)."),
+    'pause': (pause, "Pause the music."),
+    'resume': (resume, "Resume the music."),
+    'status': (status, "Get current playing, next one etc.")
 }
