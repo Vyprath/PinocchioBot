@@ -16,6 +16,7 @@ Member = sa.Table(
     sa.Column('member', sa.BigInteger, nullable=False),
     sa.Column('wallet', sa.BigInteger, default=0, nullable=False),
     sa.Column('last_dailies', sa.DateTime),
+    sa.Column('tier', sa.SmallInteger, server_default='0')
 )
 
 Guild = sa.Table(
@@ -45,7 +46,24 @@ PurchasedWaifu = sa.Table(
     sa.Column('purchased_for', sa.BigInteger, nullable=False),
 )
 
-tables = [Member, Guild, Waifu, PurchasedWaifu]
+RPGWeapon = sa.Table(
+    'rpg_weapon', meta,
+    sa.Column('id', sa.BigInteger, primary_key=True, nullable=False),
+    sa.Column('name', sa.String(length=200), nullable=False),
+    sa.Column('effects', sa.JSON, nullable=False)
+)
+
+RPGCharacter = sa.Table(
+    'rpg_character', meta,
+    sa.Column('id', sa.BigInteger, primary_key=True, nullable=False),
+    sa.Column('member', sa.BigInteger, nullable=False),
+    sa.Column('guild', sa.BigInteger, nullable=False),
+    sa.Column('level', sa.Integer, nullable=False),
+    sa.Column('game_wallet', sa.BigInteger, nullable=False),
+    sa.Column('weapon_id', sa.BigInteger, sa.ForeignKey('rpg_weapon.id', ondelete='SET NULL')),
+)
+
+tables = [Member, Guild, Waifu, PurchasedWaifu, RPGWeapon, RPGCharacter]
 
 
 async def prepare_engine():
