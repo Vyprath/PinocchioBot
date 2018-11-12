@@ -1,9 +1,11 @@
 from .utils import MusicInfo, GuildState
+from concurrent.futures import ThreadPoolExecutor
 import discord
 import asyncio
 
 
 guild_states = {}
+executor = ThreadPoolExecutor()
 
 
 def get_guild_state(guild):
@@ -35,16 +37,21 @@ Or ask everyone to leave the previous voice channel.
         return None
 
 
-async def _play_music(message, voice_client, guild_state):
-    if len(guild_state.playlist) == 0 and guild_state.now_playing is None:
+async def _play_music(message, voice_client, guild_state, skip=False):
+    if len(guild_state.playlist) == 0:
         await stop_bot(voice_client, message.guild.id)
         return
+    if guild_state.requested_skip:
+        guild_state.requested_skip = False
+        return
+    guild_state.requested_skip = skip
     music = guild_state.playlist.pop(0)
     guild_state.now_playing = music
     source = discord.PCMVolumeTransformer(
         discord.FFmpegPCMAudio(music.stream_url), volume=guild_state.volume)
 
     def after_finished(err):
+        # TODO: Fix non stopping bug.
         asyncio.run_coroutine_threadsafe(
             _play_music(message, voice_client, guild_state),
             voice_client.loop)
@@ -65,6 +72,11 @@ async def stop_bot(voice_client, guild_id):
     await voice_client.disconnect()
 
 
+def _get_music_info(args, message, duration):
+    info = MusicInfo(' '.join(args), message.author, duration)
+    return info
+
+
 async def play(client, message, *args):
     voice_client = await ensure_in_voice_channel(message)
     guild_state = get_guild_state(message.guild)
@@ -82,7 +94,10 @@ async def play(client, message, *args):
         )
         return
     try:
-        info = MusicInfo(' '.join(args), message.author, duration)
+        _info = await asyncio.gather(
+            client.loop.run_in_executor(executor, _get_music_info, args, message, duration)
+        )
+        info = _info[0]
     except AssertionError:
         await message.channel.send(
             "Music was not found! If it is youtube, make sure it is a public video."
@@ -110,7 +125,7 @@ async def skip(client, message, *args):
         await stop_bot(voice_client, message.guild.id)
     else:
         await message.channel.send("Skipped")
-        await _play_music(message, voice_client, guild_state)
+        await _play_music(message, voice_client, guild_state, True)
 
 
 async def leave(client, message, *args):
@@ -144,8 +159,12 @@ async def queue(client, message, *args):
             plays_in_txt = (
                 "Plays in: {0:>02d}:{1:>02d}:{2:>02d}".format(hours, mins, secs)
                 if duration > 0 else "Now Playing")
+            hours = v.duration//3600
+            mins = v.duration//60 - hours*60
+            secs = v.duration - mins*60 - hours*3600
+            duration_txt = "{0:>02d}:{1:>02d}:{2:>02d}".format(hours, mins, secs)
             msg += "{0}. **{1}** by *{2}*. Duration: {3}. {4}.\n".format(
-                i + 1, v.title, v.uploader, v.duration, plays_in_txt)
+                i + 1, v.title, v.uploader, duration_txt, plays_in_txt)
             duration += v.duration
             if len(msg) > 1800:
                 await message.channel.send(msg)

@@ -64,6 +64,7 @@ class GuildState:
         self.volume = 1.0
         self.playlist = []
         self.now_playing = None
+        self.requested_skip = False
 
         def is_requester(self, member):
             return self.now_playing.requested_by == member
