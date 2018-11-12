@@ -50,7 +50,7 @@ __*Usage* `{0}<command name>`:__ `{0}laugh`,`{0}cry`,`{0}blush`,`{0}confused`,`{
 **Administration (Below commands require Admininstrator Permission)**
 `{0}get-money <amount>`: Get some money.
 `{0}@paidroles`: Set up paid roles.
-`{0}@purge <number of messages>`: Purge messages from the channel.
+`{0}@purge <number of messages between 1 to 100>`: Purge messages from the channel.
 
 **NOTE: Bot is still in pre-alpha. Be prepared for bugs. Report bugs at https://discord.gg/F6REE6P**
 """.format(PREFIX)

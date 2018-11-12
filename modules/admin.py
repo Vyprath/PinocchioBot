@@ -1,11 +1,19 @@
 import database
+import asyncio
 
 
 async def clean(client, message, *args):
     if not message.author.guild_permissions.administrator:
         await message.channel.send("This command is restricted, to be used only by gods.")
         return
-    await message.channel.send("Not yet implemented... dev note: ez to implement. do it fast.")
+    if len(args) != 1 or not args[0].isdigit() or not (1 <= int(args[0]) <= 100):
+        await message.channel.send("Usage: !purge <limit between 1 to 100>")
+        return
+    limit = int(args[0])
+    await message.channel.purge(limit=limit)
+    msg = await message.channel.send("Successfully deleted {0} messages. :thumbsup:".format(limit))
+    await asyncio.sleep(3)
+    await msg.delete()
 
 
 async def set_paid_roles(client, message, *args):
