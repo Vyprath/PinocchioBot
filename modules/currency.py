@@ -90,7 +90,7 @@ async def transfer_money(client, message, *args):
     engine = await database.prepare_engine()
     if len(args) != 2 or not args[1].isdigit() or len(message.mentions) != 1:
         await message.channel.send(
-            "Corrent command is: `!transfer-money <@user mention> <amount>`")
+            "Correct command is: `!transfer-money <@user mention> <amount>`")
         return
     amount = int(args[1])
     to_transfer = message.mentions[0]

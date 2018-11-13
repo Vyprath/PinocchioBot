@@ -58,6 +58,7 @@ RPGCharacter = sa.Table(
     sa.Column('id', sa.BigInteger, primary_key=True, nullable=False),
     sa.Column('member', sa.BigInteger, nullable=False),
     sa.Column('guild', sa.BigInteger, nullable=False),
+    sa.Column('name', sa.String(length=40), nullable=False),
     sa.Column('level', sa.Integer, nullable=False),
     sa.Column('game_wallet', sa.BigInteger, nullable=False),
     sa.Column('weapon_id', sa.BigInteger, sa.ForeignKey('rpg_weapon.id', ondelete='SET NULL')),

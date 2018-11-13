@@ -235,6 +235,12 @@ async def status(client, message, *args):
     await message.channel.send(embed=embed)
 
 
+async def lyrics(client, message, *args):
+    if len(args) == 0:
+        await message.channel.send("Usage: !lyrics <song name>")
+    name = " ".join(args)
+
+
 async def on_voice_state_update(member, before, after):
     if member.bot:
         return

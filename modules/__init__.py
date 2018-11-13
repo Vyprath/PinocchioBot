@@ -16,7 +16,7 @@ Prototype of 'handlers':
 [handler_1,]
 ...
 async def handler_1(client, message):
-    ...
+...
 """
 from .admin import admin_functions
 from .devtest import devtest_functions
@@ -26,8 +26,10 @@ from .shop import shop_functions
 from .waifu import waifu_functions
 from .reactions import reactions_functions
 from .fun import fun_functions
+from .rpg import rpg_functions
 from music import music_functions
 from messages import HELP_MESSAGE
+from variables import PREFIX
 
 
 async def message_resolve(client, message, cmd_prefix):
@@ -56,7 +58,7 @@ async def print_help(client, message, *args):
         help_string = functions[args[0]][1]
         if help_string is None:
             help_string = "No help message for this command."
-        await message.channel.send("`{0}`: {1}".format(args[0], help_string))
+        await message.channel.send("`{2}{0}`: {1}".format(args[0], help_string, PREFIX))
 
 """
 This is how 'functions' is implemented in a module file:
@@ -80,6 +82,7 @@ functions.update(shop_functions)
 functions.update(waifu_functions)
 functions.update(fun_functions)
 functions.update(reactions_functions)
+functions.update(rpg_functions)
 functions.update(music_functions)
 
 handlers += currency_handlers
