@@ -9,6 +9,12 @@ Donate feature not yet enabled. Thanks for asking!
     """)
 
 
+async def invite(client, message, *args):
+    await message.channel.send("""
+Bot invite link: {add invite link}
+    """)
+
+
 async def creator(client, message, *args):
     await message.channel.send("""
 Bot created by RandomGhost#5990. Ask him for new features/bugs!
@@ -45,5 +51,6 @@ general_functions = {
     'vote': (vote_bot, "Vote for this bot."),
     'claimreward': (claim_rewards, "Claim your voting rewards."),
     'donate': (donate, "Donate money to this bot to keep it running UwU."),
-    'creator': (creator, "Get to know the creator of this bot. And annoy him to fix bugs.")
+    'creator': (creator, "Get to know the creator of this bot. And annoy him to fix bugs."),
+    'invite': (invite, "Get the invite link for the bot.")
 }

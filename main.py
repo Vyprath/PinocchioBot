@@ -12,7 +12,9 @@ from music import functions
 logging.basicConfig(level=logging.INFO)
 loop = asyncio.get_event_loop()
 loop.create_task(database.prepare_tables())
-client = discord.Client(loop=loop)
+client = discord.Client(
+    loop=loop,
+    activity=discord.Game(name="idk what"))
 tenor_anon_id_request = requests.get(variables.GET_ANON_ID_URL)
 if tenor_anon_id_request.status_code == 200:
     variables.GIF_ANON_ID = json.loads(tenor_anon_id_request.content)['anon_id']

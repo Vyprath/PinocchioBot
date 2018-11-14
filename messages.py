@@ -11,6 +11,7 @@ __**Pinocchio Bot Usage:**__
 `{0}creator`: Get to know the creator of this bot, so you can annoy him to fix the damned bugs.
 `{0}vote`: Vote for this bot! Isn't Pinocchio kawaii? Vote for her and make her happy. _(sorry)_
 `{0}claimreward`: Pinocchio is happy now! Thanks for voting. Here, collect your reward.
+`{0}invite`: Get the invite link for this server.
 
 **Financial**
 `{0}wallet [optional: @user mention]`: Check your own wallet or others' wallet.
