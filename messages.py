@@ -37,7 +37,7 @@ __*Usage* `{0}<command name>`:__ `{0}laugh`,`{0}cry`,`{0}blush`,`{0}confused`,`{
 `{0}gif <search string>`: Search for a GIF.
 
 **Lag Free HQ Music** __(Donator-exclusive feature)__
-*NOTE: To use these commands, you have to donate to the bot. After donating, please contact <@252297314394308608> to enable this.*
+*NOTE: To use these commands, you have to donate to the bot. After donating, please contact RandomGhost#5990 to enable this.*
 *NOTE#2: HQ means highest available music quality in YouTube. To save their server bandwidth, most bots take the lowest available music quality in YouTube. Not this bot.*
 `{0}play`/`{0}p`: Play some musix.
 `{0}leave`: Make the bot leave the music channel **Requires administrator permission**
@@ -52,5 +52,5 @@ __*Usage* `{0}<command name>`:__ `{0}laugh`,`{0}cry`,`{0}blush`,`{0}confused`,`{
 `{0}setpaidroles`: Set up paid roles.
 `{0}purge <number of messages between 1 to 100>`: Purge messages from the channel.
 
-**NOTE: Bot is still in pre-alpha. Be prepared for bugs. Report bugs at https://discord.gg/F6REE6P**
+**NOTE: Bot is still in pre-alpha. Be prepared for bugs. Report bugs at https://discord.gg/HkN7ReX**
 """.format(PREFIX)

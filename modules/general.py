@@ -11,7 +11,7 @@ Donate feature not yet enabled. Thanks for asking!
 
 async def creator(client, message, *args):
     await message.channel.send("""
-Bot created by <@252297314394308608>. Ask him for new features/bugs!
+Bot created by RandomGhost#5990. Ask him for new features/bugs!
     """)
 
 

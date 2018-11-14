@@ -22,7 +22,7 @@ def wrapper(func):
             await message.channel.send("""
 **This is a donator-exclusive feature.**
 You are not allowed to use this command in this guild. Please donate to this bot to use this.
-If you have donated already, and want to enable this feature, contact <@252297314394308608>.
+If you have donated already, and want to enable this feature, contact RandomGhost#5990.
             """)
     return f
 
