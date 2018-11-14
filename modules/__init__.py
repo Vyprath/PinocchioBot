@@ -34,11 +34,11 @@ from variables import PREFIX
 
 async def message_resolve(client, message, cmd_prefix):
     if message.content.startswith(cmd_prefix):
-        args = message.content[1:].split()
+        args = message.content[len(cmd_prefix):].split()
         if args[0] == 'help':
-            await print_help(client, message, *args[1:])
+            await print_help(client, message, *args[len(cmd_prefix):])
         elif args[0] in functions.keys():
-            await functions[args[0]][0](client, message, *args[1:])
+            await functions[args[0]][0](client, message, *args[len(cmd_prefix):])
     for handler in handlers:
         await handler(client, message)
 
