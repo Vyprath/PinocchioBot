@@ -16,6 +16,7 @@ Member = sa.Table(
     sa.Column('member', sa.BigInteger, nullable=False),
     sa.Column('wallet', sa.BigInteger, default=0, nullable=False),
     sa.Column('last_dailies', sa.DateTime),
+    sa.Column('last_reward', sa.DateTime),
     sa.Column('tier', sa.SmallInteger, server_default='0')
 )
 
