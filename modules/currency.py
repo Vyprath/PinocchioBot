@@ -75,7 +75,7 @@ async def get_money(client, message, *args):
         await message.channel.send("This command is restricted, to be used only by gods.")
         return
     if len(args) == 0 or not args[0].isdigit():
-        await message.channel.send("Correct command is: `wallet <amount>`")
+        await message.channel.send("Correct command is: `p!wallet <amount>`")
     else:
         amount = int(args[0])
         engine = await database.prepare_engine()
@@ -90,7 +90,7 @@ async def transfer_money(client, message, *args):
     engine = await database.prepare_engine()
     if len(args) != 2 or not args[1].isdigit() or len(message.mentions) != 1:
         await message.channel.send(
-            "Correct command is: `!transfer-money <@user mention> <amount>`")
+            "Correct command is: `p!transfer-money <@user mention> <amount>`")
         return
     amount = int(args[1])
     to_transfer = message.mentions[0]

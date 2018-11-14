@@ -83,7 +83,7 @@ async def paid_roles(client, message, *args):
             """
 Current paid roles are: ```{0}```\n
 Reply with the role name. Ensure you have the money!
-Exit this menu by writing `exit-paid-roles`.
+Exit this menu by writing `exit`.
             """
             .format(shop_roles_string)
         )
@@ -99,13 +99,13 @@ Exit this menu by writing `exit-paid-roles`.
                 msg = _msg.content
                 if msg in shop_roles_named.keys():
                     role_id = shop_roles_named[msg]
-                elif msg == 'exit-paid-roles':
+                elif msg == 'exit':
                     await message.channel.send("Exited paid roles.")
                     return
                 else:
                     await message.channel.send(
                         "Invalid role entered.\n" +
-                        "Exit this menu by writing `exit-paid-roles`.")
+                        "Exit this menu by writing `exit`.")
             wallet = await _fetch_wallet(engine, message.author)
             if wallet - shop_roles[role_id] < 0:
                 await message.channel.send("You don't have the money! :angry:")

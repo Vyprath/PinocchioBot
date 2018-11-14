@@ -16,12 +16,12 @@ def gif(gif_name=None, action="",  requires_mention=False):
     async def _gif(client, message, *args):
         if gif_name is not None:
             if requires_mention and len(message.mentions) == 0:
-                await message.channel.send("Usage: `!{0} <@user mention>`".format(gif_name))
+                await message.channel.send("Usage: `p!{0} <@user mention>`".format(gif_name))
                 return
             search_str = "anime " + gif_name
         else:
             if len(args) == 0:
-                await message.channel.send("Usage: `!gif <search string>`")
+                await message.channel.send("Usage: `p!gif <search string>`")
                 return
             else:
                 search_str = ' '.join(args)

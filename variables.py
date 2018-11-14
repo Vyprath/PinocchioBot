@@ -1,7 +1,7 @@
 import os
 
 # Core
-PREFIX = os.environ.get('PREFIX', '!')
+PREFIX = os.environ.get('PREFIX', 'p!')
 TOKEN = os.environ.get('TOKEN')
 if TOKEN is None:
     raise Exception('The TOKEN environmental variable is not set.')

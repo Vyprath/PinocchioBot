@@ -19,7 +19,7 @@ async def vote_bot(client, message, *args):
     await message.channel.send("Feature disabled for now.")
     return
     await message.channel.send("""
-Vote for this bot and then claim your reward with `!claimreward`. Thanks for voting!
+Vote for this bot and then claim your reward with `p!claimreward`. Thanks for voting!
 Vote URL: <todo: add url>
 You can vote once every 24 hours.
     """)
@@ -38,7 +38,7 @@ async def claim_rewards(client, message, *args):
     else:
         await message.channel.send("""
 You have not yet voted or it has not been 24 hours.
-Vote with `!vote` and then claim your rewards.
+Vote with `p!vote` and then claim your rewards.
         """)
 
 general_functions = {

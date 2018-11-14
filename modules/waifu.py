@@ -33,7 +33,7 @@ async def _search(client, message, *args):
         if len(resp_string) > 1600:
             await message.channel.send(resp_string)
             resp_string = ""
-    resp_string += "\nTo view details, do `!waifu details <name/id>`"
+    resp_string += "\nTo view details, do `p!waifu details <name/id>`"
     await message.channel.send(resp_string)
 
 
@@ -238,12 +238,11 @@ async def waifu(client, message, *args):
         return await _sell(client, message, *args)
     else:
         await message.channel.send("""Usage:
-`!waifu search <name>`: Search for a waifu
-`!waifu details <name/id>`: Get the details for a waifu
-`!waifu buy <name/id>`: Buy a waifu
-`!waifu sell <name/id>`: Sell your waifu
-`!waifu trade <user to trade with> <waifu name/id> <price>`: Trade your waifus with someone **not yet implemented**
-`!harem`: Get your harem, aka your bought waifus.
+`p!waifu search <name>`: Search for a waifu
+`p!waifu details <name/id>`: Get the details for a waifu
+`p!waifu buy <name/id>`: Buy a waifu
+`p!waifu sell <name/id>`: Sell your waifu
+`p!harem`: Get your harem, aka your bought waifus.
 """)
         return
 
@@ -280,7 +279,7 @@ async def _harem(client, message, member):
         if len(resp_string) > 1600:
             await message.channel.send(resp_string)
             resp_string = ""
-    resp_string += "\nTo view details, do `!waifu details <name/id>`"
+    resp_string += "\nTo view details, do `p!waifu details <name/id>`"
     await message.channel.send(resp_string)
 
 
@@ -290,7 +289,7 @@ async def harem(client, message, *args):
     elif len(args) == 1 and len(message.mentions) == 1:
         await _harem(client, message, message.mentions[0])
     else:
-        await message.channel.send("View your or others' harem list with `!harem [user mention]`.")
+        await message.channel.send("View your or others' harem list with `p!harem [user mention]`.")
 
 
 waifu_functions = {

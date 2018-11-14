@@ -7,7 +7,7 @@ async def clean(client, message, *args):
         await message.channel.send("This command is restricted, to be used only by gods.")
         return
     if len(args) != 1 or not args[0].isdigit() or not (1 <= int(args[0]) <= 100):
-        await message.channel.send("Usage: !purge <limit between 1 to 100>")
+        await message.channel.send("Usage: p!purge <limit between 1 to 100>")
         return
     limit = int(args[0])
     await message.channel.purge(limit=limit)
@@ -41,8 +41,8 @@ async def set_paid_roles(client, message, *args):
         await message.channel.send(
             """
 Current paid roles are: ```{0}```\n
-To set, run `!@paidroles set <role mention> <amount>`\n
-To remove, run `!@paidroles delete <role mention>`
+To set, run `p!setpaidroles set <role mention> <amount>`\n
+To remove, run `p!setpaidroles delete <role mention>`
             """
             .format(shop_roles_string)
         )
@@ -82,6 +82,6 @@ To remove, run `!@paidroles delete <role mention>`
 
 
 admin_functions = {
-    '@paidroles': (set_paid_roles, None),
-    '@purge': (clean, "Purge X messages from this channel.")
+    'setpaidroles': (set_paid_roles, None),
+    'purge': (clean, "Purge X messages from this channel.")
 }

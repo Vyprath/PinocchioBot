@@ -54,13 +54,13 @@ async def view_characters(client, message, *args):
             if len(msg) > 1800:
                 await message.channel.send(msg)
                 msg = ""
-    msg += "To view details, do `!character <name/id>`"
+    msg += "To view details, do `p!character <name/id>`"
     await message.channel.send(msg)
 
 
 async def character(client, message, *args):
     if len(args) == 0:
-        await message.channel.send("Usage: !character <name/id>")
+        await message.channel.send("Usage: `p!character <name/id>`")
         return
     elif len(args) == 1 and args[0].isdigit():
         char = await _get_single_character(guild_id=message.guild.id, char_id=int(args[0]))
