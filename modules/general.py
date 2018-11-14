@@ -28,6 +28,7 @@ async def vote_bot(client, message, *args):
 Vote for this bot and then claim your reward with `{0}claimreward`.
 Vote URL: https://discordbots.org/bot/506878658607054849/vote
 You can vote once every 12 hours.
+You get 2x rewards for voting on weekends.
     """.format(PREFIX))
 
 
@@ -44,17 +45,21 @@ async def claim_rewards(client, message, *args):
         cursor = await conn.execute(fetch_query)
         member = await cursor.fetchone()
         last_reward = member[database.Member.c.last_reward]
-        if last_reward is not None:
+        if last_reward is None:
+            db_verified = True
+        else:
             if ((datetime.datetime.now() - last_reward).days > 1 or
                     (datetime.datetime.now() - last_reward).seconds//3600 > 12):
                 db_verified = True
             else:
                 db_verified = False
-        else:
-            db_verified = True
     if voted and db_verified:
-        coins = VOTE_REWARD
         await message.channel.send("Thanks for voting! Here, have some coins.")
+        coins = VOTE_REWARD
+        is_weekend = await dborg.dbl_api.is_weekend()
+        if is_weekend:
+            coins *= 2
+            await message.channel.send("Thanks for voting on weekend! You get 2x coins.")
         engine = await database.prepare_engine()
         async with engine.acquire() as conn:
             update_query = database.Member.update().where(

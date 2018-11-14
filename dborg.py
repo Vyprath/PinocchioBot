@@ -1,3 +1,4 @@
+
 import logging
 import variables
 import dbl
@@ -40,6 +41,18 @@ class DiscordBotsOrgAPI:
             return bool(resp['voted'])
         except Exception as e:
             logging.exception('Failed to get votes\n{}: {}'.format(type(e).__name__, e))
+
+    async def is_weekend(self):
+        try:
+            resp = await self.dblpy.http.request(
+                'GET', '{0}/weekend'.format(self.dblpy.http.BASE))
+            if 'is_weekend' in resp and resp['is_weekend']:
+                return True
+            else:
+                return False
+        except Exception as e:
+            logging.exception('Failed to get votes\n{}: {}'.format(type(e).__name__, e))
+
 
 
 dbl_api = None
