@@ -2,7 +2,7 @@ from .currency import _remove_money, _fetch_wallet
 import database
 import discord
 import asyncio
-from variables import CUSTOM_ROLE_COST
+from variables import CUSTOM_ROLE_COST, PREFIX
 
 
 async def buy_colored_role(client, message, *args):

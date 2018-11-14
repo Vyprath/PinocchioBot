@@ -1,6 +1,6 @@
 import database
 from .currency import _add_money
-from variables import VOTE_REWARD
+from variables import VOTE_REWARD, PREFIX
 
 
 async def donate(client, message, *args):
@@ -19,10 +19,10 @@ async def vote_bot(client, message, *args):
     await message.channel.send("Feature disabled for now.")
     return
     await message.channel.send("""
-Vote for this bot and then claim your reward with `p!claimreward`. Thanks for voting!
+Vote for this bot and then claim your reward with `{0}claimreward`. Thanks for voting!
 Vote URL: <todo: add url>
 You can vote once every 24 hours.
-    """)
+    """.format(PREFIX))
 
 
 async def claim_rewards(client, message, *args):
@@ -38,8 +38,8 @@ async def claim_rewards(client, message, *args):
     else:
         await message.channel.send("""
 You have not yet voted or it has not been 24 hours.
-Vote with `p!vote` and then claim your rewards.
-        """)
+Vote with `{0}vote` and then claim your rewards.
+        """.format(PREFIX))
 
 general_functions = {
     'vote': (vote_bot, "Vote for this bot."),

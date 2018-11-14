@@ -1,5 +1,6 @@
 import database
 import asyncio
+from variables import PREFIX
 
 
 async def clean(client, message, *args):
@@ -7,7 +8,7 @@ async def clean(client, message, *args):
         await message.channel.send("This command is restricted, to be used only by gods.")
         return
     if len(args) != 1 or not args[0].isdigit() or not (1 <= int(args[0]) <= 100):
-        await message.channel.send("Usage: p!purge <limit between 1 to 100>")
+        await message.channel.send("Usage: {0}purge <limit between 1 to 100>".format(PREFIX))
         return
     limit = int(args[0])
     await message.channel.purge(limit=limit)
@@ -41,10 +42,10 @@ async def set_paid_roles(client, message, *args):
         await message.channel.send(
             """
 Current paid roles are: ```{0}```\n
-To set, run `p!setpaidroles set <role mention> <amount>`\n
-To remove, run `p!setpaidroles delete <role mention>`
+To set, run `{1}setpaidroles set <role mention> <amount>`\n
+To remove, run `{1}setpaidroles delete <role mention>`
             """
-            .format(shop_roles_string)
+            .format(shop_roles_string, PREFIX)
         )
     elif len(args) == 3 and args[0] == "set" and args[2].isdigit():
         if len(message.role_mentions) == 0:

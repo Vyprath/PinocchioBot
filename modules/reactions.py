@@ -2,6 +2,7 @@ import variables
 import aiohttp
 import json
 import discord
+from variables import PREFIX
 
 
 async def _get_gif_url(search_string):
@@ -16,12 +17,13 @@ def gif(gif_name=None, action="",  requires_mention=False):
     async def _gif(client, message, *args):
         if gif_name is not None:
             if requires_mention and len(message.mentions) == 0:
-                await message.channel.send("Usage: `p!{0} <@user mention>`".format(gif_name))
+                await message.channel.send("Usage: `{1}{0} <@user mention>`"
+                                           .format(gif_name, PREFIX))
                 return
             search_str = "anime " + gif_name
         else:
             if len(args) == 0:
-                await message.channel.send("Usage: `p!gif <search string>`")
+                await message.channel.send("Usage: `{0}gif <search string>`".format(PREFIX))
                 return
             else:
                 search_str = ' '.join(args)

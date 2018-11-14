@@ -2,6 +2,7 @@ from .utils import MusicInfo, GuildState
 from concurrent.futures import ThreadPoolExecutor
 import discord
 import asyncio
+from variables import PREFIX
 
 
 guild_states = {}
@@ -31,9 +32,9 @@ async def ensure_in_voice_channel(message):
     else:
         await message.channel.send("""
 Bot is already connected to a voice channel.
-Make the bot leave previous voice channel with `p!leave`. Requires **administrator** permission.
+Make the bot leave previous voice channel with `{0}leave`. Requires **administrator** permission.
 Or ask everyone to leave the previous voice channel.
-""")
+        """.format(PREFIX))
         return None
 
 
@@ -90,7 +91,7 @@ async def play(client, message, *args):
         return
     if len(args) == 0:
         await message.channel.send(
-            "Usage: `p!play <url/search string>`. YouTube recommended."
+            "Usage: `{0}play <url/search string>`. YouTube recommended.".format(PREFIX)
         )
         return
     try:
@@ -179,7 +180,7 @@ async def volume(client, message, *args):
         return
     guild_state = get_guild_state(message.guild)
     if len(args) != 1 or not args[0].isdigit() or not (1 <= int(args[0]) <= 100):
-        await message.channel.send("Usage: p!volume <volume % between 1 to 100>")
+        await message.channel.send("Usage: {0}volume <volume % between 1 to 100>".format(PREFIX))
         return
     volume = int(args[0])/100
     guild_state.volume = volume
@@ -237,7 +238,7 @@ async def status(client, message, *args):
 
 async def lyrics(client, message, *args):
     if len(args) == 0:
-        await message.channel.send("Usage: p!lyrics <song name>")
+        await message.channel.send("Usage: {0}lyrics <song name>".format(PREFIX))
     name = " ".join(args)
 
 

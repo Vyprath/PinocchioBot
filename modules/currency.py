@@ -4,8 +4,7 @@ import string
 import asyncio
 import time
 import datetime
-from variables import FREE_MONEY_SPAWN_LIMIT, DAILIES_AMOUNT
-# TODO: Handle in case profile not yet created.
+from variables import FREE_MONEY_SPAWN_LIMIT, DAILIES_AMOUNT, PREFIX
 
 
 async def _fetch_wallet(engine, member):
@@ -75,7 +74,7 @@ async def get_money(client, message, *args):
         await message.channel.send("This command is restricted, to be used only by gods.")
         return
     if len(args) == 0 or not args[0].isdigit():
-        await message.channel.send("Correct command is: `p!wallet <amount>`")
+        await message.channel.send("Correct command is: `{0}wallet <amount>`".format(PREFIX))
     else:
         amount = int(args[0])
         engine = await database.prepare_engine()
@@ -90,7 +89,7 @@ async def transfer_money(client, message, *args):
     engine = await database.prepare_engine()
     if len(args) != 2 or not args[1].isdigit() or len(message.mentions) != 1:
         await message.channel.send(
-            "Correct command is: `p!transfer-money <@user mention> <amount>`")
+            "Correct command is: `{0}transfer-money <@user mention> <amount>`".format(PREFIX))
         return
     amount = int(args[1])
     to_transfer = message.mentions[0]
