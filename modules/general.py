@@ -7,7 +7,8 @@ from variables import VOTE_REWARD, PREFIX
 
 async def donate(client, message, *args):
     await message.channel.send("""
-Donate feature not yet enabled. Thanks for asking!
+Please go to this site to donate: https://www.patreon.com/RandomGhost
+Thanks!
     """)
 
 
