@@ -27,6 +27,19 @@ Stats for this bot: **(Classified Information, kek)**
     ))
 
 
+async def guilds_in(client, message, *args):
+    guilds = client.guilds
+    guild_names = ', '.join(["{} ({})".format(g.name, g.id) for g in guilds])
+    await message.channel.send("""
+Stats for this bot: **(Classified Information, kek)**
+**Number of Guilds In:** {0}
+They are: {1}
+    """.format(
+        len(guilds),
+        guild_names
+    ))
+
+
 def wrapper(func, tier):
     async def f(client, message, *args):
         engine = await database.prepare_engine()
@@ -57,4 +70,5 @@ Maybe try contacting the ghost for an upgrade?
 devtest_functions = {
     'helloworld': (wrapper(hello_world, 1), None),
     'botstats': (wrapper(view_stats, 3), None),
+    'guildsin': (wrapper(guilds_in, 4), None),
 }
