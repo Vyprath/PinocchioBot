@@ -141,9 +141,18 @@ async def create_character(client, message, *args):
     await message.channel.send("Character successfully created with ID {0}".format(id[0]))
 
 
+async def _shop_search(client, message, *args):
+    pass
+
+
+async def weapon_shop(client, message, *args):
+    pass
+
+
 rpg_functions = {
     'viewcharacters': (view_characters, "View some user's characters"),
     'character': (character, "Get detailed info about a character"),
     'char': (character, "Get detailed info about a character"),
     'createcharacter': (create_character, "Create a RPG character"),
+    'weaponshop': (weapon_shop, "Buy weapons!"),
 }

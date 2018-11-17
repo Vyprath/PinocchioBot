@@ -30,11 +30,12 @@ from .rpg import rpg_functions
 from music import music_functions
 from messages import HELP_MESSAGE
 from variables import PREFIX
+import shlex
 
 
 async def message_resolve(client, message, cmd_prefix):
     if message.content.startswith(cmd_prefix):
-        args = message.content[len(cmd_prefix):].split()
+        args = shlex.split(message.content[len(cmd_prefix):])
         if args[0] == 'help':
             await print_help(client, message, *args[len(cmd_prefix):])
         elif args[0] in functions.keys():

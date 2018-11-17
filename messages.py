@@ -28,6 +28,7 @@ __**Pinocchio Bot Usage:**__
 
 **Fun**
 `{0}avatar [optional: @user mention]`: View yours or someone's avatar.
+`{0}poll \"Title of Poll\" \"Option 1\" \"Option 2\" [\"Option 3\"...]`: Create a reaction poll.
 
 **Reactions**
 __*Usage* `{0}<command name> <@user mention>`:__ `{0}hug`,`{0}kiss`,`{0}pat`,`{0}tickle`,`{0}bite`,

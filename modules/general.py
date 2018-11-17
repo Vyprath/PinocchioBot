@@ -1,6 +1,8 @@
 import database
 import dborg
 import datetime
+import discord
+from discord.utils import get
 from .currency import _add_money
 from variables import VOTE_REWARD, PREFIX
 
@@ -78,10 +80,42 @@ You have not yet voted or it has not been 12 hours.
 Vote with `{0}vote` and then claim your rewards.
         """.format(PREFIX))
 
+
+async def poll(client, message, *args):
+    if len(args) < 3:
+        await message.channel.send("""
+Usage: {0}poll \"Title of Poll\" \"Option 1\" \"Option 2\" ["Option 3"...]
+Remember to keep number options below or equal to 10.
+        """.format(PREFIX))
+        return
+    title = args[0]
+    options = list(args[1:])
+    if len(options) > 10:
+        options[9] = ' '.join(options[9:])
+        options = options[:10]
+    desc = ""
+    num_to_emote = {
+        0: 'zero', 1: 'one', 2: 'two', 3: 'three', 4: 'four',
+        5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'keycap_ten'}
+    num_to_uni_emote = {
+        0: '0⃣', 1: '1⃣', 2: '2⃣', 3: '3⃣', 4: '4⃣',
+        5: '5⃣', 6: '6⃣', 7: '7⃣', 8: '8⃣', 9: '9⃣', 10: '🔟'}
+    for i, opt in enumerate(options):
+        desc += ":{0}: : {1}\n".format(num_to_emote[i], opt)
+    embed = discord.Embed(title=title, color=0x325fa1, description=desc)
+    embed.set_footer(
+        text="Poll made by: {0}#{1}".format(message.author.name, message.author.discriminator),
+        icon_url=message.author.avatar_url)
+    msg = await message.channel.send(embed=embed)
+    for i, _ in enumerate(options):
+        await msg.add_reaction(num_to_uni_emote[i])
+
+
 general_functions = {
     'vote': (vote_bot, "Vote for this bot."),
     'claimreward': (claim_rewards, "Claim your voting rewards."),
     'donate': (donate, "Donate money to this bot to keep it running UwU."),
     'creator': (creator, "Get to know the creator of this bot. And annoy him to fix bugs."),
-    'invite': (invite, "Get the invite link for the bot.")
+    'invite': (invite, "Get the invite link for the bot."),
+    'poll': (poll, "Create a reactions poll."),
 }
