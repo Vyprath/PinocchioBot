@@ -39,7 +39,7 @@ class MusicInfo:
         embed = discord.Embed(
             title=self.title,
             description="Uploaded by: {0}".format(self.uploader),
-            url=self.video_url)
+            url=self.video_url, color=self.requested_by.colour)
         mins = self.duration//60
         secs = self.duration - mins*60
         embed.add_field(

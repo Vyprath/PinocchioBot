@@ -18,7 +18,7 @@ async def anime(client, message, *args):
     _search_result = await jikan.search(search_type='anime', query=search_str)
     search_result = _search_result['results'][0]['mal_id']
     anime = await jikan.anime(search_result)
-    embed = discord.Embed(title=anime['title'], url=anime['url'], color=0x2da8b6)
+    embed = discord.Embed(title=anime['title'], url=anime['url'], color=message.author.colour)
     if 'image_url' in anime.keys() and anime['image_url']:
         embed.set_thumbnail(url=anime['image_url'])
     embed.add_field(name="Type", value=anime['type'])
@@ -72,7 +72,7 @@ async def manga(client, message, *args):
     _search_result = await jikan.search(search_type='manga', query=search_str)
     search_result = _search_result['results'][0]['mal_id']
     manga = await jikan.manga(search_result)
-    embed = discord.Embed(title=manga['title'], url=manga['url'], color=0x2da8b6)
+    embed = discord.Embed(title=manga['title'], url=manga['url'], color=message.author.colour)
     if 'image_url' in manga.keys() and manga['image_url']:
         embed.set_thumbnail(url=manga['image_url'])
     embed.add_field(name="Type", value=manga['type'])

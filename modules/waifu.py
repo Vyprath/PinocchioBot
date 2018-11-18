@@ -72,8 +72,8 @@ async def _details(client, message, *args):
         .format(resp[database.Waifu.c.from_anime], resp[database.Waifu.c.price], gender.lower()))
     embed = discord.Embed(
         title=resp[database.Waifu.c.name], description=waifu_description,
-        type='rich', color=0x4f00f2)
-    if resp[4] is not None:
+        type='rich', color=message.author.colour)
+    if resp[database.Waifu.c.image_url] is not None:
         embed.set_image(url=resp[database.Waifu.c.image_url])
     embed.add_field(name="From", value=resp[database.Waifu.c.from_anime])
     embed.add_field(name="Cost", value=resp[database.Waifu.c.price])

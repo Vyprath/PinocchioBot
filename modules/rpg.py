@@ -70,7 +70,7 @@ async def character(client, message, *args):
     if char is None:
         await message.channel.send("Character not found!")
     else:
-        embed = discord.Embed(title=char[database.RPGCharacter.c.name], color=0x3e26f1)
+        embed = discord.Embed(title=char[database.RPGCharacter.c.name], color=message.author.colour)
         owner = message.guild.get_member(char[database.RPGCharacter.c.member])
         embed.set_footer(
             text="Owned by: {0}#{1}".format(owner.name, owner.discriminator),

@@ -28,12 +28,13 @@ __**Pinocchio Bot Usage:**__
 
 **Anime**
 (More features coming VERY soon!)
-`{0}anime <anime name>`: Get details about an anime.
-`{0}manga <manga name>`: Get details about a manga.
+`{0}anime <anime name>`: Get details about an anime. **NEW**
+`{0}manga <manga name>`: Get details about a manga. **NEW**
 
-**Fun**
+**Misc**
 `{0}avatar [optional: @user mention]`: View yours or someone's avatar.
-`{0}poll \"Title of Poll\" \"Option 1\" \"Option 2\" [\"Option 3\"...]`: Create a reaction poll.
+`{0}poll \"Title of Poll\" \"Option 1\" \"Option 2\" [\"Option 3\"...]`: Create a reaction poll. **NEW**
+`{0}whois <@user mention>`: Get information about a user. **NEW**
 
 **Reactions**
 __*Usage* `{0}<command name> <@user mention>`:__ `{0}hug`,`{0}kiss`,`{0}pat`,`{0}tickle`,`{0}bite`,

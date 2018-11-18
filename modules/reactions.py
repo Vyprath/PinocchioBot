@@ -34,7 +34,7 @@ def gif(gif_name=None, action="",  requires_mention=False):
         else:
             title = action.capitalize()
         gif_url = await _get_gif_url(search_str)
-        embed = discord.Embed(title=title, color=0x4f00f2)
+        embed = discord.Embed(title=title, color=message.author.colour)
         embed.set_image(url=gif_url)
         await message.channel.send(embed=embed)
     return _gif

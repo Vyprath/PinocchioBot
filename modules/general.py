@@ -2,7 +2,7 @@ import database
 import dborg
 import datetime
 import discord
-from discord.utils import get
+from discord.utils import snowflake_time
 from .currency import _add_money
 from variables import VOTE_REWARD, PREFIX
 
@@ -102,13 +102,63 @@ Remember to keep number options below or equal to 10.
         5: '5⃣', 6: '6⃣', 7: '7⃣', 8: '8⃣', 9: '9⃣', 10: '🔟'}
     for i, opt in enumerate(options):
         desc += ":{0}: : {1}\n".format(num_to_emote[i], opt)
-    embed = discord.Embed(title=title, color=0x325fa1, description=desc)
+    embed = discord.Embed(title=title, color=message.author.colour, description=desc)
     embed.set_footer(
         text="Poll made by: {0}#{1}".format(message.author.name, message.author.discriminator),
         icon_url=message.author.avatar_url)
     msg = await message.channel.send(embed=embed)
     for i, _ in enumerate(options):
         await msg.add_reaction(num_to_uni_emote[i])
+
+
+async def whois(client, message, *args):
+    if len(message.mentions) == 0:
+        await message.channel.send("Usage: {0}whois <@user mention>".format(PREFIX))
+        return
+    user = message.mentions[0]
+    embed = discord.Embed(
+        title="{0}#{1}".format(user.name, user.discriminator), color=user.colour)
+    tdelta = datetime.datetime.now() - user.joined_at
+    embed.add_field(name="User ID", value=user.id)
+    if user.nick:
+        embed.add_field(name="Nickname", value=user.nick)
+    if user.top_role:
+        embed.add_field(name="Top Role", value=user.top_role)
+    embed.add_field(name="Status", value=user.status)
+    embed.add_field(name="Is Bot", value=user.bot)
+    _perms = user.guild_permissions
+    embed.add_field(name="Is Administrator", value=_perms.administrator)
+    roles = user.roles[1:]
+    if len(roles) > 0:
+        role_str = ", ".join([i.name for i in roles])
+    else:
+        role_str = "No roles set."
+    embed.add_field(
+        name="Roles", inline=False, value=role_str)
+    embed.add_field(
+        name="Account Created On", inline=False,
+        value=snowflake_time(user.id).strftime("%A, %d %B, %Y. %I:%M:%S %p"))
+    embed.add_field(
+        name="In Server For", inline=False,
+        value="{0} days, {1} hours".format(tdelta.days, tdelta.seconds//3600))
+    PERMS_LIST = [
+        'kick_members', 'ban_members', 'manage_channels', 'manage_guild', 'add_reactions',
+        'view_audit_log', 'priority_speaker', 'send_messages', 'send_tts_messages',
+        'manage_messages', 'attach_files', 'read_message_history', 'mention_everyone',
+        'embed_links', 'external_emojis', 'connect', 'speak', 'mute_members', 'deafen_members',
+        'move_members', 'use_voice_activation', 'change_nickname', 'manage_nicknames',
+        'manage_roles', 'manage_webhooks', 'manage_emojis'
+    ]
+    perms = []
+    for i in PERMS_LIST:
+        if getattr(_perms, i):
+            perms += [i.replace('_', ' ').capitalize()]
+    if perms == []:
+        perms = ["No special permissions."]
+    perms_str = ', '.join(perms)
+    embed.add_field(name="Permissions", value=perms_str, inline=False)
+    embed.set_thumbnail(url=user.avatar_url)
+    await message.channel.send(embed=embed)
 
 
 general_functions = {
@@ -118,4 +168,5 @@ general_functions = {
     'creator': (creator, "Get to know the creator of this bot. And annoy him to fix bugs."),
     'invite': (invite, "Get the invite link for the bot."),
     'poll': (poll, "Create a reactions poll."),
+    'whois': (whois, "Get info about an user."),
 }
