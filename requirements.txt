@@ -5,3 +5,5 @@ aiohttp
 requests
 youtube-dl
 dblpy
+ratelimiter
+git+git://github.com/AWConant/jikanpy.git

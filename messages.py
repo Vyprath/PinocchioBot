@@ -26,6 +26,11 @@ __**Pinocchio Bot Usage:**__
 `{0}waifu`: Buy/Sell/View/Search/Trade Waifus. Will make your loneliness disappear.
 `{0}harem`: Get the list of your bought waifus.
 
+**Anime**
+(More features coming VERY soon!)
+`{0}anime <anime name>`: Get details about an anime.
+`{0}manga <manga name>`: Get details about a manga.
+
 **Fun**
 `{0}avatar [optional: @user mention]`: View yours or someone's avatar.
 `{0}poll \"Title of Poll\" \"Option 1\" \"Option 2\" [\"Option 3\"...]`: Create a reaction poll.
