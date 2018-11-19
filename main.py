@@ -7,6 +7,7 @@ import requests
 import json
 import dborg
 from modules import message_resolve
+from modules.special_handlers import send_on_member_join, send_on_member_leave
 from music import functions
 
 
@@ -27,7 +28,8 @@ else:
 @client.event
 async def on_ready():
     logging.info("Logged in as {0} - {1}.".format(client.user.name, client.user.id))
-    dborg.init_dbl(client)
+    if variables.DBL_TOKEN:
+        dborg.init_dbl(client)
     await database.make_member_profile(client.get_all_members(), client.user.id)
     await dborg.dbl_api.update_stats()
 
@@ -41,6 +43,13 @@ async def on_message(message):
 @client.event
 async def on_member_join(member):
     await database.make_member_profile([member], client.user.id)
+    await send_on_member_join(member)
+
+
+@client.event
+async def on_member_remove(member):
+    await database.make_member_profile([member], client.user.id)
+    await send_on_member_leave(member)
 
 
 @client.event

@@ -66,6 +66,9 @@ __**Pinocchio Bot Usage:**__
 `{0}get-money <amount>`: Get some money.
 `{0}setpaidroles`: Set up paid roles.
 `{0}purge <number of messages between 1 to 100>`: Purge messages from the channel.
+`{0}setwlchannel`: Set up welcome/leave message channel.
+`{0}setwelcome <new string>`: Change the default welcome string, or disable it by `{0}setwelcome None`.
+`{0}setleave <new string>`: Change the default leave string, or disable it by `{0}setleave None`.
 
 **NOTE: Bot is still in pre-alpha. Be prepared for bugs. Report bugs at https://discord.gg/HkN7ReX**
 """.format(PREFIX)

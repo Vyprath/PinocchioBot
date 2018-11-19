@@ -7,8 +7,6 @@ DBL_TOKEN = os.environ.get('DBL_TOKEN')
 CLIENT_ID = "506878658607054849"
 if TOKEN is None:
     raise Exception('The TOKEN environmental variable is not set.')
-if DBL_TOKEN is None:
-    raise Exception('The DBL_TOKEN environmental variable is not set.')
 
 
 # Database

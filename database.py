@@ -25,7 +25,10 @@ Guild = sa.Table(
     sa.Column('id', sa.BigInteger, primary_key=True, nullable=False),
     sa.Column('guild', sa.BigInteger, nullable=False),
     sa.Column('shop_roles', sa.JSON),
-    sa.Column('music_enabled', sa.Boolean)
+    sa.Column('music_enabled', sa.Boolean),
+    sa.Column('join_leave_channel', sa.BigInteger),
+    sa.Column('welcome_str', sa.String(length=60), server_default="Let the madness begin. Hold tight."),
+    sa.Column('leave_str', sa.String(length=60), server_default="See you again, in another life.")
 )
 
 Waifu = sa.Table(

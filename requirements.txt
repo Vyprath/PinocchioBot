@@ -6,4 +6,5 @@ requests
 youtube-dl
 dblpy
 ratelimiter
+Pillow
 git+git://github.com/AWConant/jikanpy.git
