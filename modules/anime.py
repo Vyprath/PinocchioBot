@@ -265,7 +265,9 @@ async def profile(client, message, *args):
     if profile['gender']:
         embed.add_field(name="Gender", value=profile['gender'])
     if profile['birthday']:
-        embed.add_field(name="Birthday", value=profile['birthday'])
+        birthday = datetime.datetime.fromisoformat(
+            profile['birthday']).strftime("%A, %d %B, %Y")
+        embed.add_field(name="Birthday", value=birthday)
     if profile['location']:
         embed.add_field(name="Location", value=profile['location'])
     if profile['joined']:
