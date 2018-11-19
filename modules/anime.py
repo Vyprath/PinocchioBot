@@ -272,7 +272,7 @@ async def profile(client, message, *args):
         embed.add_field(name="Location", value=profile['location'])
     if profile['joined']:
         joined = datetime.datetime.fromisoformat(
-            profile['joined']).strftime("%A, %d %B, %Y. %I:%M:%S %p")
+            profile['joined']).strftime("%A, %d %B, %Y")
         embed.add_field(name="Joined MAL", value=joined)
     astats = profile['anime_stats']
     anime_stats = """
