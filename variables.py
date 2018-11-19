@@ -35,3 +35,8 @@ SELL_WAIFU_DEPRECIATION = 0.6
 FREE_MONEY_SPAWN_LIMIT = 70
 DAILIES_AMOUNT = 300
 VOTE_REWARD = 500
+
+# APIs
+ICNDB_RANDOM_JOKE_URL = "http://api.icndb.com/jokes/random"
+DADJOKE_URL = "https://icanhazdadjoke.com"
+CATFACT_URL = "https://catfact.ninja/fact"

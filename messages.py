@@ -27,21 +27,24 @@ __**Pinocchio Bot Usage:**__
 `{0}harem`: Get the list of your bought waifus.
 
 **Anime**
-`{0}anime <anime name>`: Get details about an anime. **NEW**
-`{0}manga <manga name>`: Get details about a manga. **NEW**
-`{0}animelist <MAL Username>`: Get someone's MAL animelist. **NEW**
-`{0}mangalist <MAL Username>`: Get someone's MAL mangalist. **NEW**
-`{0}profile <MAL Username>`: Get someone's MAL profile. **NEW**
+`{0}anime <anime name>`: Get details about an anime.
+`{0}manga <manga name>`: Get details about a manga.
+`{0}animelist <MAL Username>`: Get someone's MAL animelist.
+`{0}mangalist <MAL Username>`: Get someone's MAL mangalist.
+`{0}profile <MAL Username>`: Get someone's MAL profile.
+
+**Fun**
+*Usage* `{0}<command name>`: `{0}chucknorris`, `{0}dadjoke`, `{0}xkcd`, `{0}catfact`.
 
 **Misc**
 `{0}avatar [optional: @user mention]`: View yours or someone's avatar.
-`{0}poll \"Title of Poll\" \"Option 1\" \"Option 2\" [\"Option 3\"...]`: Create a reaction poll. **NEW**
-`{0}whois <@user mention>`: Get information about a user. **NEW**
+`{0}poll \"Title of Poll\" \"Option 1\" \"Option 2\" [\"Option 3\"...]`: Create a reaction poll.
+`{0}whois <@user mention>`: Get information about a user.
 
 **Reactions**
-__*Usage* `{0}<command name> <@user mention>`:__ `{0}hug`,`{0}kiss`,`{0}pat`,`{0}tickle`,`{0}bite`,
+*Usage* `{0}<command name> <@user mention>`: `{0}hug`,`{0}kiss`,`{0}pat`,`{0}tickle`,`{0}bite`,
 `{0}kick`,`{0}slap`,`{0}punch`,`{0}poke`.
-__*Usage* `{0}<command name>`:__ `{0}laugh`,`{0}cry`,`{0}blush`,`{0}confused`,`{0}pout`,`{0}dance`,
+*Usage* `{0}<command name>`: `{0}laugh`,`{0}cry`,`{0}blush`,`{0}confused`,`{0}pout`,`{0}dance`,
 `{0}jojo`,`{0}megumin`,`{0}satania`,`{0}lick`,`{0}think`,`{0}shrug`,`{0}owo`,`{0}nom`,
 `{0}eyeroll`,`{0}lewd`,`{0}stare`,`{0}triggered`,`{0}facepalm`.
 `{0}gif <search string>`: Search for a GIF.
