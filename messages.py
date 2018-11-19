@@ -26,15 +26,17 @@ __**Pinocchio Bot Usage:**__
 `{0}waifu`: Buy/Sell/View/Search/Trade Waifus. Will make your loneliness disappear.
 `{0}harem`: Get the list of your bought waifus.
 
-**Anime**
+**Anime** **NEW**
 `{0}anime <anime name>`: Get details about an anime.
 `{0}manga <manga name>`: Get details about a manga.
 `{0}animelist <MAL Username>`: Get someone's MAL animelist.
 `{0}mangalist <MAL Username>`: Get someone's MAL mangalist.
 `{0}profile <MAL Username>`: Get someone's MAL profile.
 
-**Fun**
-*Usage* `{0}<command name>`: `{0}chucknorris`, `{0}dadjoke`, `{0}xkcd`, `{0}catfact`.
+**Fun** **NEW**
+*Usage* `{0}<command name>`: `{0}chucknorris`, `{0}dadjoke`, `{0}xkcd`, `{0}catfact`, `{0}8ball`.
+`{0}lmgtfy <query>`: Let me google that for you.
+`{0}urbandictionary <query>`: Let me Urban Dict-- I mean, let me search Urban Dictionary for you.
 
 **Misc**
 `{0}avatar [optional: @user mention]`: View yours or someone's avatar.

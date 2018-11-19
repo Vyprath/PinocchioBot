@@ -40,3 +40,5 @@ VOTE_REWARD = 500
 ICNDB_RANDOM_JOKE_URL = "http://api.icndb.com/jokes/random"
 DADJOKE_URL = "https://icanhazdadjoke.com"
 CATFACT_URL = "https://catfact.ninja/fact"
+LMGTFY_URL = "https://lmgtfy.com/?q="
+UD_URL = "https://api.urbandictionary.com/v0/define?term="
