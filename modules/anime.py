@@ -1,7 +1,9 @@
 from variables import PREFIX
 from jikanpy import AioJikan
+from jikanpy.exceptions import APIException
 import asyncio
 import discord
+import datetime
 
 
 jikan = AioJikan(loop=asyncio.get_event_loop())
@@ -97,7 +99,260 @@ async def manga(client, message, *args):
     await message.channel.send(embed=embed)
 
 
+async def animelist(client, message, *args):
+    if len(args) == 0:
+        await message.channel.send("Usage: {0}animelist <MAL User>".format(PREFIX))
+        return
+    search_str = ' '.join(args)
+    try:
+        raw_animelist = await jikan.user(username=search_str, request='animelist')
+    except APIException:
+        await message.channel.send("Username not found on MAL, or account is private.")
+        return
+    animelist = raw_animelist['anime']
+    sentences = []
+    for i, anime in enumerate(animelist):
+        watching_status = anime['watching_status']
+        if watching_status == 1:
+            status = 'Currently Watching ({0}/{1} eps)'.format(
+                anime['watched_episodes'], anime['total_episodes'])
+        elif watching_status == 2:
+            status = 'Completed ({0}/{1} eps)'.format(
+                anime['watched_episodes'], anime['total_episodes'])
+        elif watching_status == 3:
+            status = 'On Hold ({0}/{1} eps)'.format(
+                anime['watched_episodes'], anime['total_episodes'])
+        elif watching_status == 4:
+            status = 'Dropped ({0}/{1} eps)'.format(
+                anime['watched_episodes'], anime['total_episodes'])
+        elif watching_status == 6:
+            status = 'Plan To Watch'
+        sentences.append(
+            "{0}. **__[{1}]({2})__** ({3}). Status: **{4}**. Score: **{5}**.".format(
+                i+1, anime['title'], anime['url'].replace("_", "\_"),
+                anime['type'], status, anime['score']
+            ))
+    pages = list(chunks(sentences, 5))
+    page_num = 1
+    total_pages = len(pages)
+    embed = discord.Embed(title="{0}'s AnimeList".format(search_str), color=message.author.colour)
+    embed.add_field(name="Total Anime", value=len(animelist))
+    embed.add_field(name="List", value='\n'.join(pages[page_num - 1]), inline=False)
+    embed.set_footer(text="Page: {0}/{1}".format(page_num, total_pages))
+    msg = await message.channel.send(embed=embed)
+    if total_pages == 1:
+        return
+    await msg.add_reaction("⬅")
+    await msg.add_reaction("➡")
+    try:
+        while True:
+            def check(reaction, user):
+                emoji = str(reaction.emoji)
+                return not user.bot and (emoji == "⬅" or emoji == "➡")
+            reaction, _ = await client.wait_for('reaction_add', timeout=300, check=check)
+            emoji = str(reaction.emoji)
+            if emoji == "⬅":
+                if not page_num - 1 > 0:
+                    continue
+                page_num -= 1
+                embed.set_field_at(
+                    index=1, name="List",
+                    value='\n'.join(pages[page_num - 1]), inline=False)
+            elif emoji == "➡":
+                if not page_num + 1 <= total_pages:
+                    continue
+                page_num += 1
+                embed.set_field_at(
+                    index=1, name="List",
+                    value='\n'.join(pages[page_num - 1]), inline=False)
+            else:
+                continue
+            embed.set_footer(text="Page: {0}/{1}".format(page_num, total_pages))
+            await msg.edit(embed=embed)
+    except asyncio.TimeoutError:
+        pass  # Ignore.
+
+
+async def mangalist(client, message, *args):
+    if len(args) == 0:
+        await message.channel.send("Usage: {0}mangalist <MAL User>".format(PREFIX))
+        return
+    search_str = ' '.join(args)
+    try:
+        raw_mangalist = await jikan.user(username=search_str, request='mangalist')
+    except APIException:
+        await message.channel.send("Username not found on MAL, or account is private.")
+        return
+    mangalist = raw_mangalist['manga']
+    sentences = []
+    for i, manga in enumerate(mangalist):
+        reading_status = manga['reading_status']
+        if reading_status == 1:
+            status = 'Currently Reading ({0}/{1} chaps)'.format(
+                manga['read_chapters'], manga['total_chapters'])
+        elif reading_status == 2:
+            status = 'Completed ({0}/{1} chaps)'.format(
+                manga['read_chapters'], manga['total_chapters'])
+        elif reading_status == 3:
+            status = 'On Hold ({0}/{1} chaps)'.format(
+                manga['read_chapters'], manga['total_chapters'])
+        elif reading_status == 4:
+            status = 'Dropped ({0}/{1} chaps)'.format(
+                manga['read_chapters'], manga['total_chapters'])
+        elif reading_status == 6:
+            status = 'Plan To Read'
+        sentences.append(
+            "{0}. **__[{1}]({2})__**. Status: **{3}**. Score: **{4}**.".format(
+                i+1, manga['title'], manga['url'].replace("_", "\_"), status, manga['score']
+            ))
+    pages = list(chunks(sentences, 5))
+    page_num = 1
+    total_pages = len(pages)
+    embed = discord.Embed(title="{0}'s MangaList".format(search_str), color=message.author.colour)
+    embed.add_field(name="Total Manga", value=len(mangalist))
+    embed.add_field(name="List", value='\n'.join(pages[page_num - 1]), inline=False)
+    embed.set_footer(text="Page: {0}/{1}".format(page_num, total_pages))
+    msg = await message.channel.send(embed=embed)
+    if total_pages == 1:
+        return
+    await msg.add_reaction("⬅")
+    await msg.add_reaction("➡")
+    try:
+        while True:
+            def check(reaction, user):
+                emoji = str(reaction.emoji)
+                return not user.bot and (emoji == "⬅" or emoji == "➡")
+            reaction, _ = await client.wait_for('reaction_add', timeout=300, check=check)
+            emoji = str(reaction.emoji)
+            if emoji == "⬅":
+                if not page_num - 1 > 0:
+                    continue
+                page_num -= 1
+                embed.set_field_at(
+                    index=1, name="List",
+                    value='\n'.join(pages[page_num - 1]), inline=False)
+            elif emoji == "➡":
+                if not page_num + 1 <= total_pages:
+                    continue
+                page_num += 1
+                embed.set_field_at(
+                    index=1, name="List",
+                    value='\n'.join(pages[page_num - 1]), inline=False)
+            else:
+                continue
+            embed.set_footer(text="Page: {0}/{1}".format(page_num, total_pages))
+            await msg.edit(embed=embed)
+    except asyncio.TimeoutError:
+        pass  # Ignore.
+
+
+async def profile(client, message, *args):
+    if len(args) == 0:
+        await message.channel.send("Usage: {0}profile <MAL User>".format(PREFIX))
+        return
+    search_str = ' '.join(args)
+    try:
+        profile = await jikan.user(username=search_str, request='profile')
+    except APIException:
+        await message.channel.send("Username not found on MAL, or account is private.")
+        return
+    embed = discord.Embed(
+        title="{0}'s MAL Profile".format(search_str),
+        url=profile['url'],
+        color=message.author.colour)
+    if profile['image_url']:
+        embed.set_thumbnail(url=profile['image_url'])
+    if profile['gender']:
+        embed.add_field(name="Gender", value=profile['gender'])
+    if profile['birthday']:
+        embed.add_field(name="Birthday", value=profile['birthday'])
+    if profile['location']:
+        embed.add_field(name="Location", value=profile['location'])
+    if profile['joined']:
+        joined = datetime.datetime.fromisoformat(
+            profile['joined']).strftime("%A, %d %B, %Y. %I:%M:%S %p")
+        embed.add_field(name="Joined MAL", value=joined)
+    astats = profile['anime_stats']
+    anime_stats = """
+Days of anime watched: {0}
+Mean score: {1}
+Watching: {2}
+Completed: {3}
+On Hold: {4}
+Dropped: {5}
+Plan to Watch: {6}
+Rewatched: {7}
+Episodes Watched: {8}
+Total: {9}
+    """.format(
+        astats['days_watched'], astats['mean_score'], astats['watching'],
+        astats['completed'], astats['on_hold'], astats['dropped'], astats['plan_to_watch'],
+        astats['rewatched'], astats['episodes_watched'], astats['total_entries'],
+    )
+    mstats = profile['manga_stats']
+    manga_stats = """
+Days of manga read: {0}
+Mean score: {1}
+Reading: {2}
+Completed: {3}
+On Hold: {4}
+Dropped: {5}
+Plan to Read: {6}
+Reread: {7}
+Chapters Read: {8}
+Volumes Read: {9}
+Total: {10}
+    """.format(
+        mstats['days_read'], mstats['mean_score'], mstats['reading'],
+        mstats['completed'], mstats['on_hold'], mstats['dropped'], mstats['plan_to_read'],
+        mstats['reread'], mstats['chapters_read'], mstats['volumes_read'], mstats['total_entries'],
+    )
+    embed.add_field(name="Anime Stats", value=anime_stats, inline=False)
+    embed.add_field(name="Manga Stats", value=manga_stats, inline=False)
+    if profile['favorites']['anime']:
+        afavs = profile['favorites']['anime']
+        anime_favorites = ", ".join([
+            "[{0}]({1})".format(
+                i['name'].replace(",", ""), i['url'].replace("_", "\_"))
+            for i in afavs])
+    else:
+        anime_favorites = "No anime favorites set."
+    if profile['favorites']['manga']:
+        mfavs = profile['favorites']['manga']
+        manga_favorites = ", ".join([
+            "[{0}]({1})".format(
+                i['name'].replace(",", ""), i['url'].replace("_", "\_"))
+            for i in mfavs])
+    else:
+        manga_favorites = "No manga favorites set."
+    if profile['favorites']['characters']:
+        cfavs = profile['favorites']['characters']
+        favorite_chars = ", ".join([
+            "[{0}]({1})".format(
+                i['name'].replace(",", ""), i['url'].replace("_", "\_"))
+            for i in cfavs])
+    else:
+        favorite_chars = "No favorite characters set."
+    embed.add_field(name="Anime Favorites", value=anime_favorites, inline=False)
+    embed.add_field(name="Manga Favorites", value=manga_favorites, inline=False)
+    embed.add_field(name="Favorite Characters", value=favorite_chars, inline=False)
+    about = profile['about']
+    if about:
+        if len(about) > 500:
+            about = about[:500] + "..."
+        embed.add_field(name="About Them", value=about)
+    await message.channel.send(embed=embed)
+
+
+def chunks(l, n):
+    for i in range(0, len(l), n):
+        yield l[i:i+n]
+
+
 anime_functions = {
-    'anime': (anime, "Get details for an anime"),
-    'manga': (manga, "Get details for an manga"),
+    'anime': (anime, "Get details for an anime."),
+    'manga': (manga, "Get details for an manga."),
+    'animelist': (animelist, "Get the MAL animelist for an user."),
+    'mangalist': (mangalist, "Get the MAL mangalist for an user."),
+    'profile': (profile, "Get profile for an user.")
 }

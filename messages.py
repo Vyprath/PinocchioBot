@@ -27,9 +27,11 @@ __**Pinocchio Bot Usage:**__
 `{0}harem`: Get the list of your bought waifus.
 
 **Anime**
-(More features coming VERY soon!)
 `{0}anime <anime name>`: Get details about an anime. **NEW**
 `{0}manga <manga name>`: Get details about a manga. **NEW**
+`{0}animelist <MAL Username>`: Get someone's MAL animelist. **NEW**
+`{0}mangalist <MAL Username>`: Get someone's MAL mangalist. **NEW**
+`{0}profile <MAL Username>`: Get someone's MAL profile. **NEW**
 
 **Misc**
 `{0}avatar [optional: @user mention]`: View yours or someone's avatar.
