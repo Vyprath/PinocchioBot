@@ -105,12 +105,14 @@ async def urban_dictionary(client, message, *args):
         title="Urban Dictionary: {0}".format(ud_def['word']),
         url=ud_def['permalink'], colour=message.author.colour
     )
-    embed.add_field(
-        name="Definition", inline=False,
-        value=ud_def['definition'].replace("[", "").replace("]", ""))
-    embed.add_field(
-        name="Example", inline=False,
-        value=ud_def['example'].replace("[", "").replace("]", ""))
+    definition = ud_def['definition'].replace("[", "").replace("]", "")
+    if len(definition) > 1000:
+        definition = definition[:1000] + "..."
+    embed.add_field(name="Definition", inline=False, value=definition)
+    example = ud_def['example'].replace("[", "").replace("]", "")
+    if len(example) > 1000:
+        example = example[:1000] + "..."
+    embed.add_field(name="Example", inline=False, value=example)
     embed.add_field(name="Author", value=ud_def['author'])
     embed.add_field(
         name="Votes",
