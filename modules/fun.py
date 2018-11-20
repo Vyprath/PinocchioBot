@@ -5,8 +5,10 @@ import json
 import datetime
 import html
 import textwrap
+import io
 from random import randint
 from urllib.parse import quote
+from PIL import Image, ImageDraw
 
 
 async def avatar_url(client, message, *args):
@@ -134,6 +136,41 @@ async def cowsay(client, message, *args):
     await message.channel.send('```css\n' + _cowsay(" ".join(args)) + "```")
 
 
+async def cook_user(client, message, *args):
+    if len(message.mentions) == 0:
+        await message.channel.send("USAGE: {}cook <@user mention>".format(variables.PREFIX))
+        return
+    cooked_user = message.mentions[0]
+    profile_pic = Image.open(
+        io.BytesIO(await _get_img_bytes_from_url(cooked_user.avatar_url)), 'r')
+    profile_pic = profile_pic.resize((294, 294), Image.ANTIALIAS)
+    background = Image.open("assets/plate.jpg", 'r')
+    bigsize = (profile_pic.size[0] * 3, profile_pic.size[1] * 3)
+    mask = Image.new('L', bigsize, 0)
+    draw = ImageDraw.Draw(mask)
+    draw.ellipse((0, 0) + bigsize, fill=255)
+    mask = mask.resize(profile_pic.size, Image.ANTIALIAS)
+    profile_pic.putalpha(mask)
+    w, h = profile_pic.size
+    pts = (348 - w//2, 231 - h//2)
+    background.paste(profile_pic, pts, profile_pic)
+    byte_io = io.BytesIO()
+    background.save(byte_io, 'PNG')
+    byte_io.flush()
+    byte_io.seek(0)
+    await message.channel.send(file=discord.File(
+        fp=byte_io,
+        filename='cooked_{0}.png'.format(cooked_user.name.replace(" ", "_")))
+    )
+
+
+async def _get_img_bytes_from_url(url):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            image_bytes = await resp.read()
+            return image_bytes
+
+
 def _cowsay(str, length=40):
     return build_bubble(str, length) + build_cow()
 
@@ -187,4 +224,5 @@ fun_functions = {  # Kek, this feels like I am stuttering to say functions.
     'urbandictionary': (urban_dictionary, "Search urban dictionary."),
     '8ball': (eight_ball, "Get life advice."),
     'cowsay': (cowsay, "Cow says moo. And you can order the cow to speak for you."),
+    'cook': (cook_user, "Cook someone tastily."),
 }
