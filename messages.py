@@ -37,6 +37,7 @@ __**Pinocchio Bot Usage:**__
 *Usage* `{0}<command name>`: `{0}chucknorris`, `{0}dadjoke`, `{0}xkcd`, `{0}catfact`, `{0}8ball`.
 `{0}lmgtfy <query>`: Let me google that for you.
 `{0}urbandictionary <query>`: Let me Urban Dict-- I mean, let me search Urban Dictionary for you.
+`{0}cowsay <text>`: Cow says moo. And you can order the cow to speak for you.
 
 **Misc**
 `{0}avatar [optional: @user mention]`: View yours or someone's avatar.

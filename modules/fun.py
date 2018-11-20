@@ -4,6 +4,7 @@ import discord
 import json
 import datetime
 import html
+import textwrap
 from random import randint
 from urllib.parse import quote
 
@@ -126,6 +127,56 @@ async def eight_ball(client, message, *args):
     await message.channel.send("The 8-ball reads: {}".format(choices[rand_id]))
 
 
+async def cowsay(client, message, *args):
+    if len(args) == 0:
+        await message.channel.send("USAGE: {}cowsay <text>".format(variables.PREFIX))
+        return
+    await message.channel.send('```css\n' + _cowsay(" ".join(args)) + "```")
+
+
+def _cowsay(str, length=40):
+    return build_bubble(str, length) + build_cow()
+
+
+def build_cow():
+    return """
+         \   ^__^
+          \  (oo)\_______
+             (__)\       )\/\\
+                 ||----w |
+                 ||     ||
+    """
+
+
+def build_bubble(str, length=40):
+    bubble = []
+    lines = normalize_text(str, length)
+    bordersize = len(lines[0])
+    bubble.append("  " + "-" * bordersize)
+    for index, line in enumerate(lines):
+        border = get_border(lines, index)
+        bubble.append("%s %s %s" % (border[0], line, border[1]))
+        bubble.append("  " + "-" * bordersize)
+    return "\n".join(bubble)
+
+
+def normalize_text(str, length):
+    lines = textwrap.wrap(str, length)
+    maxlen = len(max(lines, key=len))
+    return [line.ljust(maxlen) for line in lines]
+
+
+def get_border(lines, index):
+    if len(lines) < 2:
+        return ["<", ">"]
+    elif index == 0:
+        return ["/", "\\"]
+    elif index == len(lines) - 1:
+        return ["\\", "/"]
+    else:
+        return ["|", "|"]
+
+
 fun_functions = {  # Kek, this feels like I am stuttering to say functions.
     'avatar': (avatar_url, "View yours or someone's avatar."),
     'chucknorris': (chuck_norris, "A Chuck Norris joke."),
@@ -134,5 +185,6 @@ fun_functions = {  # Kek, this feels like I am stuttering to say functions.
     'xkcd': (xkcd, 'xkcd.com'),
     'lmgtfy': (lmgtfy, "Let me google that for you."),
     'urbandictionary': (urban_dictionary, "Search urban dictionary."),
-    '8ball': (eight_ball, "Get life advice.")
+    '8ball': (eight_ball, "Get life advice."),
+    'cowsay': (cowsay, "Cow says moo. And you can order the cow to speak for you."),
 }
