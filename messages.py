@@ -17,8 +17,6 @@ __**Pinocchio Bot Usage:**__
 `{0}wallet [optional: @user mention]`: Check your own wallet or others' wallet.
 `{0}transfer-money <@user mention> <amount>`: Transfer some money.
 `{0}dailies`: Get your daily money and become riiiich.
-
-**Shop**
 `{0}paidroles`: Get a preset role with $$$.
 `{0}customrole`: Get your custom colored role with $$$$$$.
 
@@ -26,16 +24,16 @@ __**Pinocchio Bot Usage:**__
 `{0}waifu`: Buy/Sell/View/Search/Trade Waifus. Will make your loneliness disappear.
 `{0}harem`: Get the list of your bought waifus.
 
-**Anime** **NEW**
+**Anime**
 `{0}anime <anime name>`: Get details about an anime.
 `{0}manga <manga name>`: Get details about a manga.
 `{0}animelist <MAL Username>`: Get someone's MAL animelist.
 `{0}mangalist <MAL Username>`: Get someone's MAL mangalist.
 `{0}profile <MAL Username>`: Get someone's MAL profile.
 
-**Fun** **NEW**
+**Fun**
 *Usage* `{0}<command name>`: `{0}chucknorris`, `{0}dadjoke`, `{0}xkcd`, `{0}catfact`, `{0}8ball`.
-*Usage* `{0}<command name> <@user mention>`: `cook`.
+*Usage* `{0}<command name> <@user mention>`: `{0}cook`.
 `{0}lmgtfy <query>`: Let me google that for you.
 `{0}urbandictionary <query>`: Let me Urban Dict-- I mean, let me search Urban Dictionary for you.
 `{0}cowsay <text>`: Cow says moo. And you can order the cow to speak for you.
@@ -68,9 +66,10 @@ __**Pinocchio Bot Usage:**__
 `{0}get-money <amount>`: Get some money.
 `{0}setpaidroles`: Set up paid roles.
 `{0}purge <number of messages between 1 to 100>`: Purge messages from the channel.
-`{0}setwlchannel`: Set up welcome/leave message channel.
+`{0}setwlchannel`: Set up welcome/leave message channel, or disable it. Default: disabled.
 `{0}setwelcome <new string>`: Change the default welcome string, or disable it by `{0}setwelcome None`.
 `{0}setleave <new string>`: Change the default leave string, or disable it by `{0}setleave None`.
+`{0}coindrops <disable/enable>`: Enable/Disable coin drops for a server. Default: disabled.
 
 **NOTE: Bot is still in pre-alpha. Be prepared for bugs. Report bugs at https://discord.gg/HkN7ReX**
 """.format(PREFIX)

@@ -131,6 +131,9 @@ To remove, run `{1}setpaidroles delete <role mention>`
 
 
 async def set_welcome_msg(client, message, *args):
+    if not message.author.guild_permissions.administrator:
+        await message.channel.send("This command is restricted, to be used only by gods.")
+        return
     if len(args) == 0:
         await message.channel.send(
             "Usage: `{0}setwelcome` <welcome text, less than 61 chars. Write \"None\" for no welcome message>".format(PREFIX))  # noqa
@@ -154,6 +157,9 @@ async def set_welcome_msg(client, message, *args):
 
 
 async def set_leave_msg(client, message, *args):
+    if not message.author.guild_permissions.administrator:
+        await message.channel.send("This command is restricted, to be used only by gods.")
+        return
     if len(args) == 0:
         await message.channel.send(
             "Usage: `{0}setleave` <leave text, less than 61 chars. Write \"None\" for no leave message>".format(PREFIX))  # noqa
@@ -176,10 +182,40 @@ async def set_leave_msg(client, message, *args):
         await message.channel.send("Disabled leave message.")
 
 
+async def set_coin_drops(client, message, *args):
+    if not message.author.guild_permissions.administrator:
+        await message.channel.send("This command is restricted, to be used only by gods.")
+        return
+    if len(args) == 0:
+        await message.channel.send(
+            "Usage: `{0}coindrops` <disable/enable>".format(PREFIX))  # noqa
+        return
+    input_str = " ".join(args).lower()
+    if input_str == "enable":
+        engine = await database.prepare_engine()
+        async with engine.acquire() as conn:
+            update_query = database.Guild.update().where(
+                database.Guild.c.guild == message.guild.id
+            ).values(coin_drops=True)
+            await conn.execute(update_query)
+            await message.channel.send("Enabled coin drops.")
+    elif input_str == "disable":
+        engine = await database.prepare_engine()
+        async with engine.acquire() as conn:
+            update_query = database.Guild.update().where(
+                database.Guild.c.guild == message.guild.id
+            ).values(coin_drops=False)
+            await conn.execute(update_query)
+            await message.channel.send("Disabled coin drops.")
+    else:
+        await message.channel.send("Invalid command.")
+
+
 admin_functions = {
     'setpaidroles': (set_paid_roles, "Set up paid roles."),
     'setwlchannel': (set_welcome_leave_channel, "Set welcome/leave message channel."),
     'setwelcome': (set_welcome_msg, "Set the text for the welcome message."),
     'setleave': (set_leave_msg, "Set the text for the leave message."),
-    'purge': (clean, "Purge X messages from this channel.")
+    'purge': (clean, "Purge X messages from this channel."),
+    'coindrops': (set_coin_drops, "Enable/Disable coin drops for a server. Default: disabled."),
 }

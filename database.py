@@ -26,6 +26,7 @@ Guild = sa.Table(
     sa.Column('guild', sa.BigInteger, nullable=False),
     sa.Column('shop_roles', sa.JSON),
     sa.Column('music_enabled', sa.Boolean),
+    sa.Column('coin_drops', sa.Boolean, server_default='f', nullable=False),
     sa.Column('join_leave_channel', sa.BigInteger),
     sa.Column('welcome_str', sa.String(length=60), server_default="Let the madness begin. Hold tight."),
     sa.Column('leave_str', sa.String(length=60), server_default="See you again, in another life.")

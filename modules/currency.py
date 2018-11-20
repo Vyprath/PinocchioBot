@@ -155,6 +155,16 @@ async def free_money_handler(client, message):
             await _add_money(engine, message.author, random.randint(1, 20))
     else:
         passive_money_users.update({message.author.id: now})
+    engine = await database.prepare_engine()
+    async with engine.acquire() as conn:
+        fetch_query = database.Guild.select().where(
+            database.Guild.c.guild == message.guild.id
+        )
+        cursor = await conn.execute(fetch_query)
+        resp = await cursor.fetchone()
+        coin_drop_enabled = resp[database.Guild.c.coin_drops]
+    if not coin_drop_enabled:
+        return
     N = FREE_MONEY_SPAWN_LIMIT
     try:
         e = free_money_channels[message.channel.id]
@@ -186,7 +196,6 @@ async def free_money_handler(client, message):
             await asyncio.sleep(3)
             await message.channel.delete_messages([msg_1, msg_2])
             return
-    engine = await database.prepare_engine()
     await _add_money(engine, coins_collector, amount)
     msg_3 = await message.channel.send(
         "User {0} has gained {1} coins!"
