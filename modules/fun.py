@@ -2,8 +2,9 @@ import aiohttp
 import variables
 import discord
 import json
-from random import randint
 import datetime
+import html
+from random import randint
 from urllib.parse import quote
 
 
@@ -30,6 +31,7 @@ async def _fetch_text(url, headers={}):
 async def chuck_norris(client, message, *args):
     resp_txt = await _fetch_text(variables.ICNDB_RANDOM_JOKE_URL)
     joke = json.loads(resp_txt)['value']['joke']
+    joke = html.unescape(joke)
     await message.channel.send(joke)
 
 
