@@ -69,6 +69,8 @@ async def set_paid_roles(client, message, *args):
     if not message.author.guild_permissions.administrator:
         await message.channel.send("This command is restricted, to be used only by gods.")
         return
+    available_role_names = {
+        r.name.lower().strip(): r for r in message.guild.roles if not r.name == "@everyone"}
     engine = await database.prepare_engine()
     async with engine.acquire() as conn:
         fetch_query = database.Guild.select().where(
@@ -90,42 +92,46 @@ async def set_paid_roles(client, message, *args):
         await message.channel.send(
             """
 Current paid roles are: ```{0}```\n
-To set, run `{1}setpaidroles set <role mention> <amount>`\n
-To remove, run `{1}setpaidroles delete <role mention>`
+To set, run `{1}setpaidroles set <amount> "<role name>"`\n
+To remove, run `{1}setpaidroles delete <role name>`
             """
             .format(shop_roles_string, PREFIX)
         )
-    elif len(args) == 3 and args[0] == "set" and args[2].isdigit():
-        if len(message.role_mentions) == 0:
-            await message.channel.send("Please mention proper role.")
+    elif len(args) >= 3 and args[0] == "set":
+        mentioned_role = " ".join(args[2:])
+        if mentioned_role.lower().strip() in available_role_names.keys():
+            mentioned_role = available_role_names[mentioned_role.lower().strip()]
         else:
-            role = message.role_mentions[0]
-            amount = int(args[2])
-            if shop_roles:
-                shop_roles.update({role.id: amount})
-            else:
-                shop_roles = {role.id: amount}
+            await message.channel.send("No role in server with that name.")
+            return
+        amount = int(args[1])
+        if shop_roles:
+            shop_roles.update({mentioned_role.id: amount})
+        else:
+            shop_roles = {mentioned_role.id: amount}
             async with engine.acquire() as conn:
                 update_query = database.Guild.update().where(
                     database.Guild.c.guild == message.guild.id
                 ).values(shop_roles=shop_roles)
-            await conn.execute(update_query)
-            await message.channel.send("Done.")
-    elif len(args) == 2 and args[0] == "delete":
-        if len(message.role_mentions) == 0:
-            await message.channel.send("Please mention proper role.")
+                await conn.execute(update_query)
+                await message.channel.send("Done.")
+    elif len(args) >= 2 and args[0] == "delete":
+        mentioned_role = " ".join(args[1:])
+        if mentioned_role.lower().strip() in available_role_names.keys():
+            mentioned_role = available_role_names[mentioned_role.lower().strip()]
         else:
-            role = message.role_mentions[0]
-            if shop_roles and str(role.id) in shop_roles.keys():
-                shop_roles.pop(str(role.id))
-                async with engine.acquire() as conn:
-                    update_query = database.Guild.update().where(
-                        database.Guild.c.guild == message.guild.id
-                    ).values(shop_roles=shop_roles)
-                    await conn.execute(update_query)
-                    await message.channel.send("Done.")
-            else:
-                await message.channel.send("Role not present.")
+            await message.channel.send("No role in server with that name.")
+            return
+        if shop_roles and str(mentioned_role.id) in shop_roles.keys():
+            shop_roles.pop(str(mentioned_role.id))
+            async with engine.acquire() as conn:
+                update_query = database.Guild.update().where(
+                    database.Guild.c.guild == message.guild.id
+                ).values(shop_roles=shop_roles)
+                await conn.execute(update_query)
+                await message.channel.send("Done.")
+        else:
+            await message.channel.send("Role not present.")
     else:
         await message.channel.send("Invalid command.")
 
