@@ -30,7 +30,7 @@ from .rpg import rpg_functions
 from .anime import anime_functions
 from music import music_functions
 from messages import HELP_MESSAGE
-from variables import PREFIX
+from variables import PREFIX, CMD_POPULARITY
 import shlex
 
 
@@ -40,6 +40,10 @@ async def message_resolve(client, message, cmd_prefix):
         if args[0] == 'help':
             await print_help(client, message, *args[len(cmd_prefix):])
         elif args[0] in functions.keys():
+            if args[0] in CMD_POPULARITY.keys():
+                CMD_POPULARITY[args[0]] += 1
+            else:
+                CMD_POPULARITY.update({args[0]: 1})
             await functions[args[0]][0](client, message, *args[len(cmd_prefix):])
     for handler in handlers:
         await handler(client, message)

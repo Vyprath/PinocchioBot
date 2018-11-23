@@ -41,3 +41,6 @@ CATFACT_URL = "https://catfact.ninja/fact"
 LMGTFY_URL = "https://lmgtfy.com/?q="
 UD_URL = "https://api.urbandictionary.com/v0/define?term="
 TINYURL = "https://tinyurl.com/api-create.php?url="
+
+# Developer's special
+CMD_POPULARITY = {}

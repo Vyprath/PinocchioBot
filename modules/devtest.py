@@ -1,15 +1,5 @@
+from variables import CMD_POPULARITY
 import database
-
-
-async def hello_world(client, message, *args):
-    await message.channel.send("Heya, {0}. N(args) = {2}. Your args: \"{1}\"".format(
-        message.author, args, len(args),
-    ))
-    perms = message.author.guild_permissions
-    admin = perms.administrator
-    await message.channel.send(
-        "Your guild permissions: \n```{0}```. Admin: {1}".format(perms, admin)
-    )
 
 
 async def view_stats(client, message, *args):
@@ -27,17 +17,11 @@ Stats for this bot: **(Classified Information, kek)**
     ))
 
 
-async def guilds_in(client, message, *args):
-    guilds = client.guilds
-    guild_names = ', '.join(["{} ({})".format(g.name, g.id) for g in guilds])
-    await message.channel.send("""
-Stats for this bot: **(Classified Information, kek)**
-**Number of Guilds In:** {0}
-They are: {1}
-    """.format(
-        len(guilds),
-        guild_names
-    ))
+async def famous_cmd(client, message, *args):
+    resp = []
+    for k, v in CMD_POPULARITY.items():
+        resp.append("`{0}`: {1}".format(k, v))
+    await message.channel.send(", ".join(resp))
 
 
 def wrapper(func, tier):
@@ -68,7 +52,6 @@ Maybe try contacting the ghost for an upgrade?
 
 
 devtest_functions = {
-    'helloworld': (wrapper(hello_world, 1), None),
     'botstats': (wrapper(view_stats, 3), None),
-    'guildsin': (wrapper(guilds_in, 4), None),
+    'famouscmds': (wrapper(famous_cmd, 4), None),
 }
