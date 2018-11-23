@@ -97,7 +97,7 @@ To remove, run `{1}setpaidroles delete <role name>`
             """
             .format(shop_roles_string, PREFIX)
         )
-    elif len(args) >= 3 and args[0] == "set":
+    elif len(args) >= 3 and args[0] == "set" and args[1].isdigit():
         mentioned_role = " ".join(args[2:])
         if mentioned_role.lower().strip() in available_role_names.keys():
             mentioned_role = available_role_names[mentioned_role.lower().strip()]
@@ -109,12 +109,12 @@ To remove, run `{1}setpaidroles delete <role name>`
             shop_roles.update({mentioned_role.id: amount})
         else:
             shop_roles = {mentioned_role.id: amount}
-            async with engine.acquire() as conn:
-                update_query = database.Guild.update().where(
-                    database.Guild.c.guild == message.guild.id
-                ).values(shop_roles=shop_roles)
-                await conn.execute(update_query)
-                await message.channel.send("Done.")
+        async with engine.acquire() as conn:
+            update_query = database.Guild.update().where(
+                database.Guild.c.guild == message.guild.id
+            ).values(shop_roles=shop_roles)
+            await conn.execute(update_query)
+            await message.channel.send("Done.")
     elif len(args) >= 2 and args[0] == "delete":
         mentioned_role = " ".join(args[1:])
         if mentioned_role.lower().strip() in available_role_names.keys():
