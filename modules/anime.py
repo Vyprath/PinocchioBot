@@ -1,9 +1,11 @@
-from variables import PREFIX
+from variables import PREFIX, TINYURL
 from jikanpy import AioJikan
 from jikanpy.exceptions import APIException
+from NyaaPy import Nyaa
 import asyncio
 import discord
 import datetime
+import aiohttp
 
 
 jikan = AioJikan(loop=asyncio.get_event_loop())
@@ -346,9 +348,44 @@ Total: {10}
     await message.channel.send(embed=embed)
 
 
+async def nyaa_search(client, message, *args):
+    if len(args) == 0:
+        await message.channel.send("Usage: {}nyaa <search term>".format(PREFIX))
+        return
+    search_term = " ".join(args)
+    wait_msg = await message.channel.send("Fetching data, please wait...")
+    search_results = Nyaa.search(keyword=search_term)
+    if len(search_results) == 0:
+        await message.channel.send("Nothing found.")
+        await wait_msg.delete()
+        return
+    embed = discord.Embed(title="Nyaa.Si Results", colour=message.author.colour)
+    fields = 1
+    for i, result in enumerate(search_results):
+        if fields > 10:
+            break
+        short_url = await short(result['url'])
+        download_url = await short(result['download_url'])
+        field_txt = "{0}\n**Size:** {1} **Date:** {2}\n{3} :arrow_up: {4} :arrow_down:\n[Link]({5}) [Torrent File]({6})\n".format(  # noqa
+            result['category'], result['size'], result['date'],
+            result['seeders'], result['leechers'], short_url, download_url
+        )
+        embed.add_field(name=result['name'], value=field_txt, inline=False)
+        fields += 1
+    await message.channel.send(embed=embed)
+    await wait_msg.delete()
+
+
 def chunks(l, n):
     for i in range(0, len(l), n):
         yield l[i:i+n]
+
+
+async def short(url):
+    async with aiohttp.ClientSession() as sess:
+        async with sess.get(TINYURL + url) as resp:
+            txt = await resp.text()
+            return txt
 
 
 anime_functions = {
@@ -356,5 +393,6 @@ anime_functions = {
     'manga': (manga, "Get details for an manga."),
     'animelist': (animelist, "Get the MAL animelist for an user."),
     'mangalist': (mangalist, "Get the MAL mangalist for an user."),
-    'profile': (profile, "Get profile for an user.")
+    'profile': (profile, "Get profile for an user."),
+    'nyaa': (nyaa_search, "Get anime torrents from nyaa.si"),
 }
