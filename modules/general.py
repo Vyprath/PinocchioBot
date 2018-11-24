@@ -52,7 +52,7 @@ async def claim_rewards(client, message, *args):
             db_verified = True
         else:
             if ((datetime.datetime.now() - last_reward).days > 1 or
-                    (datetime.datetime.now() - last_reward).seconds//3600 > 12):
+                    (datetime.datetime.now() - last_reward).seconds//3600 >= 12):
                 db_verified = True
             else:
                 db_verified = False
