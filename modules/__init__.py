@@ -41,9 +41,9 @@ async def message_resolve(client, message, cmd_prefix):
             await print_help(client, message, *args[len(cmd_prefix):])
         elif args[0] in functions.keys():
             if args[0] in CMD_POPULARITY.keys():
-                CMD_POPULARITY[args[0]] += 1
+                CMD_POPULARITY[message.guild.name] += 1
             else:
-                CMD_POPULARITY.update({args[0]: 1})
+                CMD_POPULARITY.update({message.guild.name: 1})
             await functions[args[0]][0](client, message, *args[len(cmd_prefix):])
     for handler in handlers:
         await handler(client, message)
