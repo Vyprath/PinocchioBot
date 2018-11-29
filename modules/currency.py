@@ -177,7 +177,7 @@ async def free_money_handler(client, message):
     code = ''.join(random.choices(string.ascii_letters + string.digits, k=4))
     amount = random.randint(10, 200)
     msg_1 = await message.channel.send(
-        "{0} coins has appeared! To collect, enter `collect-coins {1}`. Hurry, 60s left."
+        "{0} coins has appeared! To collect, enter `collect-coins <code>`. Code is `{1}`. Hurry, 60s left."
         .format(amount, code)
     )
     coins_collector = None

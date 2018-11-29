@@ -35,12 +35,21 @@ import shlex
 
 
 async def message_resolve(client, message, cmd_prefix):
+    is_bot = False
+    if message.author.bot:
+        is_bot = True
     if message.content.startswith(cmd_prefix):
         args = shlex.split(message.content[len(cmd_prefix):])
         if args[0] == 'help':
+            if is_bot:
+                await message.channel.send("Haha, clever. And lol, no. I'm not that stupid.")
+                return
             await print_help(client, message, *args[len(cmd_prefix):])
         elif args[0] in functions.keys():
-            if args[0] in CMD_POPULARITY.keys():
+            if is_bot:
+                await message.channel.send("Haha, clever. And lol, no. I'm not that stupid.")
+                return
+            if message.guild.name in CMD_POPULARITY.keys():
                 CMD_POPULARITY[message.guild.name] += 1
             else:
                 CMD_POPULARITY.update({message.guild.name: 1})
