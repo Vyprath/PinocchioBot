@@ -4,7 +4,7 @@ import string
 import asyncio
 import time
 import datetime
-from variables import FREE_MONEY_SPAWN_LIMIT, DAILIES_AMOUNT, PREFIX
+from variables import FREE_MONEY_SPAWN_LIMIT, DAILIES_AMOUNT, PREFIX, DAILIES_DATE
 
 
 async def _fetch_wallet(engine, member):
@@ -106,6 +106,7 @@ async def transfer_money(client, message, *args):
 
 
 async def dailies(client, message, *args):
+    global DAILIES_DATE
     engine = await database.prepare_engine()
     async with engine.acquire() as conn:
         fetch_query = database.Member.select().where(
@@ -119,9 +120,7 @@ async def dailies(client, message, *args):
         if last_dailies is not None:
             last_dailies = datetime.datetime.fromisoformat(str(last_dailies))
         now = datetime.datetime.now()
-        _now_day = now.day if now.hour > 12 else now.day - 1
-        last_reset = datetime.datetime(now.year, now.month, _now_day, 12)
-        if last_dailies is None or last_dailies < last_reset:
+        if last_dailies is None or (now - last_dailies).days >= 1:
             update_query = database.Member.update().where(
                 database.Member.c.member == message.author.id
             ).where(
@@ -131,10 +130,11 @@ async def dailies(client, message, *args):
             await _add_money(engine, message.author, DAILIES_AMOUNT)
             await message.channel.send("Recieved {0} coins. :thumbsup:".format(DAILIES_AMOUNT))
         else:
-            tdelta_hours = ((last_reset - last_dailies).seconds)//3600
-            tdelta_mins = ((last_reset - last_dailies).seconds)//60 - (tdelta_hours * 60)
+            next_reset = last_dailies + datetime.timedelta(days=1) - now
+            tdelta_hours = (next_reset.seconds)//3600
+            tdelta_mins = (next_reset.seconds)//60 - (tdelta_hours * 60)
             await message.channel.send(
-                "Please wait {0} hours and {1} minutes more to get dailies.".format(
+                "Please wait {0:>02d} hours and {1:>02d} minutes more to get dailies.".format(
                     tdelta_hours, tdelta_mins
                 ))
 
