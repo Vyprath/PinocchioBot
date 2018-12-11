@@ -72,7 +72,7 @@ async def anime(client, message, *args):
         return
     _search_result = await jikan.search(search_type='anime', query=search_str)
     search_result = _search_result['results'][0]['mal_id']
-    embed = _anime_embed(search_result, message.author.color)
+    embed = await _anime_embed(search_result, message.author.color)
     await message.channel.send(embed=embed)
 
 
