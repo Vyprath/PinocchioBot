@@ -438,7 +438,7 @@ Send a picture (PNG/JPG/GIF only):
     et_min = _et//60
     et_sec = int(_et-et_min*60)
     fields = [
-        ("Scene Match Time", "{0:.2f}%".format(float(result['similarity'])*100), True),
+        ("Match Similarity", "{0:.2f}%".format(float(result['similarity'])*100), True),
         ("Episode", result['episode'], True),
         ("Scene Appears Between",
          "{0:>02d}:{1:>02d} to {2:>02d}:{3:>02d}".format(st_min, st_sec, et_min, et_sec),
