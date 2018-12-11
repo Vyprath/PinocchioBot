@@ -26,7 +26,7 @@ from .shop import shop_functions
 from .waifu import waifu_functions
 from .reactions import reactions_functions
 from .fun import fun_functions
-from .rpg import rpg_functions
+from .waifu_duel import rpg_functions
 from .anime import anime_functions
 from music import music_functions
 from messages import HELP_MESSAGE

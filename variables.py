@@ -42,6 +42,9 @@ CATFACT_URL = "https://catfact.ninja/fact"
 LMGTFY_URL = "https://lmgtfy.com/?q="
 UD_URL = "https://api.urbandictionary.com/v0/define?term="
 TINYURL = "https://tinyurl.com/api-create.php?url="
+TRACE_MOE_API = os.environ.get("TRACE_MOE_API")
+assert TRACE_MOE_API is not None, "Trace Moe API key not given."
+TRACE_MOE_URL = "https://trace.moe/api/search?token=" + TRACE_MOE_API
 
 # Developer's special
 CMD_POPULARITY = {}

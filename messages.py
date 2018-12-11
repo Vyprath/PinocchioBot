@@ -31,6 +31,7 @@ __**Pinocchio Bot Usage:**__
 `{0}mangalist <MAL Username>`: Get someone's MAL mangalist.
 `{0}profile <MAL Username>`: Get someone's MAL profile.
 `{0}nyaa <search string>`: Get anime torrents from nyaa.si.
+`{0}whichanime`: Get an anime from a scene picture. Using trace.moe.
 
 **Fun**
 *Usage* `{0}<command name>`: `{0}chucknorris`, `{0}dadjoke`, `{0}xkcd`, `{0}catfact`, `{0}8ball`.

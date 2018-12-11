@@ -44,6 +44,7 @@ Waifu = sa.Table(
 
 PurchasedWaifu = sa.Table(
     'purchased_waifu', meta,
+    sa.Column('id', sa.BigInteger, primary_key=True, nullable=False, unique=True),
     sa.Column('member_id', sa.BigInteger, sa.ForeignKey('members.id', ondelete='CASCADE')),
     sa.Column('waifu_id', sa.BigInteger, sa.ForeignKey('waifu.id', ondelete='CASCADE')),
     sa.Column('guild', sa.BigInteger, nullable=False),
@@ -67,6 +68,9 @@ RPGCharacter = sa.Table(
     sa.Column('level', sa.Integer, nullable=False),
     sa.Column('game_wallet', sa.BigInteger, nullable=False),
     sa.Column('weapon_id', sa.BigInteger, sa.ForeignKey('rpg_weapon.id', ondelete='SET NULL')),
+    sa.Column('waifu_id', sa.BigInteger, sa.ForeignKey('waifu.id', ondelete='CASCADE')),
+    sa.Column('purchased_waifu_id',
+              sa.BigInteger, sa.ForeignKey('purchased_waifu.id', ondelete='CASCADE')),
 )
 
 tables = [Member, Guild, Waifu, PurchasedWaifu, RPGWeapon, RPGCharacter]

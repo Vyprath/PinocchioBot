@@ -1,30 +1,27 @@
-from variables import PREFIX, TINYURL
+from variables import PREFIX, TINYURL, TRACE_MOE_URL
 from jikanpy import AioJikan
 from jikanpy.exceptions import APIException
 from NyaaPy import Nyaa
+from io import BytesIO
+from PIL import Image
+from base64 import b64encode
 import asyncio
 import discord
 import datetime
 import aiohttp
-
+import json
 
 jikan = AioJikan(loop=asyncio.get_event_loop())
 
 
-async def anime(client, message, *args):
-    if len(args) == 0:
-        await message.channel.send("Usage: {0}anime <anime name>".format(PREFIX))
-        return
-    search_str = ' '.join(args)
-    if len(search_str) < 3:
-        await message.channel.send("Anime name must be atleast 3 letters.")
-        return
-    _search_result = await jikan.search(search_type='anime', query=search_str)
-    search_result = _search_result['results'][0]['mal_id']
-    anime = await jikan.anime(search_result)
-    embed = discord.Embed(title=anime['title'], url=anime['url'], color=message.author.colour)
+async def _anime_embed(mal_id, color=0x00000000, init_fields=[]):
+    anime = await jikan.anime(mal_id)
+    embed = discord.Embed(title=anime['title'], url=anime['url'], color=color)
     if 'image_url' in anime.keys() and anime['image_url']:
         embed.set_thumbnail(url=anime['image_url'])
+    if len(init_fields) > 0:
+        for field in init_fields:
+            embed.add_field(name=field[0], value=field[1], inline=field[2])
     embed.add_field(name="Type", value=anime['type'])
     embed.add_field(name="Episodes", value="{0} ({1})".format(anime['episodes'], anime['duration']))
     embed.add_field(name="Status", value=anime['status'])
@@ -62,6 +59,20 @@ async def anime(client, message, *args):
         embed.add_field(
             name="Ending Theme Song", value=", ".join(anime['ending_themes']), inline=False)
     embed.set_footer(text="Taken from MyAnimeList.net")
+    return embed
+
+
+async def anime(client, message, *args):
+    if len(args) == 0:
+        await message.channel.send("Usage: {0}anime <anime name>".format(PREFIX))
+        return
+    search_str = ' '.join(args)
+    if len(search_str) < 3:
+        await message.channel.send("Anime name must be atleast 3 letters.")
+        return
+    _search_result = await jikan.search(search_type='anime', query=search_str)
+    search_result = _search_result['results'][0]['mal_id']
+    embed = _anime_embed(search_result, message.author.color)
     await message.channel.send(embed=embed)
 
 
@@ -376,6 +387,73 @@ async def nyaa_search(client, message, *args):
     await wait_msg.delete()
 
 
+async def which_anime(client, message, *args):
+    await message.channel.send(
+        """
+Let's find out which anime that scene is from!
+This is using https://trace.moe, kudos to the creator.
+**Please follow this: https://trace.moe/faq. You will get to know what kind of images to send.**
+Send a picture (PNG/JPG/GIF only):
+        """)
+    try:
+        def check(m):
+            return len(m.attachments) != 0 or m.content == 'exit'
+        msg = await client.wait_for('message', check=check, timeout=60)
+        if msg.content == 'exit':
+            await message.channel.send("Okay, exiting...")
+            return
+        img_attachment = msg.attachments[0]
+        img_bio = BytesIO()
+        await img_attachment.save(img_bio)
+    except asyncio.TimeoutError:
+        await message.channel.send('Error: Timeout.')
+        return
+    img = Image.open(img_bio, 'r')
+    img.thumbnail((320, 240), Image.ANTIALIAS)
+    out_io = BytesIO()
+    img.save(out_io, 'JPEG')
+    out_io.seek(0)
+    b64_data = b64encode(out_io.getvalue()).decode()
+    data = "data:image/jpeg;base64,{}".format(b64_data)
+    async with aiohttp.ClientSession() as sess:
+        async with sess.post(TRACE_MOE_URL, json={'image': data}) as resp:
+            if resp.status == 429:
+                await message.channel.send("Too many people using this command >.< Please wait till quota is cleared.")  # noqa
+                return
+            assert resp.status == 200
+            txt = await resp.text()
+            try:
+                result = json.loads(txt)['docs']
+            except (json.decoder.JSONDecodeError, KeyError, AssertionError):
+                await message.channel.send("Something is wrong >.< . Contact developer.")
+                return
+    if len(result) == 0:
+        await message.channel.send("No results found. Gommenasai.")
+        return
+    result = result[0]
+    _st = int(result['from'])
+    st_min = _st//60
+    st_sec = int(_st-st_min*60)
+    _et = int(result['to'])
+    et_min = _et//60
+    et_sec = int(_et-et_min*60)
+    fields = [
+        ("Scene Match Time", "{0:.2f}%".format(float(result['similarity'])*100), True),
+        ("Episode", result['episode'], True),
+        ("Scene Appears Between",
+         "{0:>02d}:{1:>02d} to {2:>02d}:{3:>02d}".format(st_min, st_sec, et_min, et_sec),
+         True),
+        ("Is Hentai", str(result['is_adult']).capitalize(), True)
+    ]
+    if result['mal_id']:
+        embed = await _anime_embed(result['mal_id'], color=message.author.color, init_fields=fields)
+    else:
+        embed = discord.Embed(title=result['title_romaji'], color=message.author.color)
+        for field in fields:
+            embed.add_field(name=field[0], value=field[1], inline=field[2])
+    await message.channel.send(embed=embed)
+
+
 def chunks(l, n):
     for i in range(0, len(l), n):
         yield l[i:i+n]
@@ -395,4 +473,5 @@ anime_functions = {
     'mangalist': (mangalist, "Get the MAL mangalist for an user."),
     'profile': (profile, "Get profile for an user."),
     'nyaa': (nyaa_search, "Get anime torrents from nyaa.si"),
+    'whichanime': (which_anime, "Which Anime Is This? Get information about an anime scene. (trace.moe)")  # noqa
 }
