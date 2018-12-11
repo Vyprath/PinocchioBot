@@ -410,6 +410,7 @@ Send a picture (PNG/JPG/GIF only):
         return
     img = Image.open(img_bio, 'r')
     img.thumbnail((320, 240), Image.ANTIALIAS)
+    img = img.convert('RGB')
     out_io = BytesIO()
     img.save(out_io, 'JPEG')
     out_io.seek(0)
