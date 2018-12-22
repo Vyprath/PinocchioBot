@@ -75,14 +75,18 @@ RPGCharacter = sa.Table(
 
 tables = [Member, Guild, Waifu, PurchasedWaifu, RPGWeapon, RPGCharacter]
 
+engine = None
+
 
 async def prepare_engine():
-    engine = await create_engine(
-        database=DB_NAME,
-        user=DB_USERNAME,
-        password=DB_PASSWORD,
-        host='127.0.0.1',
-    )
+    global engine
+    if engine is None:
+        engine = await create_engine(
+            database=DB_NAME,
+            user=DB_USERNAME,
+            password=DB_PASSWORD,
+            host='127.0.0.1',
+        )
     return engine
 
 
