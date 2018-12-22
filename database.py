@@ -86,6 +86,7 @@ async def prepare_engine():
             user=DB_USERNAME,
             password=DB_PASSWORD,
             host='127.0.0.1',
+            maxsize=50,
         )
     return engine
 
