@@ -86,7 +86,7 @@ async def prepare_engine():
             user=DB_USERNAME,
             password=DB_PASSWORD,
             host='127.0.0.1',
-            maxsize=50,
+            maxsize=25,
         )
     return engine
 
@@ -100,8 +100,8 @@ async def prepare_tables():
             SELECT * FROM INFORMATION_SCHEMA.TABLES
             WHERE TABLE_NAME = N'{}'""".format(table_name)
             cursor = await conn.execute(query)
-            resp = await cursor.fetchone()
-            if resp is None:
+            resp = await cursor.fetchall()
+            if resp is None or resp == []:
                 logging.info("Table {} does not exist; creating.".format(table_name))
                 create_expr = CreateTable(table)
                 await conn.execute(create_expr)
@@ -120,8 +120,8 @@ async def make_member_profile(members_list, self_id):
                     Member.c.member == member.id).where(
                     Member.c.guild == member.guild.id)
                 cursor = await conn.execute(exists_query)
-                res = await cursor.fetchone()
-                if res is None:
+                res = await cursor.fetchall()
+                if res is None or res == []:
                     create_query_values.append({
                         'guild': member.guild.id,
                         'member': member.id,
@@ -141,8 +141,8 @@ async def make_guild_entry(guilds_list):
                 exists_query = Guild.select().where(
                     Guild.c.guild == guild.id)
                 cursor = await conn.execute(exists_query)
-                res = await cursor.fetchone()
-                if res is None:
+                res = await cursor.fetchall()
+                if res is None or res == []:
                     create_query_values.append({
                         'guild': guild.id,
                     })

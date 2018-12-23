@@ -30,13 +30,13 @@ async def on_ready():
     logging.info("Logged in as {0} - {1}.".format(client.user.name, client.user.id))
     if variables.DBL_TOKEN:
         dborg.init_dbl(client)
-    await database.make_member_profile(client.get_all_members(), client.user.id)
+    # await database.make_member_profile(client.get_all_members(), client.user.id)
     await dborg.dbl_api.update_stats()
 
 
 @client.event
 async def on_message(message):
-    await database.make_guild_entry(client.guilds)
+    # await database.make_guild_entry(client.guilds)
     await message_resolve(client, message, variables.PREFIX)
 
 
