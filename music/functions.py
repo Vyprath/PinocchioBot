@@ -49,7 +49,10 @@ async def _play_music(message, voice_client, guild_state, skip=False):
     music = guild_state.playlist.pop(0)
     guild_state.now_playing = music
     source = discord.PCMVolumeTransformer(
-        discord.FFmpegPCMAudio(music.stream_url), volume=guild_state.volume)
+        discord.FFmpegPCMAudio(
+            music.stream_url,
+            before_options="-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"),
+        volume=guild_state.volume)
 
     def after_finished(err):
         # TODO: Fix non stopping bug.
