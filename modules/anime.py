@@ -397,7 +397,8 @@ Send a picture (PNG/JPG/GIF only):
         """)
     try:
         def check(m):
-            return len(m.attachments) != 0 or m.content == 'exit'
+            return (m.channel == message.channel and m.author == message.author and
+                    (len(m.attachments) != 0 or m.content == 'exit'))
         msg = await client.wait_for('message', check=check, timeout=60)
         if msg.content == 'exit':
             await message.channel.send("Okay, exiting...")
