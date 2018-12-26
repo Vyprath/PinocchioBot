@@ -19,11 +19,14 @@ class MusicInfo:
         self.video_url = info['webpage_url']
         self.requested_by = requested_by
         self.time_left = time_left
-        formats = {x['abr']: x for x in info['formats'] if 'abr' in x and 'tbr' in x}
+        formats = {x['abr']: x for x in info['formats'] if 'abr' in x}
         assert formats is not None and formats != {}
         abr_max = max(formats.keys())
         source = formats[abr_max]
         self.stream_url = source['url']
+        self.abr = source['abr']
+        self.asr = source['asr'] if 'asr' in source.keys() else None
+        self.acodec = source['acodec'] if 'acodec' in source.keys() else None
 
     def _get_info(self, search_str):
         with youtube_dl.YoutubeDL(YTDL_OPTS) as ydl:
@@ -42,6 +45,11 @@ class MusicInfo:
             url=self.video_url, color=self.requested_by.colour)
         mins = self.duration//60
         secs = self.duration - mins*60
+        embed.add_field(name="Average Audio Bitrate", value="{0} KBit/s".format(self.abr))
+        if self.asr:
+            embed.add_field(name="Audio Sampling Rate", value="{0} Hz".format(self.asr))
+        if self.acodec:
+            embed.add_field(name="Audio Codec", value=self.acodec)
         embed.add_field(
             name="Duration",
             value="{0:>02d}:{1:>02d}".format(mins, secs))

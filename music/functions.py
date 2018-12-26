@@ -39,11 +39,11 @@ Or ask everyone to leave the previous voice channel.
 
 
 async def _play_music(message, voice_client, guild_state, skip=False):
-    if len(guild_state.playlist) == 0:
-        await stop_bot(voice_client, message.guild.id)
-        return
     if guild_state.requested_skip:
         guild_state.requested_skip = False
+        return
+    if len(guild_state.playlist) == 0:
+        await stop_bot(voice_client, message.guild.id)
         return
     guild_state.requested_skip = skip
     music = guild_state.playlist.pop(0)
