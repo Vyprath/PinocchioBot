@@ -78,7 +78,7 @@ class MusicInfo:
 
 class GuildState:
     def __init__(self):
-        self.volume = 0.8
+        self.volume = 0.6
         self.playlist = []
         self.now_playing = None
         self.requested_skip = False
