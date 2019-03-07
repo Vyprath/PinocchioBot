@@ -29,7 +29,8 @@ Guild = sa.Table(
     sa.Column('coin_drops', sa.Boolean, server_default='f', nullable=False),
     sa.Column('join_leave_channel', sa.BigInteger),
     sa.Column('welcome_str', sa.String(length=60), server_default="Let the madness begin. Hold tight."),
-    sa.Column('leave_str', sa.String(length=60), server_default="See you again, in another life.")
+    sa.Column('leave_str', sa.String(length=60), server_default="See you again, in another life."),
+    sa.Column('custom_role', sa.BigInteger, server_default="40000")
 )
 
 Waifu = sa.Table(

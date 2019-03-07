@@ -217,11 +217,30 @@ async def set_coin_drops(client, message, *args):
         await message.channel.send("Invalid command.")
 
 
+async def set_custom_roles(client, message, *args):
+    if len(args) != 1 or not args[0].lstrip("-").isdigit():
+        await message.channel.send(
+            "Usage: {}setcustomroles <price (-1 for disabling)>".format(PREFIX))
+        return
+    price = int(args[0])
+    engine = await database.prepare_engine()
+    async with engine.acquire() as conn:
+        update_query = database.Guild.update().where(
+            database.Guild.c.guild == message.guild.id
+        ).values(custom_role=price)
+        await conn.execute(update_query)
+    if price < 0:
+        await message.channel.send("Successfully disabled custom roles.")
+    else:
+        await message.channel.send("Set custom roles price to {}.".format(price))
+
+
 admin_functions = {
     'setpaidroles': (set_paid_roles, "Set up paid roles."),
     'setwlchannel': (set_welcome_leave_channel, "Set welcome/leave message channel."),
     'setwelcome': (set_welcome_msg, "Set the text for the welcome message."),
     'setleave': (set_leave_msg, "Set the text for the leave message."),
+    'setcustomroles': (set_custom_roles, "Change the settings for custom roles."),
     'purge': (clean, "Purge X messages from this channel."),
     'coindrops': (set_coin_drops, "Enable/Disable coin drops for a server. Default: disabled."),
 }

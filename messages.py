@@ -67,6 +67,7 @@ __**Pinocchio Bot Usage:**__
 **Administration (Below commands require Admininstrator Permission)**
 `{0}get-money <amount>`: Get some money.
 `{0}setpaidroles`: Set up paid roles.
+`{0}setcustomroles`: Set price or disable custom roles.
 `{0}purge <number of messages between 1 to 100>`: Purge messages from the channel.
 `{0}setwlchannel`: Set up welcome/leave message channel, or disable it. Default: disabled.
 `{0}setwelcome <new string>`: Change the default welcome string, or disable it by `{0}setwelcome None`.

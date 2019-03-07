@@ -2,16 +2,25 @@ from .currency import _remove_money, _fetch_wallet
 import database
 import discord
 import asyncio
-from variables import CUSTOM_ROLE_COST, PREFIX
+from variables import PREFIX
 
 
 async def buy_colored_role(client, message, *args):
     engine = await database.prepare_engine()
-    await message.channel.send("Welcome to the custom colored role creator!")
     wallet = await _fetch_wallet(engine, message.author)
-    if wallet - CUSTOM_ROLE_COST < 0:
+    async with engine.acquire() as conn:
+        select_query = database.Guild.select().where(
+            database.Guild.c.guild == message.guild.id)
+        cursor = await conn.execute(select_query)
+        resp = await cursor.fetchone()
+    custom_role_cost = resp[database.Guild.c.custom_role]
+    if custom_role_cost < 0:
+        await message.channel.send("Custom roles disabled in this server.")
+        return
+    await message.channel.send("Welcome to the custom colored role creator!")
+    if wallet - custom_role_cost < 0:
         await message.channel.send(
-            "Unfortunately you don't have enough money. Cost is {0} coins".format(CUSTOM_ROLE_COST))
+            "Unfortunately you don't have enough money. Cost is {0} coins".format(custom_role_cost))
         return
     await message.channel.send(
         "Enter the color (Either enter a hex code like `0x00ff00`, or enter an 8-bit RGB sequence like `0 255 0`):")  # noqa
@@ -50,7 +59,7 @@ async def buy_colored_role(client, message, *args):
     except (AssertionError, ValueError):
         await message.channel.send("Invalid text entered. Exiting...")
         return
-    await _remove_money(engine, message.author, CUSTOM_ROLE_COST)
+    await _remove_money(engine, message.author, custom_role_cost)
     role = await message.guild.create_role(
         name=role_name, color=color, reason="Bought this custom role.")
     await message.author.add_roles(role, reason="Bought this custom role.")

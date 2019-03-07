@@ -1,5 +1,6 @@
 import youtube_dl
 import discord
+import re
 
 YTDL_OPTS = {
     "default_search": "ytsearch",
@@ -7,19 +8,26 @@ YTDL_OPTS = {
     "quiet": True,
     "extract_flat": "in_playlist"
 }
+regex_str = "^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$"
 
 
 class MusicInfo:
     def __init__(self, search_str, requested_by, time_left):
-        info = self._get_info(search_str)
-        self.title = info['title']
-        self.duration = info['duration']
-        self.uploader = info['uploader']
-        self.thumbnail = info['thumbnail'] if 'thumbnail' in info else None
-        self.video_url = info['webpage_url']
+        self.is_playlist = False
         self.requested_by = requested_by
         self.time_left = time_left
-        formats = {x['abr']: x for x in info['formats'] if 'abr' in x}
+        self.raw_info = self._get_info(search_str)
+        if (self.is_playlist and not re.match(regex_str, search_str)):
+            self.is_playlist = False
+            self.raw_info = self._get_info(self.raw_info['entries'][0]['url'])
+
+    def process_url(self):
+        self.title = self.raw_info['title']
+        self.duration = self.raw_info['duration']
+        self.uploader = self.raw_info['uploader']
+        self.thumbnail = self.raw_info['thumbnail'] if 'thumbnail' in self.raw_info else None
+        self.video_url = self.raw_info['webpage_url']
+        formats = {x['abr']: x for x in self.raw_info['formats'] if 'abr' in x}
         assert formats is not None and formats != {}
         abr_max = max(formats.keys())
         source = formats[abr_max]
@@ -33,7 +41,8 @@ class MusicInfo:
             try:
                 info = ydl.extract_info(search_str, download=False)
                 if "_type" in info and info["_type"] == "playlist":
-                    return self._get_info(info['entries'][0]['url'])
+                    self.is_playlist = True
+                #     return self._get_info(info['entries'][0]['url'])
                 return info
             except youtube_dl.utils.DownloadError:
                 raise AssertionError
@@ -69,7 +78,7 @@ class MusicInfo:
 
 class GuildState:
     def __init__(self):
-        self.volume = 1.0
+        self.volume = 0.8
         self.playlist = []
         self.now_playing = None
         self.requested_skip = False

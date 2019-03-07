@@ -61,11 +61,11 @@ async def _play_music(message, voice_client, guild_state, skip=False):
             voice_client.loop)
 
     embed = music.get_embed()
-    embed.remove_field(1)
+    # embed.remove_field(1)
     await message.channel.send("Now Playing", embed=embed)
     if voice_client.is_playing():
         voice_client.stop()
-    voice_client.play(source, after=after_finished)
+        voice_client.play(source, after=after_finished)
 
 
 async def stop_bot(voice_client, guild_id):
@@ -73,11 +73,13 @@ async def stop_bot(voice_client, guild_id):
         voice_client.stop()
     if guild_id in guild_states:
         guild_states.pop(guild_id)
-    await voice_client.disconnect()
+        await voice_client.disconnect()
 
 
 def _get_music_info(args, message, duration):
     info = MusicInfo(' '.join(args), message.author, duration)
+    if not info.is_playlist:
+        info.process_url()
     return info
 
 
@@ -102,18 +104,37 @@ async def play(client, message, *args):
             client.loop.run_in_executor(executor, _get_music_info, args, message, duration)
         )
         info = _info[0]
+        if info.is_playlist:
+            await message.channel.send("Link leads to playlist. Adding, please wait. (Max 5 can be added.)")
+            entries = info.raw_info['entries']
+            entries = entries if len(entries) < 5 else entries[:5]
+            for entry in entries:
+                _pl_info = await asyncio.gather(
+                    client.loop.run_in_executor(
+                        executor, _get_music_info, entry['url'], message, duration
+                    ))
+                pl_info = _pl_info[0]
+                pl_info.process_url()
+                duration += pl_info.duration
+                guild_state.playlist.append(pl_info)
+                if len(guild_state.playlist) != 0 or guild_state.now_playing is not None:
+                    message = await message.channel.send(
+                        "Added from playlist to queue.", embed=pl_info.get_embed())
+                else:
+                    await _play_music(message, voice_client, guild_state)
+        else:
+            if len(guild_state.playlist) != 0 or guild_state.now_playing is not None:
+                guild_state.playlist.append(info)
+                message = await message.channel.send(
+                    "Added to queue.", embed=info.get_embed())
+            else:
+                guild_state.playlist.append(info)
+                await _play_music(message, voice_client, guild_state)
     except AssertionError:
         await message.channel.send(
             "Music was not found! If it is youtube, make sure it is a public video."
         )
         return
-    if len(guild_state.playlist) != 0 or guild_state.now_playing is not None:
-        guild_state.playlist.append(info)
-        message = await message.channel.send(
-            "Added to queue.", embed=info.get_embed())
-    else:
-        guild_state.playlist.append(info)
-        await _play_music(message, voice_client, guild_state)
 
 
 async def skip(client, message, *args):
@@ -224,25 +245,25 @@ async def status(client, message, *args):
     embed = discord.Embed(title="Music Status", color=0x35fd24)
     if guild_state.now_playing.thumbnail:
         embed.set_thumbnail(url=guild_state.now_playing.thumbnail)
-    embed.add_field(name="Currently Playing", value=guild_state.now_playing.title, inline=False)
-    next_playing = "Nothing in queue."
+        embed.add_field(name="Currently Playing", value=guild_state.now_playing.title, inline=False)
+        next_playing = "Nothing in queue."
     if len(guild_state.playlist) > 0:
         next_playing = guild_state.playlist[0].title
-    embed.add_field(name="Next Playing", value=next_playing, inline=False)
-    mins = guild_state.now_playing.duration//60
-    secs = guild_state.now_playing.duration - mins*60
-    embed.add_field(
-        name="Current Music Duration", value="{0:>02d}:{1:>02d}".format(mins, secs), inline=False)
-    req_by = guild_state.now_playing.requested_by
-    embed.set_footer(
-        text="Current one requested by: {0}".format(req_by.name), icon_url=req_by.avatar_url)
-    await message.channel.send(embed=embed)
+        embed.add_field(name="Next Playing", value=next_playing, inline=False)
+        mins = guild_state.now_playing.duration//60
+        secs = guild_state.now_playing.duration - mins*60
+        embed.add_field(
+            name="Current Music Duration", value="{0:>02d}:{1:>02d}".format(mins, secs), inline=False)
+        req_by = guild_state.now_playing.requested_by
+        embed.set_footer(
+            text="Current one requested by: {0}".format(req_by.name), icon_url=req_by.avatar_url)
+        await message.channel.send(embed=embed)
 
 
 async def lyrics(client, message, *args):
     if len(args) == 0:
         await message.channel.send("Usage: {0}lyrics <song name>".format(PREFIX))
-    name = " ".join(args)
+        name = " ".join(args)
 
 
 async def on_voice_state_update(member, before, after):
