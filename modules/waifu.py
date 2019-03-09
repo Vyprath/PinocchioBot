@@ -413,7 +413,7 @@ async def random_waifu(client, message, *args):
     DONATOR_TIER_2 = 2
     DEV_TIER = 4
     PRICE_CUT = 0.1
-    CLAIM_INTERVAL = 3*3600  # 3 hours in seconds
+    ROLL_INTERVAL = 3*3600  # 3 hours in seconds
     engine = await database.prepare_engine()
     member = message.author
     async with engine.acquire() as conn:
@@ -428,32 +428,32 @@ async def random_waifu(client, message, *args):
         if _t > member_tier:
             member_tier = _t
     if member_tier >= DEV_TIER:
-        total_claims = 3*3600  # Virtually unlimited for devs, lol.
+        total_rolls = 3*3600  # Virtually unlimited for devs, lol.
     elif member_tier >= DONATOR_TIER_2:
-        total_claims = 60
+        total_rolls = 60
     elif member_tier >= DONATOR_TIER_1:
-        total_claims = 30
+        total_rolls = 30
     else:
-        total_claims = 10
-    claims_left = total_claims
-    last_claim = None
+        total_rolls = 10
+    rolls_left = total_rolls
+    last_roll = None
     if member.id in random_waifu_counter.keys():
-        last_claim = random_waifu_counter[member.id][1]
-        last_claim_interval = datetime.now() - last_claim
-        if last_claim_interval.seconds + last_claim_interval.days*24*3600 < CLAIM_INTERVAL:
-            claims_left = total_claims - random_waifu_counter[member.id][0]
+        last_roll = random_waifu_counter[member.id][1]
+        last_roll_interval = datetime.now() - last_roll
+        if last_roll_interval.seconds + last_roll_interval.days*24*3600 < ROLL_INTERVAL:
+            rolls_left = total_rolls - random_waifu_counter[member.id][0]
     else:
         random_waifu_counter.update({member.id: (0, datetime.now())})
-    if claims_left < 1:
-        s = CLAIM_INTERVAL - (datetime.now() - last_claim).seconds
+    if rolls_left < 1:
+        s = ROLL_INTERVAL - (datetime.now() - last_roll).seconds
         h = s // 3600
         m = s // 60 - h*60
         await message.channel.send(
             """
-You have no claims left! Claims reset in {0:02d} hours {1:02d} minutes. You can donate to me and get more claims!
+You have no rolls left! Rolls reset in {0:02d} hours {1:02d} minutes. You can donate to me and get more rolls!
 """.format(h, m))
         return
-    random_waifu_counter.update({member.id: (total_claims - claims_left + 1, datetime.now())})
+    random_waifu_counter.update({member.id: (total_rolls - rolls_left + 1, datetime.now())})
     async with engine.acquire() as conn:
         count_query = database.Waifu.count()
         cur = await conn.execute(count_query)
@@ -503,32 +503,32 @@ You have no claims left! Claims reset in {0:02d} hours {1:02d} minutes. You can 
             embed.set_footer(
                 text="Purchased by {0} for {1} coins.".format(purchaser_user.name, purchased_for),
                 icon_url=purchaser_user.avatar_url_as(size=128))
-        claim_msg = await message.channel.send(embed=embed)
+        roll_msg = await message.channel.send(embed=embed)
         if not purchaseable:
             return
-        await claim_msg.add_reaction("❤")
+        await roll_msg.add_reaction("❤")
 
         def check(reaction, user):
             return (not user.bot
                     and reaction.message.channel == message.channel
-                    and reaction.message.id == claim_msg.id)
+                    and reaction.message.id == roll_msg.id)
 
         try:
             reaction, purchaser = await client.wait_for('reaction_add', timeout=5.0, check=check)
             if not (str(reaction.emoji) == '❤'):
                 embed.description = "Oh no! You were too late to buy me. Bye bye."
-                await claim_msg.remove_reaction("❤", client.user)
-                await claim_msg.edit(embed=embed)
+                await roll_msg.remove_reaction("❤", client.user)
+                await roll_msg.edit(embed=embed)
                 return
         except asyncio.TimeoutError:
             embed.description = "Oh no! You were too late to buy me. Bye bye."
-            await claim_msg.remove_reaction("❤", client.user)
-            await claim_msg.edit(embed=embed)
+            await roll_msg.remove_reaction("❤", client.user)
+            await roll_msg.edit(embed=embed)
             return
         wallet = await _fetch_wallet(engine, purchaser)
         if wallet - price < 0:
             embed.description = "Don't buy me if you don't have the money :angry:, bye."
-            await claim_msg.edit(embed=embed)
+            await roll_msg.edit(embed=embed)
             await message.channel.send("You do not have enough money :angry:")
             return
         await _remove_money(engine, purchaser, price)
@@ -548,16 +548,16 @@ You have no claims left! Claims reset in {0:02d} hours {1:02d} minutes. You can 
         }])
         await conn.execute(create_query)
         embed.description = "I am now in a relationship with {}!".format(purchaser.name)
-        await claim_msg.edit(embed=embed)
+        await roll_msg.edit(embed=embed)
         await message.channel.send(
             "Successfully bought waifu at an unbelievable price :thumbsup:. Don't lewd them!")
 
 
-async def claims_left(client, message, *args):
+async def rolls_left(client, message, *args):
     DONATOR_TIER_1 = 1
     DONATOR_TIER_2 = 2
     DEV_TIER = 4
-    CLAIM_INTERVAL = 3*3600  # 3 hours in seconds
+    ROLL_INTERVAL = 3*3600  # 3 hours in seconds
     engine = await database.prepare_engine()
     member = message.author
     async with engine.acquire() as conn:
@@ -572,29 +572,29 @@ async def claims_left(client, message, *args):
         if _t > member_tier:
             member_tier = _t
     if member_tier >= DEV_TIER:
-        total_claims = 3*3600  # Virtually unlimited for devs, lol.
+        total_rolls = 3*3600  # Virtually unlimited for devs, lol.
     elif member_tier >= DONATOR_TIER_2:
-        total_claims = 60
+        total_rolls = 60
     elif member_tier >= DONATOR_TIER_1:
-        total_claims = 30
+        total_rolls = 30
     else:
-        total_claims = 10
-    claims_left = total_claims
-    last_claim = None
+        total_rolls = 10
+    rolls_left = total_rolls
+    last_roll = None
     if member.id in random_waifu_counter.keys():
-        last_claim = random_waifu_counter[member.id][1]
-        last_claim_interval = datetime.now() - last_claim
-        if last_claim_interval.seconds + last_claim_interval.days*24*3600 < CLAIM_INTERVAL:
-            claims_left = total_claims - random_waifu_counter[member.id][0]
+        last_roll = random_waifu_counter[member.id][1]
+        last_roll_interval = datetime.now() - last_roll
+        if last_roll_interval.seconds + last_roll_interval.days*24*3600 < ROLL_INTERVAL:
+            rolls_left = total_rolls - random_waifu_counter[member.id][0]
     else:
         random_waifu_counter.update({member.id: (0, datetime.now())})
-    s = CLAIM_INTERVAL - (datetime.now() - last_claim).seconds
+    s = ROLL_INTERVAL - (datetime.now() - last_roll).seconds
     h = s // 3600
     m = s // 60 - h*60
-    claims_left_txt = "no" if claims_left < 1 else claims_left
+    rolls_left_txt = "no" if rolls_left < 1 else rolls_left
     await message.channel.send("""
-You have {2} claims left! Please try again in {0:02d} hours {1:02d} minutes. You can donate to me and get more claims!
-    """.format(h, m, claims_left_txt))
+You have {2} rolls left! Please try again in {0:02d} hours {1:02d} minutes. You can donate to me and get more rolls!
+    """.format(h, m, rolls_left_txt))
 
 
 waifu_functions = {
@@ -602,5 +602,5 @@ waifu_functions = {
     'harem': (harem, "Your waifu list. Now go, show off."),
     'randomwaifu': (random_waifu, "Get a random waifu for cheap."),
     'rw': (random_waifu, "Get a random waifu for cheap."),
-    'claims': (claims_left, "Claims left for random waifus.")
+    'rolls': (rolls_left, "Rolls left for random waifus.")
 }
