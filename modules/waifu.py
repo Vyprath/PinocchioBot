@@ -483,7 +483,7 @@ You have no rolls left! Rolls reset in {0:02d} hours {1:02d} minutes. You can do
         price = int(resp[database.Waifu.c.price] * PRICE_CUT)
         if purchaseable:
             waifu_description = (
-                "Hi! I am a {2} from {0}. You need {1} coins to buy me! React with the :heart: below to buy me! Hurry up, 5 seconds left."  # noqa
+                "Hi! I am a {2} from {0}. You need {1} coins to buy me! React with the :heart: below to buy me! Hurry up, 10 seconds left."  # noqa
                 .format(resp[database.Waifu.c.from_anime], price, gender.lower()))
         else:
             waifu_description = (
@@ -514,7 +514,7 @@ You have no rolls left! Rolls reset in {0:02d} hours {1:02d} minutes. You can do
                     and reaction.message.id == roll_msg.id)
 
         try:
-            reaction, purchaser = await client.wait_for('reaction_add', timeout=5.0, check=check)
+            reaction, purchaser = await client.wait_for('reaction_add', timeout=10.0, check=check)
             if not (str(reaction.emoji) == '❤'):
                 embed.description = "Oh no! You were too late to buy me. Bye bye."
                 await roll_msg.remove_reaction("❤", client.user)
