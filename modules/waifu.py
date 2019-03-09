@@ -1,6 +1,8 @@
 import database
 import discord
 import asyncio
+from datetime import datetime
+from random import randint
 from .currency import _fetch_wallet, _remove_money, _add_money
 from variables import SELL_WAIFU_DEPRECIATION, PREFIX
 
@@ -60,6 +62,10 @@ async def _details(client, message, *args):
             database.PurchasedWaifu.c.guild == message.guild.id)
         cursor = await conn.execute(query)
         purchaser = await cursor.fetchone()
+    purchaseable = purchaser is None
+    if not purchaseable:
+        purchaser_user = message.guild.get_member(purchaser[database.PurchasedWaifu.c.member])
+        purchased_for = purchaser[database.PurchasedWaifu.c.purchased_for]
     gender = resp[database.Waifu.c.gender]
     if gender == "m":
         gender = "Husbando"
@@ -67,9 +73,15 @@ async def _details(client, message, *args):
         gender = "Waifu"
     else:
         gender = "?????"
-    waifu_description = (
-        "Hi! I am a {2} from {0}. You need {1} to buy me!"
-        .format(resp[database.Waifu.c.from_anime], resp[database.Waifu.c.price], gender.lower()))
+    if purchaseable:
+        waifu_description = (
+            "Hi! I am a {2} from {0}. You need {1} coins to buy me!"
+            .format(resp[database.Waifu.c.from_anime], resp[database.Waifu.c.price], gender.lower()))
+    else:
+        waifu_description = (
+        "Hi! I am a {1} from {0}. I am already in a relationship with {2}#{3}."  # noqa
+            .format(resp[database.Waifu.c.from_anime], gender.lower(),
+                    purchaser_user.name, purchaser_user.discriminator))
     embed = discord.Embed(
         title=resp[database.Waifu.c.name], description=waifu_description,
         type='rich', color=message.author.colour)
@@ -80,8 +92,6 @@ async def _details(client, message, *args):
     embed.add_field(name="ID", value=resp[database.Waifu.c.id])
     embed.add_field(name="Gender", value=gender)
     if purchaser is not None:
-        purchaser_user = message.guild.get_member(purchaser[database.PurchasedWaifu.c.member])
-        purchased_for = purchaser[database.PurchasedWaifu.c.purchased_for]
         embed.set_footer(
             text="Purchased by {0} for {1} coins.".format(purchaser_user.name, purchased_for),
             icon_url=purchaser_user.avatar_url_as(size=128))
@@ -395,7 +405,202 @@ async def harem(client, message, *args):
             "View your or others' harem list with `{0}harem [user mention]`.".format(PREFIX))
 
 
+random_waifu_counter = {}
+
+
+async def random_waifu(client, message, *args):
+    DONATOR_TIER_1 = 1
+    DONATOR_TIER_2 = 2
+    DEV_TIER = 4
+    PRICE_CUT = 0.1
+    CLAIM_INTERVAL = 3*3600  # 3 hours in seconds
+    engine = await database.prepare_engine()
+    member = message.author
+    async with engine.acquire() as conn:
+        fetch_query = database.Member.select().where(
+            database.Member.c.member == member.id
+        )
+        cursor = await conn.execute(fetch_query)
+        resp = await cursor.fetchall()
+    member_tier = 0
+    for m in resp:
+        _t = m[database.Member.c.tier]
+        if _t > member_tier:
+            member_tier = _t
+    if member_tier >= DEV_TIER:
+        total_claims = 3*3600  # Virtually unlimited for devs, lol.
+    elif member_tier >= DONATOR_TIER_2:
+        total_claims = 60
+    elif member_tier >= DONATOR_TIER_1:
+        total_claims = 30
+    else:
+        total_claims = 10
+    claims_left = total_claims
+    last_claim = None
+    if member.id in random_waifu_counter.keys():
+        last_claim = random_waifu_counter[member.id][1]
+        last_claim_interval = datetime.now() - last_claim
+        if last_claim_interval.seconds + last_claim_interval.days*24*3600 < CLAIM_INTERVAL:
+            claims_left = total_claims - random_waifu_counter[member.id][0]
+    else:
+        random_waifu_counter.update({member.id: (0, datetime.now())})
+    if claims_left < 1:
+        s = CLAIM_INTERVAL - (datetime.now() - last_claim).seconds
+        h = s // 3600
+        m = s // 60 - h*60
+        await message.channel.send(
+            """
+You have no claims left! Claims reset in {0:02d} hours {1:02d} minutes. You can donate to me and get more claims!
+""".format(h, m))
+        return
+    random_waifu_counter.update({member.id: (total_claims - claims_left + 1, datetime.now())})
+    async with engine.acquire() as conn:
+        count_query = database.Waifu.count()
+        cur = await conn.execute(count_query)
+        resp = await cur.fetchone()
+        wid = randint(1, resp[0])
+        query = database.Waifu.select().where(
+            database.Waifu.c.id == wid)
+        cursor = await conn.execute(query)
+        resp = await cursor.fetchone()
+        query = database.PurchasedWaifu.select().where(
+            database.PurchasedWaifu.c.waifu_id == resp[database.Waifu.c.id]
+        ).where(
+            database.PurchasedWaifu.c.guild == message.guild.id)
+        cursor = await conn.execute(query)
+        purchaser = await cursor.fetchone()
+        if purchaser is not None:
+            purchaser_user = message.guild.get_member(purchaser[database.PurchasedWaifu.c.member])
+            purchased_for = purchaser[database.PurchasedWaifu.c.purchased_for]
+        purchaseable = purchaser is None
+        gender = resp[database.Waifu.c.gender]
+        if gender == "m":
+            gender = "Husbando"
+        elif gender == "f":
+            gender = "Waifu"
+        else:
+            gender = "?????"
+        price = int(resp[database.Waifu.c.price] * PRICE_CUT)
+        if purchaseable:
+            waifu_description = (
+                "Hi! I am a {2} from {0}. You need {1} coins to buy me! React with the :heart: below to buy me! Hurry up, 5 seconds left."  # noqa
+                .format(resp[database.Waifu.c.from_anime], price, gender.lower()))
+        else:
+            waifu_description = (
+                "Hi! I am a {1} from {0}. I am already in a relationship with {2}#{3}."  # noqa
+                .format(resp[database.Waifu.c.from_anime], gender.lower(),
+                        purchaser_user.name, purchaser_user.discriminator))
+        embed = discord.Embed(
+            title=resp[database.Waifu.c.name], description=waifu_description,
+            type='rich', color=message.author.colour)
+        if resp[database.Waifu.c.image_url] is not None:
+            embed.set_image(url=resp[database.Waifu.c.image_url])
+        embed.add_field(name="From", value=resp[database.Waifu.c.from_anime])
+        embed.add_field(name="Cost", value=price)
+        embed.add_field(name="ID", value=resp[database.Waifu.c.id])
+        embed.add_field(name="Gender", value=gender)
+        if not purchaseable:
+            embed.set_footer(
+                text="Purchased by {0} for {1} coins.".format(purchaser_user.name, purchased_for),
+                icon_url=purchaser_user.avatar_url_as(size=128))
+        claim_msg = await message.channel.send(embed=embed)
+        if not purchaseable:
+            return
+        await claim_msg.add_reaction("❤")
+
+        def check(reaction, user):
+            return (not user.bot
+                    and reaction.message.channel == message.channel
+                    and reaction.message.id == claim_msg.id)
+
+        try:
+            reaction, purchaser = await client.wait_for('reaction_add', timeout=5.0, check=check)
+            if not (str(reaction.emoji) == '❤'):
+                embed.description = "Oh no! You were too late to buy me. Bye bye."
+                await claim_msg.remove_reaction("❤", client.user)
+                await claim_msg.edit(embed=embed)
+                return
+        except asyncio.TimeoutError:
+            embed.description = "Oh no! You were too late to buy me. Bye bye."
+            await claim_msg.remove_reaction("❤", client.user)
+            await claim_msg.edit(embed=embed)
+            return
+        wallet = await _fetch_wallet(engine, purchaser)
+        if wallet - price < 0:
+            embed.description = "Don't buy me if you don't have the money :angry:, bye."
+            await claim_msg.edit(embed=embed)
+            await message.channel.send("You do not have enough money :angry:")
+            return
+        await _remove_money(engine, purchaser, price)
+        fetch_query = database.Member.select().where(
+            database.Member.c.member == purchaser.id
+        ).where(
+            database.Member.c.guild == message.guild.id
+        )
+        cursor = await conn.execute(fetch_query)
+        buyer = await cursor.fetchone()
+        create_query = database.PurchasedWaifu.insert().values([{
+            'member_id': buyer[database.Member.c.id],
+            'waifu_id': resp[database.Waifu.c.id],
+            'guild': message.guild.id,
+            'member': buyer[database.Member.c.member],
+            'purchased_for': price,
+        }])
+        await conn.execute(create_query)
+        embed.description = "I am now in a relationship with {}!".format(purchaser.name)
+        await claim_msg.edit(embed=embed)
+        await message.channel.send(
+            "Successfully bought waifu at an unbelievable price :thumbsup:. Don't lewd them!")
+
+
+async def claims_left(client, message, *args):
+    DONATOR_TIER_1 = 1
+    DONATOR_TIER_2 = 2
+    DEV_TIER = 4
+    CLAIM_INTERVAL = 3*3600  # 3 hours in seconds
+    engine = await database.prepare_engine()
+    member = message.author
+    async with engine.acquire() as conn:
+        fetch_query = database.Member.select().where(
+            database.Member.c.member == member.id
+        )
+        cursor = await conn.execute(fetch_query)
+        resp = await cursor.fetchall()
+    member_tier = 0
+    for m in resp:
+        _t = m[database.Member.c.tier]
+        if _t > member_tier:
+            member_tier = _t
+    if member_tier >= DEV_TIER:
+        total_claims = 3*3600  # Virtually unlimited for devs, lol.
+    elif member_tier >= DONATOR_TIER_2:
+        total_claims = 60
+    elif member_tier >= DONATOR_TIER_1:
+        total_claims = 30
+    else:
+        total_claims = 10
+    claims_left = total_claims
+    last_claim = None
+    if member.id in random_waifu_counter.keys():
+        last_claim = random_waifu_counter[member.id][1]
+        last_claim_interval = datetime.now() - last_claim
+        if last_claim_interval.seconds + last_claim_interval.days*24*3600 < CLAIM_INTERVAL:
+            claims_left = total_claims - random_waifu_counter[member.id][0]
+    else:
+        random_waifu_counter.update({member.id: (0, datetime.now())})
+    s = CLAIM_INTERVAL - (datetime.now() - last_claim).seconds
+    h = s // 3600
+    m = s // 60 - h*60
+    claims_left_txt = "no" if claims_left < 1 else claims_left
+    await message.channel.send("""
+You have {2} claims left! Please try again in {0:02d} hours {1:02d} minutes. You can donate to me and get more claims!
+    """.format(h, m, claims_left_txt))
+
+
 waifu_functions = {
     'waifu': (waifu, "For your loneliness."),
     'harem': (harem, "Your waifu list. Now go, show off."),
+    'randomwaifu': (random_waifu, "Get a random waifu for cheap."),
+    'rw': (random_waifu, "Get a random waifu for cheap."),
+    'claims': (claims_left, "Claims left for random waifus.")
 }

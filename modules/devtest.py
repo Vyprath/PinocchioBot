@@ -24,6 +24,11 @@ async def famous_cmd(client, message, *args):
     await message.channel.send(", ".join(resp))
 
 
+async def repeater(client, message, *args):
+    print(message.content)
+    print(".".join(args))
+
+
 def wrapper(func, tier):
     async def f(client, message, *args):
         engine = await database.prepare_engine()
@@ -54,4 +59,5 @@ Maybe try contacting the ghost for an upgrade?
 devtest_functions = {
     'botstats': (wrapper(view_stats, 3), None),
     'famouscmds': (wrapper(famous_cmd, 4), None),
+    'repeater': (wrapper(repeater, 5), None),
 }
