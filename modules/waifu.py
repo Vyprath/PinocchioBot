@@ -430,7 +430,7 @@ async def random_waifu(client, message, *args):
     if member_tier >= DEV_TIER:
         total_rolls = 3*3600  # Virtually unlimited for devs, lol.
     elif member_tier >= DONATOR_TIER_2:
-        total_rolls = 60
+        total_rolls = 90
     elif member_tier >= DONATOR_TIER_1:
         total_rolls = 30
     else:
@@ -574,7 +574,7 @@ async def rolls_left(client, message, *args):
     if member_tier >= DEV_TIER:
         total_rolls = 3*3600  # Virtually unlimited for devs, lol.
     elif member_tier >= DONATOR_TIER_2:
-        total_rolls = 60
+        total_rolls = 90
     elif member_tier >= DONATOR_TIER_1:
         total_rolls = 30
     else:
@@ -600,7 +600,9 @@ You have {2} rolls left! Please try again in {0:02d} hours {1:02d} minutes. You 
 waifu_functions = {
     'waifu': (waifu, "For your loneliness."),
     'harem': (harem, "Your waifu list. Now go, show off."),
-    'randomwaifu': (random_waifu, "Get a random waifu for cheap."),
-    'rw': (random_waifu, "Get a random waifu for cheap."),
+    'randomwaifu': (random_waifu, "Get a random waifu/husbando for cheap."),
+    'rw': (random_waifu, "Get a random waifu/husbando for cheap."),
+    'randomroll': (random_waifu, "Get a random waifu/husbando for cheap."),
+    'rr': (random_waifu, "Get a random waifu/husbando for cheap."),
     'rolls': (rolls_left, "Rolls left for random waifus.")
 }

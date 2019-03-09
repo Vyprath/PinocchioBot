@@ -23,7 +23,7 @@ __**Pinocchio Bot Usage:**__
 **Waifu**
 `{0}waifu`: Buy/Sell/View/Search/Trade Waifus. Will make your loneliness disappear.
 `{0}harem`: Get the list of your bought waifus.
-`{0}randomwaifu`/`{0}rw`: Get a random waifu for a very cheap price. Normal users can do it ten times per 3 hours, tier 1 donators 30 times, and tier 2 donators 90 times.  **NEW**
+`{0}randomroll`/`{0}rr`: Get a random waifu/husbando for a very cheap price. Normal users can do it 10 times per 3 hours, tier 1 donators 30 times, and tier 2 donators 90 times.  **NEW**
 `{0}rolls`: Check how many rolls you have left for getting a random waifu. Resets every 3 hours.  **NEW**
 
 **Anime**
