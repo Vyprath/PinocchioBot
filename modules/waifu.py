@@ -4,7 +4,8 @@ import asyncio
 from datetime import datetime
 from random import randint
 from .currency import _fetch_wallet, _remove_money, _add_money
-from variables import SELL_WAIFU_DEPRECIATION, PREFIX
+from variables import PREFIX
+import variables
 
 
 async def _search(client, message, *args):
@@ -204,11 +205,11 @@ async def _sell(client, message, *args):
             await message.channel.send(
                 "By what logic are you trying to sell a waifu you don't own? :rolling_eyes:")
             return
-        cost = purchased_waifu[database.PurchasedWaifu.c.purchased_for] * SELL_WAIFU_DEPRECIATION
+        cost = purchased_waifu[database.PurchasedWaifu.c.purchased_for] * variables.SELL_WAIFU_DEPRECIATION
         cost = int(cost)
         await message.channel.send(
             "Want to sell for sure? You will get back {0}% of the cost, {1} coins. Reply with `confirm` in 60s or `exit`.".format(  # noqa
-                SELL_WAIFU_DEPRECIATION * 100, cost))
+                variables.SELL_WAIFU_DEPRECIATION * 100, cost))
 
         def check(m):
             return (m.author.id != client.user.id and
@@ -409,11 +410,6 @@ random_waifu_counter = {}
 
 
 async def random_waifu(client, message, *args):
-    DONATOR_TIER_1 = 1
-    DONATOR_TIER_2 = 2
-    DEV_TIER = 4
-    PRICE_CUT = 0.1
-    ROLL_INTERVAL = 3*3600  # 3 hours in seconds
     engine = await database.prepare_engine()
     member = message.author
     async with engine.acquire() as conn:
@@ -427,11 +423,11 @@ async def random_waifu(client, message, *args):
         _t = m[database.Member.c.tier]
         if _t > member_tier:
             member_tier = _t
-    if member_tier >= DEV_TIER:
+    if member_tier >= variables.DEV_TIER:
         total_rolls = 3*3600  # Virtually unlimited for devs, lol.
-    elif member_tier >= DONATOR_TIER_2:
+    elif member_tier >= variables.DONATOR_TIER_2:
         total_rolls = 90
-    elif member_tier >= DONATOR_TIER_1:
+    elif member_tier >= variables.DONATOR_TIER_1:
         total_rolls = 30
     else:
         total_rolls = 10
@@ -440,12 +436,12 @@ async def random_waifu(client, message, *args):
     if member.id in random_waifu_counter.keys():
         last_roll = random_waifu_counter[member.id][1]
         last_roll_interval = datetime.now() - last_roll
-        if last_roll_interval.seconds + last_roll_interval.days*24*3600 < ROLL_INTERVAL:
+        if last_roll_interval.seconds + last_roll_interval.days*24*3600 < variables.ROLL_INTERVAL:
             rolls_left = total_rolls - random_waifu_counter[member.id][0]
     else:
         random_waifu_counter.update({member.id: (0, datetime.now())})
     if rolls_left < 1:
-        s = ROLL_INTERVAL - (datetime.now() - last_roll).seconds
+        s = variables.ROLL_INTERVAL - (datetime.now() - last_roll).seconds
         h = s // 3600
         m = s // 60 - h*60
         await message.channel.send(
@@ -480,7 +476,7 @@ You have no rolls left! Rolls reset in {0:02d} hours {1:02d} minutes. You can do
             gender = "Waifu"
         else:
             gender = "?????"
-        price = int(resp[database.Waifu.c.price] * PRICE_CUT)
+        price = int(resp[database.Waifu.c.price] * variables.PRICE_CUT)
         if purchaseable:
             waifu_description = (
                 "Hi! I am a {2} from {0}. You need {1} coins to buy me! React with the :heart: below to buy me! Hurry up, 5 seconds left."  # noqa
@@ -554,10 +550,6 @@ You have no rolls left! Rolls reset in {0:02d} hours {1:02d} minutes. You can do
 
 
 async def rolls_left(client, message, *args):
-    DONATOR_TIER_1 = 1
-    DONATOR_TIER_2 = 2
-    DEV_TIER = 4
-    ROLL_INTERVAL = 3*3600  # 3 hours in seconds
     engine = await database.prepare_engine()
     member = message.author
     async with engine.acquire() as conn:
@@ -571,11 +563,11 @@ async def rolls_left(client, message, *args):
         _t = m[database.Member.c.tier]
         if _t > member_tier:
             member_tier = _t
-    if member_tier >= DEV_TIER:
+    if member_tier >= variables.DEV_TIER:
         total_rolls = 3*3600  # Virtually unlimited for devs, lol.
-    elif member_tier >= DONATOR_TIER_2:
+    elif member_tier >= variables.DONATOR_TIER_2:
         total_rolls = 90
-    elif member_tier >= DONATOR_TIER_1:
+    elif member_tier >= variables.DONATOR_TIER_1:
         total_rolls = 30
     else:
         total_rolls = 10
@@ -584,11 +576,11 @@ async def rolls_left(client, message, *args):
     if member.id in random_waifu_counter.keys():
         last_roll = random_waifu_counter[member.id][1]
         last_roll_interval = datetime.now() - last_roll
-        if last_roll_interval.seconds + last_roll_interval.days*24*3600 < ROLL_INTERVAL:
+        if last_roll_interval.seconds + last_roll_interval.days*24*3600 < variables.ROLL_INTERVAL:
             rolls_left = total_rolls - random_waifu_counter[member.id][0]
     else:
         random_waifu_counter.update({member.id: (0, datetime.now())})
-    s = ROLL_INTERVAL - (datetime.now() - last_roll).seconds
+    s = variables.ROLL_INTERVAL - (datetime.now() - last_roll).seconds
     h = s // 3600
     m = s // 60 - h*60
     rolls_left_txt = "no" if rolls_left < 1 else rolls_left

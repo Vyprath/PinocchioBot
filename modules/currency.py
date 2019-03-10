@@ -5,6 +5,7 @@ import asyncio
 import time
 import datetime
 from variables import FREE_MONEY_SPAWN_LIMIT, DAILIES_AMOUNT, PREFIX, DAILIES_DATE
+import variables
 
 
 async def _fetch_wallet(engine, member):
@@ -119,6 +120,16 @@ async def dailies(client, message, *args):
         last_dailies = member[database.Member.c.last_dailies]
         if last_dailies is not None:
             last_dailies = datetime.datetime.fromisoformat(str(last_dailies))
+        fetch_query = database.Member.select().where(
+                database.Member.c.member == message.author.id
+            )
+        cursor = await conn.execute(fetch_query)
+        resp = await cursor.fetchall()
+        member_tier = 0
+        for m in resp:
+            _t = m[database.Member.c.tier]
+            if _t > member_tier:
+                member_tier = _t
         now = datetime.datetime.now()
         if last_dailies is None or (now - last_dailies).days >= 1:
             update_query = database.Member.update().where(
@@ -127,8 +138,17 @@ async def dailies(client, message, *args):
                 database.Member.c.guild == message.guild.id
             ).values(last_dailies=now.isoformat())
             await conn.execute(update_query)
-            await _add_money(engine, message.author, DAILIES_AMOUNT)
-            await message.channel.send("Recieved {0} coins. :thumbsup:".format(DAILIES_AMOUNT))
+            if member_tier >= variables.DONATOR_TIER_2:
+                await _add_money(engine, message.author, DAILIES_AMOUNT * 4)
+                await message.channel.send(
+                    "Recieved {0} coins. 4 times the usual amount for being a donator! :smile:".format(DAILIES_AMOUNT * 4))
+            elif member_tier > variables.DONATOR_TIER_1:
+                await _add_money(engine, message.author, DAILIES_AMOUNT * 2)
+                await message.channel.send(
+                    "Recieved {0} coins. Twice the usual amount for being a donator! :smile:".format(DAILIES_AMOUNT * 2))
+            else:
+                await _add_money(engine, message.author, DAILIES_AMOUNT)
+                await message.channel.send("Recieved {0} coins. :thumbsup:".format(DAILIES_AMOUNT))
         else:
             next_reset = last_dailies + datetime.timedelta(days=1) - now
             tdelta_hours = (next_reset.seconds)//3600

@@ -5,6 +5,7 @@ import discord
 from discord.utils import snowflake_time
 from .currency import _add_money
 from variables import VOTE_REWARD, PREFIX
+import variables
 
 
 async def donate(client, message, *args):
@@ -47,6 +48,16 @@ async def claim_rewards(client, message, *args):
         )
         cursor = await conn.execute(fetch_query)
         member = await cursor.fetchone()
+        fetch_query = database.Member.select().where(
+                database.Member.c.member == message.author.id
+            )
+        cursor = await conn.execute(fetch_query)
+        resp = await cursor.fetchall()
+        member_tier = 0
+        for m in resp:
+            _t = m[database.Member.c.tier]
+            if _t > member_tier:
+                member_tier = _t
         last_reward = member[database.Member.c.last_reward]
         if last_reward is None:
             db_verified = True
@@ -63,6 +74,14 @@ async def claim_rewards(client, message, *args):
         if is_weekend:
             coins *= 2
             await message.channel.send("Thanks for voting on weekend! You get 2x coins.")
+        if member_tier >= variables.DONATOR_TIER_2:
+            coins *= 4
+            await message.channel.send(
+                "You get 4 times the usual amount for being a tier 2 donator! :smile:")
+        elif member_tier > variables.DONATOR_TIER_1:
+            coins *= 2
+            await message.channel.send(
+                "You get 2 times the usual amount for being a tier 1 donator! :smile:")
         engine = await database.prepare_engine()
         async with engine.acquire() as conn:
             update_query = database.Member.update().where(
