@@ -37,6 +37,7 @@ DONATOR_TIER_1 = 1
 DONATOR_TIER_2 = 2
 DEV_TIER = 4
 ROLL_INTERVAL = 3*3600  # 3 hours in seconds
+PRICE_CUT = 0.08
 
 # APIs
 ICNDB_RANDOM_JOKE_URL = "http://api.icndb.com/jokes/random"
