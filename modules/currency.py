@@ -142,7 +142,7 @@ async def dailies(client, message, *args):
                 await _add_money(engine, message.author, DAILIES_AMOUNT * 4)
                 await message.channel.send(
                     "Recieved {0} coins. 4 times the usual amount for being a donator! :smile:".format(DAILIES_AMOUNT * 4))
-            elif member_tier > variables.DONATOR_TIER_1:
+            elif member_tier >= variables.DONATOR_TIER_1:
                 await _add_money(engine, message.author, DAILIES_AMOUNT * 2)
                 await message.channel.send(
                     "Recieved {0} coins. Twice the usual amount for being a donator! :smile:".format(DAILIES_AMOUNT * 2))
