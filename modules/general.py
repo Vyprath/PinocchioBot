@@ -78,7 +78,7 @@ async def claim_rewards(client, message, *args):
             coins *= 4
             await message.channel.send(
                 "You get 4 times the usual amount for being a tier 2 donator! :smile:")
-        elif member_tier > variables.DONATOR_TIER_1:
+        elif member_tier >= variables.DONATOR_TIER_1:
             coins *= 2
             await message.channel.send(
                 "You get 2 times the usual amount for being a tier 1 donator! :smile:")
