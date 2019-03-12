@@ -566,9 +566,9 @@ async def rolls_left(client, message, *args):
     if member_tier >= variables.DEV_TIER:
         total_rolls = 3*3600  # Virtually unlimited for devs, lol.
     elif member_tier >= variables.DONATOR_TIER_2:
-        total_rolls = 90
-    elif member_tier >= variables.DONATOR_TIER_1:
         total_rolls = 30
+    elif member_tier >= variables.DONATOR_TIER_1:
+        total_rolls = 20
     else:
         total_rolls = 10
     rolls_left = total_rolls
