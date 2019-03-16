@@ -65,7 +65,7 @@ async def _play_music(message, voice_client, guild_state, skip=False):
     await message.channel.send("Now Playing", embed=embed)
     if voice_client.is_playing():
         voice_client.stop()
-        voice_client.play(source, after=after_finished)
+    voice_client.play(source, after=after_finished)
 
 
 async def stop_bot(voice_client, guild_id):
