@@ -180,8 +180,8 @@ You have crossed that limit. Please wait till tomorrow.
 :negative_squared_cross_mark: Bot total limit exceeded.
 The limit for {to} is {resp_data['limit']}.
 The recipient bot has exceeded it's daily limits. Please wait till tomorrow.
-                        """)
-                    return
+                    """)
+                return
     engine = await database.prepare_engine()
     await _remove_money(engine, message.author, amount)
     embed = discord.Embed(

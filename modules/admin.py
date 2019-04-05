@@ -5,7 +5,7 @@ from variables import PREFIX
 
 async def clean(client, message, *args):
     if not message.author.guild_permissions.administrator:
-        await message.channel.send("This command is restricted, to be used only by gods.")
+        await message.channel.send("This command is restricted, to be used only by admins.")
         return
     if len(args) != 1 or not args[0].isdigit() or not (1 <= int(args[0]) <= 100):
         await message.channel.send("Usage: {0}purge <limit between 1 to 100>".format(PREFIX))
@@ -19,7 +19,7 @@ async def clean(client, message, *args):
 
 async def set_welcome_leave_channel(client, message, *args):
     if not message.author.guild_permissions.administrator:
-        await message.channel.send("This command is restricted, to be used only by gods.")
+        await message.channel.send("This command is restricted, to be used only by admins.")
         return
     engine = await database.prepare_engine()
     async with engine.acquire() as conn:
@@ -67,7 +67,7 @@ To disable, run `{1}setwlchannel disable`.
 
 async def set_paid_roles(client, message, *args):
     if not message.author.guild_permissions.administrator:
-        await message.channel.send("This command is restricted, to be used only by gods.")
+        await message.channel.send("This command is restricted, to be used only by admins.")
         return
     available_role_names = {
         r.name.lower().strip(): r for r in message.guild.roles if not r.name == "@everyone"}
@@ -138,7 +138,7 @@ To remove, run `{1}setpaidroles delete <role name>`
 
 async def set_welcome_msg(client, message, *args):
     if not message.author.guild_permissions.administrator:
-        await message.channel.send("This command is restricted, to be used only by gods.")
+        await message.channel.send("This command is restricted, to be used only by admins.")
         return
     if len(args) == 0:
         await message.channel.send(
@@ -164,7 +164,7 @@ async def set_welcome_msg(client, message, *args):
 
 async def set_leave_msg(client, message, *args):
     if not message.author.guild_permissions.administrator:
-        await message.channel.send("This command is restricted, to be used only by gods.")
+        await message.channel.send("This command is restricted, to be used only by admins.")
         return
     if len(args) == 0:
         await message.channel.send(
@@ -190,7 +190,7 @@ async def set_leave_msg(client, message, *args):
 
 async def set_coin_drops(client, message, *args):
     if not message.author.guild_permissions.administrator:
-        await message.channel.send("This command is restricted, to be used only by gods.")
+        await message.channel.send("This command is restricted, to be used only by admins.")
         return
     if len(args) == 0:
         await message.channel.send(
@@ -218,6 +218,9 @@ async def set_coin_drops(client, message, *args):
 
 
 async def set_custom_roles(client, message, *args):
+    if not message.author.guild_permissions.administrator:
+        await message.channel.send("This command is restricted, to be used only by admins.")
+        return
     if len(args) != 1 or not args[0].lstrip("-").isdigit():
         await message.channel.send(
             "Usage: {}setcustomroles <price (-1 for disabling)>".format(PREFIX))
@@ -233,6 +236,41 @@ async def set_custom_roles(client, message, *args):
         await message.channel.send("Successfully disabled custom roles.")
     else:
         await message.channel.send("Set custom roles price to {}.".format(price))
+
+
+async def remove_abandoned_waifus(client, message, *args):
+    if not message.author.guild_permissions.administrator:
+        await message.channel.send("This command is restricted, to be used only by admins.")
+        return
+    await message.channel.send(":skull_crossbones: This command will remove all waifus from users who left the server. Do you want to proceed? Type `confirm` in 15s.")  # noqa
+
+    def check(m):
+        return (m.author.id != client.user.id and
+                m.channel == message.channel and message.author.id == m.author.id)
+    sure = False
+    while not sure:
+        try:
+            msg = await client.wait_for('message', check=check, timeout=60)
+            if msg.content == 'confirm':
+                sure = True
+            elif msg.content == 'exit':
+                await message.channel.send("Okay, exiting...")
+                return
+            else:
+                await message.channel.send("Respond properly. Write `exit` to exit.")
+        except asyncio.TimeoutError:
+            await message.channel.send('Error: Timeout.')
+            return
+    engine = await database.prepare_engine()
+    async with engine.acquire() as conn:
+        delete_query = database.PurchasedWaifu.delete().where(
+            database.PurchasedWaifu.c.guild == message.guild.id
+        ).where(
+            database.PurchasedWaifu.c.member.notin_()
+        )
+        await conn.execute(delete_query)
+    await message.channel.send(":skull_crossbones: Removed waifus from people who left the server.")
+
 
 
 admin_functions = {
