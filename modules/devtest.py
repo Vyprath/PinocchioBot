@@ -32,7 +32,7 @@ async def view_stats(client, message, *args):
     embed.add_field(name="Invite", value="[https://invite.pinocchiobot.tk](https://invite.pinocchiobot.tk)")
     embed.add_field(name="Add Waifus", value="[https://waifu.pinocchiobot.tk](https://waifu.pinocchiobot.tk)")
     embed.set_footer(
-        text="Running on Takagi-VPS • Made by {app_info.owner.name}#{app_info.owner.discriminator}",
+        text=f"Running on Takagi-VPS • Made by {app_info.owner.name}#{app_info.owner.discriminator}",
         icon_url=app_info.owner.avatar_url_as(size=128))
     await message.channel.send(embed=embed)
 
