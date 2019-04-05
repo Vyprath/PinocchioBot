@@ -193,7 +193,10 @@ See `{PREFIX}discoin` for more info.
     embed.add_field(name="Pinocchio Coins (PIC) Exchanged", value=amount)
     embed.add_field(name=f"{to} To Recieve", value=resp_data['resultAmount'])
     embed.add_field(
-        name="Transaction Receipt",
+        name="Transfer Limit", inline=False,
+        value=f"You can transfer {resp_data['limitNow']} {to} more as of today.")
+    embed.add_field(
+        name="Transaction Receipt", inline=False,
         value=f"```{resp_data['receipt']}```Keep this code in case Agent Wumpus fails to deliver the coins.")
     embed.set_footer(
         text=f"{message.author.name}#{message.author.discriminator}",
