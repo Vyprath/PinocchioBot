@@ -10,4 +10,5 @@ ratelimiter
 Pillow
 nyaapy
 psycopg2-binary
+psutil
 git+git://github.com/AWConant/jikanpy.git
