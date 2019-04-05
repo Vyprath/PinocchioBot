@@ -2,19 +2,19 @@ import database
 import random
 import string
 import asyncio
+import aiohttp
 import time
 import datetime
-from variables import FREE_MONEY_SPAWN_LIMIT, DAILIES_AMOUNT, PREFIX, DAILIES_DATE
+import json
+import discord
+from variables import FREE_MONEY_SPAWN_LIMIT, DAILIES_AMOUNT, PREFIX
 import variables
 
 
 async def _fetch_wallet(engine, member):
     async with engine.acquire() as conn:
         fetch_query = database.Member.select().where(
-            database.Member.c.member == member.id
-        ).where(
-            database.Member.c.guild == member.guild.id
-        )
+            database.Member.c.member == member.id)
         cursor = await conn.execute(fetch_query)
         resp = await cursor.fetchone()
         if resp is None:
@@ -30,8 +30,6 @@ async def _add_money(engine, member, amount):
     async with engine.acquire() as conn:
         update_query = database.Member.update().where(
             database.Member.c.member == member.id
-        ).where(
-            database.Member.c.guild == member.guild.id
         ).values(wallet=current_balance + amount)
         await conn.execute(update_query)
     return current_balance + amount
@@ -46,8 +44,6 @@ async def _remove_money(engine, member, amount):
     async with engine.acquire() as conn:
         update_query = database.Member.update().where(
             database.Member.c.member == member.id
-        ).where(
-            database.Member.c.guild == member.guild.id
         ).values(wallet=current_balance - amount)
         await conn.execute(update_query)
     return current_balance + amount
@@ -67,22 +63,6 @@ async def fetch_wallet(client, message, *args):
         await message.channel.send(
             "{1} has `{0}` coins in their wallet."
             .format(wallet, member.name)
-            )
-
-
-async def get_money(client, message, *args):
-    if not message.author.guild_permissions.administrator:
-        await message.channel.send("This command is restricted, to be used only by gods.")
-        return
-    if len(args) == 0 or not args[0].isdigit():
-        await message.channel.send("Correct command is: `{0}wallet <amount>`".format(PREFIX))
-    else:
-        amount = int(args[0])
-        engine = await database.prepare_engine()
-        balance = await _add_money(engine, message.author, amount)
-        await message.channel.send(
-            "Gave `{0}` coins. You now have `{1}` coins in your wallet."
-            .format(amount, balance)
             )
 
 
@@ -112,8 +92,6 @@ async def dailies(client, message, *args):
     async with engine.acquire() as conn:
         fetch_query = database.Member.select().where(
             database.Member.c.member == message.author.id
-        ).where(
-            database.Member.c.guild == message.guild.id
         )
         cursor = await conn.execute(fetch_query)
         member = await cursor.fetchone()
@@ -134,8 +112,6 @@ async def dailies(client, message, *args):
         if last_dailies is None or (now - last_dailies).days >= 1:
             update_query = database.Member.update().where(
                 database.Member.c.member == message.author.id
-            ).where(
-                database.Member.c.guild == message.guild.id
             ).values(last_dailies=now.isoformat())
             await conn.execute(update_query)
             if member_tier >= variables.DONATOR_TIER_2:
@@ -157,6 +133,72 @@ async def dailies(client, message, *args):
                 "Please wait {0:>02d} hours and {1:>02d} minutes more to get dailies.".format(
                     tdelta_hours, tdelta_mins
                 ))
+
+
+async def exchange(client, message, *args):
+    if len(args) != 2 or not args[0].isdigit():
+        await message.channel.send(f"""
+Usage: `{PREFIX}exchange <coins> <currency>`
+If you want to know more about this and supported currencies, use `{PREFIX}discoin`.
+        """)
+        return
+    processing_msg = await message.channel.send("Processing Transaction...")
+    amount = int(args[0])
+    to = args[1].upper()
+    transaction_data = {
+        "user": str(message.author.id),
+        "amount": amount,
+        "exchangeTo": to
+    }
+    headers = {'Authorization': variables.DISCOIN_AUTH_KEY}
+    async with aiohttp.ClientSession() as session:
+        async with session.post("http://discoin.sidetrip.xyz/transaction",
+                                data=json.dumps(transaction_data), headers=headers) as response:
+            resp_data = await response.json()
+            if response.status == 200:
+                pass
+            elif response.status == 400:
+                await processing_msg.edit(content=f"""
+:negative_squared_cross_mark: Exchange declined.
+Reason: `{resp_data['reason']}`
+                """)
+                return
+            elif response.status == 403:
+                if resp_data['reason'] == "verify required":
+                    await processing_msg.edit(content=f"""
+:negative_squared_cross_mark: You are not verified to make exchanges.
+Please verify yourself at [http://discoin.sidetrip.xyz/verify]!
+                    """)
+                elif resp_data['reason'] == "per-user limit exceeded":
+                    await processing_msg.edit(content=f"""
+:negative_squared_cross_mark: Per user limit exceeded.
+The limit for {to} is {resp_data['limit']}.
+You have crossed that limit. Please wait till tomorrow.
+                    """)
+                elif resp_data['reason'] == "total limit exceeded":
+                    await processing_msg.edit(content=f"""
+:negative_squared_cross_mark: Bot total limit exceeded.
+The limit for {to} is {resp_data['limit']}.
+The recipient bot has exceeded it's daily limits. Please wait till tomorrow.
+                        """)
+                    return
+    engine = await database.prepare_engine()
+    await _remove_money(engine, message.author, amount)
+    embed = discord.Embed(
+        title="<:Discoin:357656754642747403> Exchange Successful!",
+        description=f"""
+Your Pino-coins are being sent via the top-secret Agent Wumpus. He usually delivers the coins within 5 minutes.
+See `{PREFIX}discoin` for more info.
+        """)
+    embed.add_field(name="Pinocchio Coins (PIC) Exchanged", value=amount)
+    embed.add_field(name=f"{to} To Recieve", value=resp_data['resultAmount'])
+    embed.add_field(
+        name="Transaction Receipt",
+        value=f"```{resp_data['receipt']}```Keep this code in case Agent Wumpus fails to deliver the coins.")
+    embed.set_footer(
+        text=f"{message.author.name}#{message.author.discriminator}",
+        icon_url=message.author.avatar_url_as(size=128))
+    await processing_msg.edit(content=None, embed=embed)
 
 
 free_money_channels = {}
@@ -227,8 +269,8 @@ async def free_money_handler(client, message):
 
 currency_functions = {
     'wallet': (fetch_wallet, 'Check your wallet.'),
-    'get-money': (get_money, 'Get yourself some coins.'),
     'transfer-money': (transfer_money, 'Transfer your money.'),
     'dailies': (dailies, 'Come, collect your free money.'),
+    'exchange': (exchange, 'Exchange currency with other bots using <:Discoin:357656754642747403> Discoin.'),
 }
 currency_handlers = [free_money_handler]

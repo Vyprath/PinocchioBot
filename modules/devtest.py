@@ -1,5 +1,6 @@
 from variables import CMD_POPULARITY
 import database
+from .currency import _add_money
 
 
 async def view_stats(client, message, *args):
@@ -29,6 +30,19 @@ async def repeater(client, message, *args):
     print(".".join(args))
 
 
+async def get_money(client, message, *args):
+    if len(args) == 0 or not args[0].isdigit():
+        await message.channel.send("Correct command is: `!wallet <amount>`")
+    else:
+        amount = int(args[0])
+        engine = await database.prepare_engine()
+        balance = await _add_money(engine, message.author, amount)
+        await message.channel.send(
+            "Gave `{0}` coins. You now have `{1}` coins in your wallet."
+            .format(amount, balance)
+            )
+
+
 def wrapper(func, tier):
     async def f(client, message, *args):
         engine = await database.prepare_engine()
@@ -38,12 +52,8 @@ def wrapper(func, tier):
                 database.Member.c.member == member.id
             )
             cursor = await conn.execute(fetch_query)
-            conn = await cursor.fetchall()
-            member_tier = 0
-            for m in conn:
-                _t = m[database.Member.c.tier]
-                if _t > member_tier:
-                    member_tier = _t
+            conn = await cursor.fetchone()
+            member_tier = conn[database.Member.c.tier]
             if member_tier >= tier:
                 await func(client, message, *args)
             else:
@@ -59,5 +69,6 @@ Maybe try contacting the ghost for an upgrade?
 devtest_functions = {
     'botstats': (wrapper(view_stats, 3), None),
     'famouscmds': (wrapper(famous_cmd, 4), None),
+    'getmoney': (wrapper(get_money, 4), None),
     'repeater': (wrapper(repeater, 5), None),
 }

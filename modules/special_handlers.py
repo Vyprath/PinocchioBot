@@ -1,7 +1,10 @@
 from PIL import Image, ImageDraw, ImageFont
+from .currency import _add_money, _remove_money
+from datetime import datetime
 import aiohttp
 import discord
 import database
+import variables
 import io
 
 
@@ -71,3 +74,42 @@ async def send_on_member_leave(member):
         leave_str
         )
     await channel.send(file=img)
+
+
+async def discoin_watcher(client):
+    async with aiohttp.ClientSession() as session:
+        headers = {'Authorization': variables.DISCOIN_AUTH_KEY}
+        async with session.get(
+                "http://discoin.sidetrip.xyz/transactions",
+                headers=headers) as response:
+            transactions = await response.json()
+        engine = await database.prepare_engine()
+        for i in transactions:
+            receipt = i['receipt']
+            async with session.get(
+                    f"http://discoin.sidetrip.xyz/transaction/{receipt}",
+                    headers=headers) as response:
+                transaction = await response.json()
+                user = client.get_user(int(transaction['user']))
+                await _add_money(engine, user, transaction['amountTarget'])
+                embed = discord.Embed(
+                    title="<:Discoin:357656754642747403> Recieved Discoin Exchange Coins!",
+                    description=f"""
+Recieved coins via exchange!
+See `{variables.PREFIX}discoin` for more info.
+        """)
+                embed.add_field(
+                    name=f"{transaction['source']} Exchanged",
+                    value=transaction['amountSource'])
+                embed.add_field(
+                    name=f"Pinocchio Coins (PIC) Recieved",
+                    value=transaction['amountTarget'])
+                embed.add_field(
+                    name="Transaction Receipt",
+                    value=f"```{transaction['receipt']}```")
+                rcvd_time = datetime.fromtimestamp(
+                    transaction['timestamp']).strftime("%I:%M %p")
+                embed.set_footer(
+                    text=f"{user.name}#{user.discriminator} • {rcvd_time}",
+                    icon_url=user.avatar_url_as(size=128))
+                await user.send(embed=embed)

@@ -4,9 +4,12 @@ import os
 PREFIX = os.environ.get('PREFIX', 'p!')
 TOKEN = os.environ.get('TOKEN')
 DBL_TOKEN = os.environ.get('DBL_TOKEN')
+DISCOIN_AUTH_KEY = os.environ.get('DISCOIN_AUTH_KEY')
 CLIENT_ID = "506878658607054849"
 if TOKEN is None:
     raise Exception('The TOKEN environmental variable is not set.')
+if DISCOIN_AUTH_KEY is None:
+    raise Exception('The Discoin Auth Key is not set.')
 
 
 # Database

@@ -12,7 +12,6 @@ meta = sa.MetaData()
 Member = sa.Table(
     'members', meta,
     sa.Column('id', sa.BigInteger, primary_key=True, nullable=False),
-    sa.Column('guild', sa.BigInteger, nullable=False),
     sa.Column('member', sa.BigInteger, nullable=False),
     sa.Column('wallet', sa.BigInteger, default=0, nullable=False),
     sa.Column('last_dailies', sa.DateTime),
@@ -118,13 +117,11 @@ async def make_member_profile(members_list, self_id):
                 if member.id == self_id:
                     continue
                 exists_query = Member.select().where(
-                    Member.c.member == member.id).where(
-                    Member.c.guild == member.guild.id)
+                    Member.c.member == member.id)
                 cursor = await conn.execute(exists_query)
                 res = await cursor.fetchall()
                 if res is None or res == []:
                     create_query_values.append({
-                        'guild': member.guild.id,
                         'member': member.id,
                         'wallet': 0,
                     })

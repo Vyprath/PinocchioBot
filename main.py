@@ -7,7 +7,8 @@ import requests
 import json
 import dborg
 from modules import message_resolve
-from modules.special_handlers import send_on_member_join, send_on_member_leave
+from modules.special_handlers import send_on_member_join, send_on_member_leave, \
+    discoin_watcher
 from music import functions
 
 
@@ -28,15 +29,17 @@ else:
 @client.event
 async def on_ready():
     logging.info("Logged in as {0} - {1}.".format(client.user.name, client.user.id))
+    # await database.make_member_profile(client.get_all_members(), client.user.id)
     if variables.DBL_TOKEN:
         dborg.init_dbl(client)
-    # await database.make_member_profile(client.get_all_members(), client.user.id)
-    await dborg.dbl_api.update_stats()
+        await dborg.dbl_api.update_stats()
+    while True:
+        await discoin_watcher(client)
+        await asyncio.sleep(150)
 
 
 @client.event
 async def on_message(message):
-    # await database.make_guild_entry(client.guilds)
     await message_resolve(client, message, variables.PREFIX)
 
 

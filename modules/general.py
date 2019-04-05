@@ -43,8 +43,6 @@ async def claim_rewards(client, message, *args):
     async with engine.acquire() as conn:
         fetch_query = database.Member.select().where(
             database.Member.c.member == message.author.id
-        ).where(
-            database.Member.c.guild == message.guild.id
         )
         cursor = await conn.execute(fetch_query)
         member = await cursor.fetchone()
@@ -52,12 +50,8 @@ async def claim_rewards(client, message, *args):
                 database.Member.c.member == message.author.id
             )
         cursor = await conn.execute(fetch_query)
-        resp = await cursor.fetchall()
-        member_tier = 0
-        for m in resp:
-            _t = m[database.Member.c.tier]
-            if _t > member_tier:
-                member_tier = _t
+        resp = await cursor.fetchone()
+        member_tier = resp[database.Member.c.tier]
         last_reward = member[database.Member.c.last_reward]
         if last_reward is None:
             db_verified = True
@@ -86,8 +80,6 @@ async def claim_rewards(client, message, *args):
         async with engine.acquire() as conn:
             update_query = database.Member.update().where(
                 database.Member.c.member == message.author.id
-            ).where(
-                database.Member.c.guild == message.guild.id
             ).values(last_reward=datetime.datetime.now().isoformat())
             await conn.execute(update_query)
         await _add_money(engine, message.author, coins)
@@ -180,6 +172,22 @@ async def whois(client, message, *args):
     await message.channel.send(embed=embed)
 
 
+async def discoin(client, message, *args):
+    embed = discord.Embed(title="<:Discoin:357656754642747403> Discoin Information", description=f"""
+Discoin is a platform with which participating bots can exchange money with each other.
+Supported Discord bots and their commands are found here: [https://discoin.gitbook.io/docs/users-guide].
+The conversion rates are found here: [http://discoin.sidetrip.xyz/rates].
+
+For **Pinocchio Coins (PTC)**, conversion rate is __1.00 PIC => 0.20 Discoin => 0.80 PIC__.
+
+**You need to verify your discord account first (http://discoin.sidetrip.xyz/verify) in order to use discoin functionality on any participating bot!**
+
+Usage: `{PREFIX}exchange <Pinocchio Coins> <Currency>`
+where `currency` is the receiving bot's currency name.
+        """)
+    await message.channel.send(embed=embed)
+
+
 general_functions = {
     'vote': (vote_bot, "Vote for this bot."),
     'claimreward': (claim_rewards, "Claim your voting rewards."),
@@ -188,4 +196,5 @@ general_functions = {
     'invite': (invite, "Get the invite link for the bot."),
     'poll': (poll, "Create a reactions poll."),
     'whois': (whois, "Get info about an user."),
+    'discoin': (discoin, "Get info about <:Discoin:357656754642747403> Discoin.")
 }

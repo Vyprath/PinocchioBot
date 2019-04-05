@@ -160,8 +160,6 @@ async def _buy(client, message, *args):
         await _remove_money(engine, message.author, cost)
         fetch_query = database.Member.select().where(
             database.Member.c.member == message.author.id
-        ).where(
-            database.Member.c.guild == message.guild.id
         )
         cursor = await conn.execute(fetch_query)
         buyer = await cursor.fetchone()
@@ -321,8 +319,6 @@ async def _trade(client, message, *args):
         await _remove_money(engine, recipient, price)
         fetch_query = database.Member.select().where(
             database.Member.c.member == recipient.id
-        ).where(
-            database.Member.c.guild == message.guild.id
         )
         cursor = await conn.execute(fetch_query)
         buyer = await cursor.fetchone()
@@ -417,12 +413,8 @@ async def random_waifu(client, message, *args):
             database.Member.c.member == member.id
         )
         cursor = await conn.execute(fetch_query)
-        resp = await cursor.fetchall()
-    member_tier = 0
-    for m in resp:
-        _t = m[database.Member.c.tier]
-        if _t > member_tier:
-            member_tier = _t
+        resp = await cursor.fetchone()
+    member_tier = resp[database.Member.c.tier]
     if member_tier >= variables.DEV_TIER:
         total_rolls = 3*3600  # Virtually unlimited for devs, lol.
     elif member_tier >= variables.DONATOR_TIER_2:
@@ -530,8 +522,6 @@ You have no rolls left! Rolls reset in {0:02d} hours {1:02d} minutes. You can do
         await _remove_money(engine, purchaser, price)
         fetch_query = database.Member.select().where(
             database.Member.c.member == purchaser.id
-        ).where(
-            database.Member.c.guild == message.guild.id
         )
         cursor = await conn.execute(fetch_query)
         buyer = await cursor.fetchone()
@@ -557,12 +547,8 @@ async def rolls_left(client, message, *args):
             database.Member.c.member == member.id
         )
         cursor = await conn.execute(fetch_query)
-        resp = await cursor.fetchall()
-    member_tier = 0
-    for m in resp:
-        _t = m[database.Member.c.tier]
-        if _t > member_tier:
-            member_tier = _t
+        resp = await cursor.fetchone()
+    member_tier = resp[database.Member.c.tier]
     if member_tier >= variables.DEV_TIER:
         total_rolls = 3*3600  # Virtually unlimited for devs, lol.
     elif member_tier >= variables.DONATOR_TIER_2:

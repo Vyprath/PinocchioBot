@@ -4,6 +4,9 @@ from variables import PREFIX
 HELP_MESSAGE = """
 __**Pinocchio Bot Usage:**__
 
+**Important Update Message:** Recently, Pinocchio bot's currency system was made global. That is, the currency earnt in one server can be used in another. To facilitate this change, (1) existing coins were reduced to 20k, if one had more than 20k in their wallet, and (2) `{0}get-money` was removed.
+Also, <:Discoin:357656754642747403> Discoin support was added which lets you exchange currencies with some other bots. See `{0}discoin` for more info.
+
 **Bot**
 `{0}help`: Get the commands and a brief description.
 `{0}help <command name>`: A little more detailed description (if available).
@@ -19,12 +22,14 @@ __**Pinocchio Bot Usage:**__
 `{0}dailies`: Get your daily money and become riiiich.
 `{0}paidroles`: Get a preset role with $$$.
 `{0}customrole`: Get your custom colored role with $$$$$$.
+`{0}discoin`: Get information about how to exchange currency with other bots using <:Discoin:357656754642747403> Discoin. **NEW**
+`{0}exchange <Pinocchio Coins> <Currency>`: Exchange currency with other bots with <:Discoin:357656754642747403> Discoin. **NEW**
 
 **Waifu**
 `{0}waifu`: Buy/Sell/View/Search/Trade Waifus. Will make your loneliness disappear.
 `{0}harem`: Get the list of your bought waifus.
-`{0}randomroll`/`{0}rr`: Get a random waifu/husbando for a very cheap price. Normal users can do it 10 times per 3 hours, tier 1 donators 30 times, and tier 2 donators 90 times.  **NEW**
-`{0}rolls`: Check how many rolls you have left for getting a random waifu. Resets every 3 hours.  **NEW**
+`{0}randomroll`/`{0}rr`: Get a random waifu/husbando for a very cheap price. Normal users can do it 10 times per 3 hours, tier 1 donators 30 times, and tier 2 donators 90 times.
+`{0}rolls`: Check how many rolls you have left for getting a random waifu. Resets every 3 hours.
 
 **Anime**
 `{0}anime <anime name>`: Get details about an anime.
@@ -67,7 +72,6 @@ __**Pinocchio Bot Usage:**__
 `{0}status`: Get status about current playing music.
 
 **Administration (Below commands require Admininstrator Permission)**
-`{0}get-money <amount>`: Get some money.
 `{0}setpaidroles`: Set up paid roles.
 `{0}setcustomroles`: Set price or disable custom roles.
 `{0}purge <number of messages between 1 to 100>`: Purge messages from the channel.
