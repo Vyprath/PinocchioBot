@@ -79,6 +79,7 @@ Also, <:Discoin:357656754642747403> Discoin support was added which lets you exc
 `{0}setwelcome <new string>`: Change the default welcome string, or disable it by `{0}setwelcome None`.
 `{0}setleave <new string>`: Change the default leave string, or disable it by `{0}setleave None`.
 `{0}coindrops <disable/enable>`: Enable/Disable coin drops for a server. Default: disabled.
+`{0}rescuewaifus`: Removes waifus/husbandos from people who left the server. **NEW**
 
 **NOTE: Bot is still in pre-alpha. Be prepared for bugs. Report bugs at https://discord.gg/HkN7ReX**
 """.format(PREFIX)

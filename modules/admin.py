@@ -262,11 +262,12 @@ async def remove_abandoned_waifus(client, message, *args):
             await message.channel.send('Error: Timeout.')
             return
     engine = await database.prepare_engine()
+    member_ids = [i.id for i in message.guild.members]
     async with engine.acquire() as conn:
         delete_query = database.PurchasedWaifu.delete().where(
             database.PurchasedWaifu.c.guild == message.guild.id
         ).where(
-            database.PurchasedWaifu.c.member.notin_()
+            database.PurchasedWaifu.c.member.notin_(member_ids)
         )
         await conn.execute(delete_query)
     await message.channel.send(":skull_crossbones: Removed waifus from people who left the server.")
@@ -281,4 +282,5 @@ admin_functions = {
     'setcustomroles': (set_custom_roles, "Change the settings for custom roles."),
     'purge': (clean, "Purge X messages from this channel."),
     'coindrops': (set_coin_drops, "Enable/Disable coin drops for a server. Default: disabled."),
+    'rescuewaifus': (remove_abandoned_waifus, "Removes waifus/husbandos from people who left the server.")
 }

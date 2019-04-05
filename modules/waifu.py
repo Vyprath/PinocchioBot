@@ -79,10 +79,15 @@ async def _details(client, message, *args):
             "Hi! I am a {2} from {0}. You need {1} coins to buy me!"
             .format(resp[database.Waifu.c.from_anime], resp[database.Waifu.c.price], gender.lower()))
     else:
-        waifu_description = (
-        "Hi! I am a {1} from {0}. I am already in a relationship with {2}#{3}."  # noqa
-            .format(resp[database.Waifu.c.from_anime], gender.lower(),
-                    purchaser_user.name, purchaser_user.discriminator))
+        if purchaser_user is not None:
+            waifu_description = (
+                "Hi! I am a {1} from {0}. I am already in a relationship with {2}#{3}."  # noqa
+                .format(resp[database.Waifu.c.from_anime], gender.lower(),
+                        purchaser_user.name, purchaser_user.discriminator))
+        else:
+            waifu_description = (
+                "Hi! I am a {1} from {0}. I was purchased an abandoned by someone who left this server. Rescue me with `=rescuewaifus`."  # noqa
+                .format(resp[database.Waifu.c.from_anime], gender.lower()))
     embed = discord.Embed(
         title=resp[database.Waifu.c.name], description=waifu_description,
         type='rich', color=message.author.colour)
@@ -93,9 +98,13 @@ async def _details(client, message, *args):
     embed.add_field(name="ID", value=resp[database.Waifu.c.id])
     embed.add_field(name="Gender", value=gender)
     if purchaser is not None:
-        embed.set_footer(
-            text="Purchased by {0} for {1} coins.".format(purchaser_user.name, purchased_for),
-            icon_url=purchaser_user.avatar_url_as(size=128))
+        if purchaser_user is not None:
+            embed.set_footer(
+                text="Purchased by {0} for {1} coins.".format(purchaser_user.name, purchased_for),
+                icon_url=purchaser_user.avatar_url_as(size=128))
+        else:
+            embed.set_footer(
+                text="Purchased by someone who left for {0} coins.".format(purchased_for))
     await message.channel.send(embed=embed)
 
 
