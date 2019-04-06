@@ -407,7 +407,7 @@ async def waifu(client, message, *args):
 `{0}waifu buy <name/id>`: Buy a waifu
 `{0}waifu sell <name/id>`: Sell your waifu
 `{0}waifu trade <@user mention>`: Trade your waifu with others for money.
-`{0}harem`: Get your harem, aka your bought waifus.
+`{0}harem [sort option] [gender option]`: Get your harem, aka your bought waifus. Valid sort options: `name-desc`, `series-desc`, `name-asc`, `series-asc`, `id-asc`, `id-desc`, `price-asc`, `price-desc`. Valid gender options: `waifu`, `husbando`.
         """.format(PREFIX))
         return
 
@@ -424,7 +424,7 @@ def _prepare_harem_page(waifus, waifu_data):
     return txt
 
 
-async def _harem(client, message, member):
+async def _harem(client, message, member, sort_opt=None, sort_gender=None):
     engine = await database.prepare_engine()
     async with engine.acquire() as conn:
         query = database.PurchasedWaifu.select().where(
@@ -445,6 +445,41 @@ async def _harem(client, message, member):
         cursor = await conn.execute(query)
         resp = await cursor.fetchall()
         waifu_data = {x[database.Waifu.c.id]: x for x in resp}
+    if sort_opt:
+        reverse = False
+        if 'desc' in sort_opt:
+            reverse = True
+        if sort_opt.startswith('id'):
+            purchased_waifus.sort(
+                key=lambda x: x[database.PurchasedWaifu.c.waifu_id],
+                reverse=reverse)
+        elif sort_opt.startswith('price'):
+            purchased_waifus.sort(
+                key=lambda x: x[database.PurchasedWaifu.c.purchased_for],
+                reverse=reverse)
+        elif sort_opt.startswith('name'):
+            tpw = [
+                (waifu_data[x[database.PurchasedWaifu.c.waifu_id]][database.Waifu.c.name], x)
+                for x in purchased_waifus]
+            tpw.sort(reverse=reverse)
+            purchased_waifus = [x[1] for x in tpw]
+        elif sort_opt.startswith('series'):
+            tpw = [
+                (waifu_data[x[database.PurchasedWaifu.c.waifu_id]][database.Waifu.c.from_anime], x)
+                for x in purchased_waifus]
+            tpw.sort(reverse=reverse)
+            purchased_waifus = [x[1] for x in tpw]
+    if sort_gender:
+        if sort_gender == 'waifu':
+            purchased_waifus = [
+                x for x in purchased_waifus
+                if waifu_data[x[database.PurchasedWaifu.c.waifu_id]][database.Waifu.c.gender] == 'f'
+            ]
+        elif sort_gender == 'husbando':
+            purchased_waifus = [
+                x for x in purchased_waifus
+                if waifu_data[x[database.PurchasedWaifu.c.waifu_id]][database.Waifu.c.gender] == 'm'
+            ]
     pages = []
     n = 0
     for i in range(0, len(purchased_waifus), 10):
@@ -508,15 +543,28 @@ async def _harem(client, message, member):
     return
 
 
-
 async def harem(client, message, *args):
-    if len(args) == 0:
-        await _harem(client, message, message.author)
-    elif len(args) == 1 and len(message.mentions) == 1:
-        await _harem(client, message, message.mentions[0])
-    else:
-        await message.channel.send(
-            "View your or others' harem list with `{0}harem [user mention]`.".format(PREFIX))
+    VALID_SORT_OPTS = [
+        'name-desc', 'series-desc', 'name-asc',
+        'series-asc', 'id-asc', 'id-desc',
+        'price-asc', 'price-desc']
+    VALID_GENDER_OPTS = ['waifu', 'husbando']
+    matching_sort = None
+    matching_gender = None
+    x = [i.lower() in args for i in VALID_SORT_OPTS]
+    if len(x) > 0 and max(x):
+        matching_sort = VALID_SORT_OPTS[x.index(True)]
+    x = [i.lower() in args for i in VALID_GENDER_OPTS]
+    if len(x) > 0 and max(x):
+        matching_gender = VALID_GENDER_OPTS[x.index(True)]
+    if len(message.mentions) == 0:
+        await _harem(
+            client, message, message.author,
+            matching_sort, matching_gender)
+    if len(message.mentions) == 1:
+        await _harem(
+            client, message, message.mentions[0],
+            matching_sort, matching_gender)
 
 
 random_waifu_counter = {}
