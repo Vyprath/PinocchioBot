@@ -407,7 +407,7 @@ async def waifu(client, message, *args):
 `{0}waifu buy <name/id>`: Buy a waifu
 `{0}waifu sell <name/id>`: Sell your waifu
 `{0}waifu trade <@user mention>`: Trade your waifu with others for money.
-`{0}harem [sort option] [gender option]`: Get your harem, aka your bought waifus. Valid sort options: `name-desc`, `series-desc`, `name-asc`, `series-asc`, `id-asc`, `id-desc`, `price-asc`, `price-desc`. Valid gender options: `waifu`, `husbando`.
+`{0}harem [@user mention] [sort option] [gender option] [series name]`: Get your harem, aka your bought waifus. Valid sort options: `name-desc`, `series-desc`, `name-asc`, `series-asc`, `id-asc`, `id-desc`, `price-asc`, `price-desc`. Valid gender options: `waifu`, `husbando`.
         """.format(PREFIX))
         return
 
@@ -424,7 +424,13 @@ def _prepare_harem_page(waifus, waifu_data):
     return txt
 
 
-async def _harem(client, message, member, sort_opt=None, sort_gender=None):
+def compare_strings(a, b):
+    a = ''.join(e for e in a.lower().strip() if e.isalnum())
+    b = ''.join(e for e in b.lower().strip() if e.isalnum())
+    return a in b
+
+
+async def _harem(client, message, member, sort_opt=None, sort_gender=None, series_name=None):
     engine = await database.prepare_engine()
     async with engine.acquire() as conn:
         query = database.PurchasedWaifu.select().where(
@@ -445,6 +451,14 @@ async def _harem(client, message, member, sort_opt=None, sort_gender=None):
         cursor = await conn.execute(query)
         resp = await cursor.fetchall()
         waifu_data = {x[database.Waifu.c.id]: x for x in resp}
+    if series_name:
+        purchased_waifus = [
+            x for x in purchased_waifus
+            if compare_strings(
+                    series_name,
+                    waifu_data[x[database.PurchasedWaifu.c.waifu_id]][database.Waifu.c.from_anime]
+            )
+        ]
     if sort_opt:
         reverse = False
         if 'desc' in sort_opt:
@@ -480,6 +494,9 @@ async def _harem(client, message, member, sort_opt=None, sort_gender=None):
                 x for x in purchased_waifus
                 if waifu_data[x[database.PurchasedWaifu.c.waifu_id]][database.Waifu.c.gender] == 'm'
             ]
+    if len(purchased_waifus) == 0:
+        await message.channel.send("No harem found for specified queries.")
+        return
     pages = []
     n = 0
     for i in range(0, len(purchased_waifus), 10):
@@ -544,6 +561,7 @@ async def _harem(client, message, member, sort_opt=None, sort_gender=None):
 
 
 async def harem(client, message, *args):
+    args = list(args)
     VALID_SORT_OPTS = [
         'name-desc', 'series-desc', 'name-asc',
         'series-asc', 'id-asc', 'id-desc',
@@ -551,20 +569,25 @@ async def harem(client, message, *args):
     VALID_GENDER_OPTS = ['waifu', 'husbando']
     matching_sort = None
     matching_gender = None
-    x = [i.lower() in args for i in VALID_SORT_OPTS]
+    x = [i in args for i in VALID_SORT_OPTS]
     if len(x) > 0 and max(x):
         matching_sort = VALID_SORT_OPTS[x.index(True)]
-    x = [i.lower() in args for i in VALID_GENDER_OPTS]
+        args.remove(matching_sort)
+    x = [i in args for i in VALID_GENDER_OPTS]
     if len(x) > 0 and max(x):
         matching_gender = VALID_GENDER_OPTS[x.index(True)]
+        args.remove(matching_gender)
+    series_name = None
+    if len(args) > 0:
+        series_name = " ".join(args)
     if len(message.mentions) == 0:
         await _harem(
             client, message, message.author,
-            matching_sort, matching_gender)
+            matching_sort, matching_gender, series_name)
     if len(message.mentions) == 1:
         await _harem(
             client, message, message.mentions[0],
-            matching_sort, matching_gender)
+            matching_sort, matching_gender, series_name)
 
 
 random_waifu_counter = {}

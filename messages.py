@@ -7,6 +7,8 @@ __**Pinocchio Bot Usage:**__
 **Important Update Message:** Recently, Pinocchio bot's currency system was made global. That is, the currency earnt in one server can be used in another. To facilitate this change, (1) existing coins were reduced to 20k, if one had more than 20k in their wallet, and (2) `{0}get-money` was removed.
 Also, <:Discoin:357656754642747403> Discoin support was added which lets you exchange currencies with some other bots. See `{0}discoin` for more info.
 
+**NOTE:** Arguments inside <> are necessary, and inside [] are optional.
+
 **Bot**
 `{0}help`: Get the commands and a brief description.
 `{0}help <command name>`: A little more detailed description (if available).
@@ -15,6 +17,7 @@ Also, <:Discoin:357656754642747403> Discoin support was added which lets you exc
 `{0}vote`: Vote for this bot! Isn't Pinocchio kawaii? Vote for her and make her happy. _(sorry)_
 `{0}claimreward`: Pinocchio is happy now! Thanks for voting. Here, collect your reward.
 `{0}invite`: Get the invite link for this server.
+`{0}botstats`: General stats about the bot.
 
 **Financial**
 `{0}wallet [optional: @user mention]`: Check your own wallet or others' wallet.
@@ -27,7 +30,7 @@ Also, <:Discoin:357656754642747403> Discoin support was added which lets you exc
 
 **Waifu**
 `{0}waifu`: Buy/Sell/View/Search/Trade Waifus. Will make your loneliness disappear.
-`{0}harem`: Get the list of your bought waifus. Valid sort options: `name-desc`, `series-desc`, `name-asc`, `series-asc`, `id-asc`, `id-desc`, `price-asc`, `price-desc`. Valid gender options: `waifu`, `husbando`.
+`{0}harem [@user mention] [sort option] [gender option] [series name]`: Get the list of your bought waifus. Valid sort options: `name-desc`, `series-desc`, `name-asc`, `series-asc`, `id-asc`, `id-desc`, `price-asc`, `price-desc`. Valid gender options: `waifu`, `husbando`.
 `{0}randomroll`/`{0}rr`: Get a random waifu/husbando for a very cheap price. Normal users can do it 10 times per 3 hours, tier 1 donators 30 times, and tier 2 donators 90 times.
 `{0}rolls`: Check how many rolls you have left for getting a random waifu. Resets every 3 hours.
 
@@ -61,7 +64,7 @@ Also, <:Discoin:357656754642747403> Discoin support was added which lets you exc
 `{0}gif <search string>`: Search for a GIF.
 
 **Lag Free HQ Music** __(Donator-exclusive feature)__
-*NOTE: To use these commands, you have to donate to the bot. After donating, please contact RandomGhost#5990 to enable this.*
+*NOTE: To use these commands, you have to donate to the bot. After donating, please contact RandomGhost#0666 to enable this.*
 *NOTE#2: HQ means highest available music quality in YouTube. To save their server bandwidth, most bots take the lowest available music quality in YouTube. Not this bot.*
 `{0}play`/`{0}p`: Play some musix.
 `{0}leave`: Make the bot leave the music channel **Requires administrator permission**
@@ -81,5 +84,5 @@ Also, <:Discoin:357656754642747403> Discoin support was added which lets you exc
 `{0}coindrops <disable/enable>`: Enable/Disable coin drops for a server. Default: disabled.
 `{0}rescuewaifus`: Removes waifus/husbandos from people who left the server. **NEW**
 
-**NOTE: Bot is still in pre-alpha. Be prepared for bugs. Report bugs at https://discord.gg/HkN7ReX**
+**Support Server: https://discord.gg/HkN7ReX**
 """.format(PREFIX)
