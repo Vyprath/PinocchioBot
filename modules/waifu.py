@@ -91,12 +91,20 @@ async def _details(client, message, *args):
     embed = discord.Embed(
         title=resp[database.Waifu.c.name], description=waifu_description,
         type='rich', color=message.author.colour)
+    curr_img = -1
+    images = []
     if resp[database.Waifu.c.image_url] is not None:
-        embed.set_image(url=resp[database.Waifu.c.image_url])
+        images = resp[database.Waifu.c.image_url].split(",")
+        embed.set_image(url=images[0])
+        curr_img = 0
     embed.add_field(name="From", value=resp[database.Waifu.c.from_anime])
     embed.add_field(name="Cost", value=resp[database.Waifu.c.price])
     embed.add_field(name="ID", value=resp[database.Waifu.c.id])
     embed.add_field(name="Gender", value=gender)
+    if len(images) > 1:
+        embed.add_field(
+            name="Image", inline=False,
+            value=f"**Showing: {curr_img+1}/{len(images)}**")
     if purchaser is not None:
         if purchaser_user is not None:
             embed.set_footer(
@@ -105,7 +113,46 @@ async def _details(client, message, *args):
         else:
             embed.set_footer(
                 text="Purchased by someone who left for {0} coins.".format(purchased_for))
-    await message.channel.send(embed=embed)
+    detail_msg = await message.channel.send(embed=embed)
+    if len(images) <= 1:
+        return
+    await detail_msg.add_reaction("⬅")
+    await detail_msg.add_reaction("➡")
+
+    def check(reaction, user):
+        return (not user.bot
+                and reaction.message.channel == message.channel
+                and reaction.message.id == detail_msg.id)
+    seen = False
+    try:
+        while not seen:
+            reaction, purchaser = await client.wait_for(
+                'reaction_add', timeout=120.0, check=check)
+            if str(reaction.emoji) == '➡' and len(images) > 1:
+                if curr_img < len(images) - 1:
+                    curr_img += 1
+                    embed.set_image(url=images[curr_img])
+                    embed.set_field_at(
+                        index=4, name="Image", inline=False,
+                        value=f"**Showing: {curr_img+1}/{len(images)}**")
+                    await detail_msg.edit(embed=embed)
+                await detail_msg.remove_reaction('➡', purchaser)
+            elif str(reaction.emoji) == '⬅' and len(images) > 1:
+                if curr_img > 0:
+                    curr_img -= 1
+                    embed.set_image(url=images[curr_img])
+                    embed.set_field_at(
+                        index=4, name="Image", inline=False,
+                        value=f"**Showing: {curr_img+1}/{len(images)}**")
+                    await detail_msg.edit(embed=embed)
+                await detail_msg.remove_reaction('⬅', purchaser)
+            else:
+                continue
+    except asyncio.TimeoutError:
+        await detail_msg.remove_reaction("⬅", client.user)
+        await detail_msg.remove_reaction("➡", client.user)
+        return
+
 
 
 async def _buy(client, message, *args):
@@ -448,7 +495,7 @@ async def random_waifu(client, message, *args):
         await message.channel.send(
             """
 You have no rolls left! Rolls reset in {0:02d} hours {1:02d} minutes. You can donate to me and get more rolls!
-""".format(h, m))
+            """.format(h, m))
         return
     random_waifu_counter.update({member.id: (total_rolls - rolls_left + 1, datetime.now())})
     async with engine.acquire() as conn:
@@ -490,37 +537,77 @@ You have no rolls left! Rolls reset in {0:02d} hours {1:02d} minutes. You can do
         embed = discord.Embed(
             title=resp[database.Waifu.c.name], description=waifu_description,
             type='rich', color=message.author.colour)
+        curr_img = -1
+        images = []
         if resp[database.Waifu.c.image_url] is not None:
-            embed.set_image(url=resp[database.Waifu.c.image_url])
+            images = resp[database.Waifu.c.image_url].split(",")
+            embed.set_image(url=images[0])
+            curr_img = 0
         embed.add_field(name="From", value=resp[database.Waifu.c.from_anime])
         embed.add_field(name="Cost", value=price)
         embed.add_field(name="ID", value=resp[database.Waifu.c.id])
         embed.add_field(name="Gender", value=gender)
+        if len(images) > 1:
+            embed.add_field(
+                name="Image", inline=False,
+                value=f"**Showing: {curr_img+1}/{len(images)}**")
         if not purchaseable:
             embed.set_footer(
                 text="Purchased by {0} for {1} coins.".format(purchaser_user.name, purchased_for),
                 icon_url=purchaser_user.avatar_url_as(size=128))
         roll_msg = await message.channel.send(embed=embed)
-        if not purchaseable:
-            return
-        await roll_msg.add_reaction("❤")
+        if purchaseable:
+            await roll_msg.add_reaction("❤")
+        if len(images) > 1:
+            await roll_msg.add_reaction("⬅")
+            await roll_msg.add_reaction("➡")
 
         def check(reaction, user):
             return (not user.bot
                     and reaction.message.channel == message.channel
                     and reaction.message.id == roll_msg.id)
-
+        purchased = False
         try:
-            reaction, purchaser = await client.wait_for('reaction_add', timeout=10.0, check=check)
-            if not (str(reaction.emoji) == '❤'):
-                embed.description = "Oh no! You were too late to buy me. Bye bye."
-                await roll_msg.remove_reaction("❤", client.user)
-                await roll_msg.edit(embed=embed)
-                return
+            while not purchased:
+                reaction, purchaser = await client.wait_for(
+                    'reaction_add', timeout=10.0, check=check)
+                if str(reaction.emoji) == '❤':
+                    purchased = True
+                elif str(reaction.emoji) == '➡' and len(images) > 1:
+                    if curr_img < len(images) - 1:
+                        curr_img += 1
+                        embed.set_image(url=images[curr_img])
+                        embed.set_field_at(
+                            index=4, name="Image", inline=False,
+                            value=f"**Showing: {curr_img+1}/{len(images)}**")
+                        await roll_msg.edit(embed=embed)
+                    await roll_msg.remove_reaction('➡', purchaser)
+                elif str(reaction.emoji) == '⬅' and len(images) > 1:
+                    if curr_img > 0:
+                        curr_img -= 1
+                        embed.set_image(url=images[curr_img])
+                        embed.set_field_at(
+                            index=4, name="Image", inline=False,
+                            value=f"**Showing: {curr_img+1}/{len(images)}**")
+                        await roll_msg.edit(embed=embed)
+                    await roll_msg.remove_reaction('⬅', purchaser)
+                else:
+                    embed.description = "Oh no! You were too late to buy me. Bye bye."
+                    await roll_msg.remove_reaction("❤", client.user)
+                    await roll_msg.edit(embed=embed)
+                    return
         except asyncio.TimeoutError:
+            if not purchaseable:
+                await roll_msg.remove_reaction("⬅", client.user)
+                await roll_msg.remove_reaction("➡", client.user)
+                return
             embed.description = "Oh no! You were too late to buy me. Bye bye."
             await roll_msg.remove_reaction("❤", client.user)
+            await roll_msg.remove_reaction("⬅", client.user)
+            await roll_msg.remove_reaction("➡", client.user)
             await roll_msg.edit(embed=embed)
+            return
+        if not purchaseable:
             return
         wallet = await _fetch_wallet(engine, purchaser)
         if wallet - price < 0:
@@ -544,6 +631,8 @@ You have no rolls left! Rolls reset in {0:02d} hours {1:02d} minutes. You can do
         await conn.execute(create_query)
         embed.description = "I am now in a relationship with {}!".format(purchaser.name)
         await roll_msg.edit(embed=embed)
+        await roll_msg.remove_reaction("⬅", client.user)
+        await roll_msg.remove_reaction("➡", client.user)
         await message.channel.send(
             "Successfully bought waifu at an unbelievable price :thumbsup:. Don't lewd them!")
 
