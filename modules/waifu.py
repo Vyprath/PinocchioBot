@@ -578,8 +578,10 @@ async def harem(client, message, *args):
         matching_gender = VALID_GENDER_OPTS[x.index(True)]
         args.remove(matching_gender)
     series_name = None
-    if len(args) > 0:
+    if (len(message.mentions) == 0 and len(args) > 0):
         series_name = " ".join(args)
+    if (len(message.mentions) == 1 and len(args) > 1):
+        series_name = " ".join(args[1:])
     if len(message.mentions) == 0:
         await _harem(
             client, message, message.author,
