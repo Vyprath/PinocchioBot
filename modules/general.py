@@ -178,7 +178,7 @@ Discoin is a platform with which participating bots can exchange money with each
 Supported Discord bots and their commands are found here: [https://discoin.gitbook.io/docs/users-guide].
 The conversion rates are found here: [http://discoin.sidetrip.xyz/rates].
 
-For **Pinocchio Coins (PTC)**, conversion rate is __1.00 PIC => 0.20 Discoin => 0.80 PIC__.
+For **Pinocchio Coins (PIC)**, conversion rate is __1.00 PIC => 0.20 Discoin => 0.80 PIC__.
 
 **You need to verify your discord account first (http://discoin.sidetrip.xyz/verify) in order to use discoin functionality on any participating bot!**
 

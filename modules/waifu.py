@@ -412,6 +412,18 @@ async def waifu(client, message, *args):
         return
 
 
+def _prepare_harem_page(waifus, waifu_data):
+    txt = ""
+    for n, row in waifus:
+        data = waifu_data[row[database.PurchasedWaifu.c.waifu_id]]
+        txt += (
+            "{0}: **__{1}__**\n**ID:** {2}. **Bought For:** {4} coins. **From:** {3}.\n".
+            format(n, data[database.Waifu.c.name], data[database.Waifu.c.id],
+                   data[database.Waifu.c.from_anime], row[database.PurchasedWaifu.c.purchased_for])
+        )
+    return txt
+
+
 async def _harem(client, message, member):
     engine = await database.prepare_engine()
     async with engine.acquire() as conn:
@@ -432,20 +444,69 @@ async def _harem(client, message, member):
         query = database.Waifu.select().where(database.Waifu.c.id.in_(waifu_ids))
         cursor = await conn.execute(query)
         resp = await cursor.fetchall()
-        waifus = {x[database.Waifu.c.id]: x for x in resp}
-    resp_string = "{0} found in {1}'s locker:\n".format(len(purchased_waifus), member.name)
-    for row in purchased_waifus:
-        data = waifus[row[database.PurchasedWaifu.c.waifu_id]]
-        resp_string += (
-            "**{0}**: ID is {1}, from *{2}*. Bought for **{3}** coins.\n".
-            format(data[database.Waifu.c.name], data[database.Waifu.c.id],
-                   data[database.Waifu.c.from_anime], row[database.PurchasedWaifu.c.purchased_for])
+        waifu_data = {x[database.Waifu.c.id]: x for x in resp}
+    pages = []
+    n = 0
+    for i in range(0, len(purchased_waifus), 10):
+        pages.append(
+            [(n+nn+1, j) for nn, j in enumerate(purchased_waifus[i:i+10])]
         )
-        if len(resp_string) > 1600:
-            await message.channel.send(resp_string)
-            resp_string = ""
-    resp_string += "\nTo view details, do `{0}waifu details <name/id>`".format(PREFIX)
-    await message.channel.send(resp_string)
+        n += 10
+    curr_page = 0
+    embed = discord.Embed(
+        title=f"{member.name}'s Harem", color=member.color,
+        description=_prepare_harem_page(pages[curr_page], waifu_data))
+    embed.add_field(name="Waifus Inside Locker", value=len(purchased_waifus))
+    embed.add_field(
+        name="Net Harem Value",
+        value=str(sum(
+            [i[database.PurchasedWaifu.c.purchased_for] for i in purchased_waifus])) + " coins")
+    embed.add_field(
+        name="\u200b", inline=False,
+        value=f"To view details, do `{PREFIX}waifu details <name/id>`")
+    embed.set_footer(
+        text=f"{member.name}#{member.discriminator} • Page {curr_page+1}/{len(pages)}",
+        icon_url=member.avatar_url_as(size=128))
+    harem_msg = await message.channel.send(embed=embed)
+    if len(pages) == 1:
+        return
+    await harem_msg.add_reaction("⬅")
+    await harem_msg.add_reaction("➡")
+
+    def check(reaction, user):
+        return (not user.bot
+                and reaction.message.channel == message.channel
+                and reaction.message.id == harem_msg.id)
+    seen = False
+    try:
+        while not seen:
+            reaction, user = await client.wait_for(
+                'reaction_add', timeout=120.0, check=check)
+            if str(reaction.emoji) == '➡' and len(pages) > 1:
+                if curr_page < len(pages) - 1:
+                    curr_page += 1
+                    embed.description = _prepare_harem_page(pages[curr_page], waifu_data)
+                    embed.set_footer(
+                        text=f"{member.name}#{member.discriminator} • Page {curr_page+1}/{len(pages)}",  # noqa
+                        icon_url=member.avatar_url_as(size=128))
+                    await harem_msg.edit(embed=embed)
+                await harem_msg.remove_reaction('➡', user)
+            elif str(reaction.emoji) == '⬅' and len(pages) > 1:
+                if curr_page > 0:
+                    curr_page -= 1
+                    embed.description = _prepare_harem_page(pages[curr_page], waifu_data)
+                    embed.set_footer(
+                        text=f"{member.name}#{member.discriminator} • Page {curr_page+1}/{len(pages)}",  # noqa
+                        icon_url=member.avatar_url_as(size=128))
+                    await harem_msg.edit(embed=embed)
+                await harem_msg.remove_reaction('⬅', user)
+            else:
+                continue
+    except asyncio.TimeoutError:
+        await harem_msg.remove_reaction("⬅", client.user)
+        await harem_msg.remove_reaction("➡", client.user)
+    return
+
 
 
 async def harem(client, message, *args):
