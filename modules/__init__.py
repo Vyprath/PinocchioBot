@@ -60,13 +60,7 @@ async def message_resolve(client, message, cmd_prefix):
 
 async def print_help(client, message, *args):
     if len(args) == 0:
-        text = ""
-        for line in HELP_MESSAGE.splitlines(True):
-            text += line
-            if len(text) > 1850:
-                await message.author.send(text)
-                text = ""
-        if text != "":
+        for text in [HELP_MESSAGE[i:i+1990] for i in range(0, len(HELP_MESSAGE), 1990)]:
             await message.author.send(text)
         await message.channel.send("DM-ed the help message!")
     elif args[0] in functions.keys():
