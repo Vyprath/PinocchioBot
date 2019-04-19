@@ -84,5 +84,5 @@ Also, <:Discoin:357656754642747403> Discoin support was added which lets you exc
 `{0}coindrops <disable/enable>`: Enable/Disable coin drops for a server. Default: disabled.
 `{0}rescuewaifus`: Removes waifus/husbandos from people who left the server. **NEW**
 
-**Support Server: https://discord.gg/HkN7ReX**
+**Support Server: https://discord.gg/BzaksqP**
 """.format(PREFIX)
