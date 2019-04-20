@@ -10,9 +10,11 @@ from modules import message_resolve
 from modules.special_handlers import send_on_member_join, send_on_member_leave, \
     discoin_watcher
 from music import functions
+import uvloop
 
 
 logging.basicConfig(level=logging.INFO)
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 loop = asyncio.get_event_loop()
 loop.create_task(database.prepare_tables())
 client = discord.Client(

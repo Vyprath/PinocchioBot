@@ -11,4 +11,5 @@ Pillow
 nyaapy
 psycopg2-binary
 psutil
+uvloop
 git+git://github.com/AWConant/jikanpy.git
