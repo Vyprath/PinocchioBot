@@ -30,7 +30,7 @@ from .waifu_duel import rpg_functions
 from .anime import anime_functions
 from music import music_functions
 from messages import HELP_MESSAGE
-from variables import PREFIX, CMD_POPULARITY
+from variables import PREFIX
 import shlex
 
 
@@ -49,10 +49,6 @@ async def message_resolve(client, message, cmd_prefix):
             if is_bot:
                 await message.channel.send("Haha, clever. And lol, no. I'm not that stupid.")
                 return
-            if message.guild.name in CMD_POPULARITY.keys():
-                CMD_POPULARITY[message.guild.name] += 1
-            else:
-                CMD_POPULARITY.update({message.guild.name: 1})
             await functions[args[0]][0](client, message, *args[len(cmd_prefix):])
     for handler in handlers:
         await handler(client, message)

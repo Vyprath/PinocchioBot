@@ -1,4 +1,3 @@
-from variables import CMD_POPULARITY
 import database
 import discord
 import psutil
@@ -36,13 +35,6 @@ async def view_stats(client, message, *args):
         text=f"Running on Node-Megumin • Made by {app_info.owner.name}#{app_info.owner.discriminator}",
         icon_url=app_info.owner.avatar_url_as(size=128))
     await message.channel.send(embed=embed)
-
-
-async def famous_cmd(client, message, *args):
-    resp = []
-    for k, v in CMD_POPULARITY.items():
-        resp.append("`{0}`: {1}".format(k, v))
-    await message.channel.send(", ".join(resp))
 
 
 async def repeater(client, message, *args):
@@ -88,7 +80,6 @@ Maybe try contacting the ghost for an upgrade?
 
 devtest_functions = {
     'botstats': (wrapper(view_stats, 0), None),
-    'famouscmds': (wrapper(famous_cmd, 4), None),
     'getmoney': (wrapper(get_money, 4), None),
     'repeater': (wrapper(repeater, 5), None),
 }
