@@ -227,6 +227,8 @@ async def free_money_handler(client, message):
         )
         cursor = await conn.execute(fetch_query)
         resp = await cursor.fetchone()
+        if resp is None:
+            return
         coin_drop_enabled = resp[database.Guild.c.coin_drops]
     if not coin_drop_enabled:
         return
