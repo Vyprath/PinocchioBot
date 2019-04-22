@@ -17,7 +17,7 @@ Also, <:Discoin:357656754642747403> Discoin support was added which lets you exc
 `{0}vote`: Vote for this bot! Isn't Pinocchio kawaii? Vote for her and make her happy. _(sorry)_
 `{0}claimreward`: Pinocchio is happy now! Thanks for voting. Here, collect your reward.
 `{0}invite`: Get the invite link for this server.
-`{0}botstats`: General stats about the bot.
+`{0}botstats`/`{0}botinfo`/`{0}info`: General stats about the bot.
 
 **Financial**
 `{0}wallet [optional: @user mention]`: Check your own wallet or others' wallet.

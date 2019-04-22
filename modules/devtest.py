@@ -80,6 +80,8 @@ Maybe try contacting the ghost for an upgrade?
 
 devtest_functions = {
     'botstats': (wrapper(view_stats, 0), None),
+    'botinfo': (wrapper(view_stats, 0), None),
+    'info': (wrapper(view_stats, 0), None),
     'getmoney': (wrapper(get_money, 4), None),
     'repeater': (wrapper(repeater, 5), None),
 }
