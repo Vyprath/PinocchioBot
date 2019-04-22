@@ -1,4 +1,4 @@
-"""
+u"""
 Note: In this init file, you have to specifically import the individual module's functions
 as a dictionary. Then append that dictionary to the master dictionary in this init module.
 The master dictionary here is called "functions".
@@ -42,12 +42,10 @@ async def message_resolve(client, message, cmd_prefix):
         args = shlex.split(message.content[len(cmd_prefix):])
         if args[0] == 'help':
             if is_bot:
-                await message.channel.send("Haha, clever. And lol, no. I'm not that stupid.")
                 return
             await print_help(client, message, *args[len(cmd_prefix):])
         elif args[0] in functions.keys():
             if is_bot:
-                await message.channel.send("Haha, clever. And lol, no. I'm not that stupid.")
                 return
             await functions[args[0]][0](client, message, *args[len(cmd_prefix):])
     for handler in handlers:
