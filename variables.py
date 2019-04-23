@@ -1,4 +1,5 @@
 import os
+from aiohttp import BasicAuth
 
 # Core
 PREFIX = os.environ.get('PREFIX', 'p!')
@@ -10,6 +11,16 @@ if TOKEN is None:
     raise Exception('The TOKEN environmental variable is not set.')
 if DISCOIN_AUTH_KEY is None:
     raise Exception('The Discoin Auth Key is not set.')
+# Proxy
+PROXY = None
+PROXY_AUTH = None
+proxy_str = os.environ.get('PROXY_STR')
+if proxy_str:
+    proxy_parts = proxy_str.split("@")
+    PROXY = proxy_parts[0]
+    if len(proxy_parts) == 2:
+        username, password = proxy_parts[1].split(":")
+        PROXY_AUTH = BasicAuth(username, password)
 
 
 # Database

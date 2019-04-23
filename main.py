@@ -13,12 +13,14 @@ from music import functions
 import uvloop
 
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 loop = asyncio.get_event_loop()
 loop.create_task(database.prepare_tables())
 client = discord.Client(
     loop=loop,
+    proxy=variables.PROXY,
+    proxy_auth=variables.PROXY_AUTH,
     activity=discord.Game(
         name="{0}help | Playing around in 100 servers".format(variables.PREFIX)))
 tenor_anon_id_request = requests.get(variables.GET_ANON_ID_URL)
@@ -42,6 +44,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    await database.make_member_profile([message.author], client.user.id)
     await message_resolve(client, message, variables.PREFIX)
 
 
