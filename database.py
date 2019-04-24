@@ -50,6 +50,7 @@ PurchasedWaifu = sa.Table(
     sa.Column('guild', sa.BigInteger, nullable=False),
     sa.Column('member', sa.BigInteger, nullable=False),
     sa.Column('purchased_for', sa.BigInteger, nullable=False),
+    sa.Column('favorite', sa.Boolean, nullable=False, server_default='f'),
 )
 
 RPGWeapon = sa.Table(
@@ -73,7 +74,7 @@ RPGCharacter = sa.Table(
               sa.BigInteger, sa.ForeignKey('purchased_waifu.id', ondelete='CASCADE')),
 )
 
-tables = [Member, Guild, Waifu, PurchasedWaifu, RPGWeapon, RPGCharacter]
+tables = [Member, Guild, Waifu, PurchasedWaifu]
 
 engine = None
 

@@ -29,7 +29,7 @@ Also, <:Discoin:357656754642747403> Discoin support was added which lets you exc
 `{0}exchange <Pinocchio Coins> <Currency>`: Exchange currency with other bots with <:Discoin:357656754642747403> Discoin. **NEW**
 
 **Waifu**
-`{0}waifu`: Buy/Sell/View/Search/Trade Waifus. Will make your loneliness disappear.
+`{0}waifu`: Buy/Sell/View/Search/Trade/Money-Trade/Favorite/Unfavorite Waifus. Will make your loneliness disappear.
 `{0}harem [@user mention] [sort option] [gender option] [series name]`: Get the list of your bought waifus. Valid sort options: `name-desc`, `series-desc`, `name-asc`, `series-asc`, `id-asc`, `id-desc`, `price-asc`, `price-desc`. Valid gender options: `waifu`, `husbando`.
 `{0}randomroll`/`{0}rr`: Get a random waifu/husbando for a very cheap price. Normal users can do it 10 times per 3 hours, tier 1 donators 30 times, and tier 2 donators 90 times.
 `{0}rolls`: Check how many rolls you have left for getting a random waifu. Resets every 3 hours.
