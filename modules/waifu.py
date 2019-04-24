@@ -102,9 +102,11 @@ async def _details(client, message, *args):
     embed.add_field(name="Cost", value=resp[database.Waifu.c.price])
     embed.add_field(name="ID", value=resp[database.Waifu.c.id])
     embed.add_field(name="Gender", value=gender)
+    image_field_id = 4
     if purchaser_user and purchaser[database.PurchasedWaifu.c.favorite]:
         embed.add_field(name="Favorite", inline=False,
                         value="Purchaser's favorite waifu :heart:")
+        image_field_id += 1
     if len(images) > 1:
         embed.add_field(
             name="Image", inline=False,
@@ -137,7 +139,7 @@ async def _details(client, message, *args):
                     curr_img += 1
                     embed.set_image(url=images[curr_img])
                     embed.set_field_at(
-                        index=4, name="Image", inline=False,
+                        index=image_field_id, name="Image", inline=False,
                         value=f"**Showing: {curr_img+1}/{len(images)}**")
                     await detail_msg.edit(embed=embed)
                 await detail_msg.remove_reaction('➡', purchaser)
@@ -146,7 +148,7 @@ async def _details(client, message, *args):
                     curr_img -= 1
                     embed.set_image(url=images[curr_img])
                     embed.set_field_at(
-                        index=4, name="Image", inline=False,
+                        index=image_field_id, name="Image", inline=False,
                         value=f"**Showing: {curr_img+1}/{len(images)}**")
                     await detail_msg.edit(embed=embed)
                 await detail_msg.remove_reaction('⬅', purchaser)
