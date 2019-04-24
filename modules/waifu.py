@@ -677,6 +677,11 @@ async def _harem(client, message, member, sort_opt=None, sort_gender=None, serie
                 x for x in purchased_waifus
                 if waifu_data[x[database.PurchasedWaifu.c.waifu_id]][database.Waifu.c.gender] == 'm'
             ]
+    tpw = [
+        (x[database.PurchasedWaifu.c.favorite], x)
+        for x in purchased_waifus]
+    tpw.sort(reverse=True, key=lambda i: i[0])
+    purchased_waifus = [x[1] for x in tpw]
     if len(purchased_waifus) == 0:
         await message.channel.send("No harem found for specified queries.")
         return
