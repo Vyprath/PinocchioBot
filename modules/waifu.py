@@ -64,6 +64,7 @@ async def _details(client, message, *args):
         cursor = await conn.execute(query)
         purchaser = await cursor.fetchone()
     purchaseable = purchaser is None
+    purchaser_user = None
     if not purchaseable:
         purchaser_user = message.guild.get_member(purchaser[database.PurchasedWaifu.c.member])
         purchased_for = purchaser[database.PurchasedWaifu.c.purchased_for]
