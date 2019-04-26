@@ -23,7 +23,8 @@ Bot invite link: https://discordbots.org/bot/506878658607054849
 
 async def creator(client, message, *args):
     await message.channel.send("""
-Bot created by RandomGhost#5990. Ask him for new features/bugs!
+Bot created by RandomGhost#0666. Ask him for new features/bugs!
+To join support server, use `=help` or go to https://support.pinocchiobot.xyz.
     """)
 
 
