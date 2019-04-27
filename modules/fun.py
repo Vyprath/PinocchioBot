@@ -16,11 +16,12 @@ async def avatar_url(client, message, *args):
         member = message.author
     else:
         member = message.mentions[0]
+    avatar_url = str(member.avatar_url)
     embed = discord.Embed(
         title="{0}#{1}'s Avatar".format(member.name, member.discriminator),
-        url=member.avatar_url, colour=member.colour
+        url=avatar_url, colour=member.colour
     )
-    embed.set_image(url=member.avatar_url)
+    embed.set_image(url=avatar_url)
     await message.channel.send(embed=embed)
 
 
