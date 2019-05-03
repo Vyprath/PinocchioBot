@@ -2,6 +2,8 @@ import database
 import discord
 import psutil
 import os
+import time
+from datetime import timedelta
 from .currency import _add_money
 
 
@@ -19,18 +21,28 @@ async def view_stats(client, message, *args):
     embed.add_field(name="Guild Count", value=f"{len(client.guilds):,}")
     embed.add_field(name="User Count", value=f"{len(client.users):,}")
     embed.add_field(name="**__Technical Info__**", inline=False, value="\u200b")
-    embed.add_field(name="Overall CPU Usage", value=f"{psutil.cpu_percent():.02f}%")
-    embed.add_field(name="Overall RAM Usage",
+    embed.add_field(name="System CPU Usage", value=f"{psutil.cpu_percent():.02f}%")
+    embed.add_field(name="System RAM Usage",
                     value=f"{psutil.virtual_memory().used/1048576:.02f} MB")
+    embed.add_field(name="System Uptime",
+                    value=str(timedelta(seconds=int(time.time()-psutil.boot_time()))))
     embed.add_field(name="Bot CPU Usage", value=f"{process.cpu_percent():.02f}%")
     embed.add_field(name="Bot RAM Usage", value=f"{process.memory_info().rss/1048576:.02f} MB")
+    embed.add_field(name="Bot Uptime",
+                    value=str(timedelta(seconds=int(time.time()-process.create_time()))))
     embed.add_field(name="**__Links__**", inline=False, value="\u200b")
-    embed.add_field(name="Donate", value="[https://patreon.com/RandomGhost](https://patreon.com/RandomGhost)")
-    embed.add_field(name="Website", value="[https://pinocchiobot.xyz](https://pinocchiobot.xyz)")
-    embed.add_field(name="Discord Bots", value="[https://dbots.pinocchiobot.xyz](https://dbots.pinocchiobot.xyz)")
-    embed.add_field(name="Support Server", value="[https://support.pinocchiobot.xyz](https://support.pinocchiobot.xyz)")
-    embed.add_field(name="Invite", value="[https://invite.pinocchiobot.xyz](https://invite.pinocchiobot.xyz)")
-    embed.add_field(name="Add Waifus", value="[https://waifu.pinocchiobot.xyz](https://waifu.pinocchiobot.xyz)")
+    embed.add_field(name="Donate",
+                    value="[https://patreon.com/RandomGhost](https://patreon.com/RandomGhost)")
+    embed.add_field(name="Website",
+                    value="[https://pinocchiobot.xyz](https://pinocchiobot.xyz)")
+    embed.add_field(name="Discord Bots",
+                    value="[https://dbots.pinocchiobot.xyz](https://dbots.pinocchiobot.xyz)")
+    embed.add_field(name="Support Server",
+                    value="[https://support.pinocchiobot.xyz](https://support.pinocchiobot.xyz)")
+    embed.add_field(name="Invite",
+                    value="[https://invite.pinocchiobot.xyz](https://invite.pinocchiobot.xyz)")
+    embed.add_field(name="Add Waifus",
+                    value="[https://waifu.pinocchiobot.xyz](https://waifu.pinocchiobot.xyz)")
     embed.set_footer(
         text=f"Running on Node-Megumin • Made by {app_info.owner.name}#{app_info.owner.discriminator}",
         icon_url=app_info.owner.avatar_url_as(size=128))
