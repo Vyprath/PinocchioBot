@@ -10,7 +10,7 @@ import io
 
 async def make_join_leave_image(image_url, header, subtitle):
     async with aiohttp.ClientSession() as session:
-        async with session.get(image_url) as resp:
+        async with session.get(str(image_url)) as resp:
             image_bytes = await resp.read()
     profile_pic = Image.open(io.BytesIO(image_bytes), 'r')
     profile_pic = profile_pic.resize((160, 160), Image.ANTIALIAS)

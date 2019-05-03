@@ -16,7 +16,8 @@ Member = sa.Table(
     sa.Column('wallet', sa.BigInteger, default=0, nullable=False),
     sa.Column('last_dailies', sa.DateTime),
     sa.Column('last_reward', sa.DateTime),
-    sa.Column('tier', sa.SmallInteger, server_default='0')
+    sa.Column('tier', sa.SmallInteger, server_default='0'),
+    sa.Column('level', sa.BigInteger, nullable=False, server_default='0')
 )
 
 Guild = sa.Table(
@@ -29,7 +30,7 @@ Guild = sa.Table(
     sa.Column('join_leave_channel', sa.BigInteger),
     sa.Column('welcome_str', sa.String(length=60), server_default="Let the madness begin. Hold tight."),
     sa.Column('leave_str', sa.String(length=60), server_default="See you again, in another life."),
-    sa.Column('custom_role', sa.BigInteger, server_default="40000")
+    sa.Column('custom_role', sa.BigInteger, server_default="40000"),
 )
 
 Waifu = sa.Table(
@@ -57,24 +58,25 @@ RPGWeapon = sa.Table(
     'rpg_weapon', meta,
     sa.Column('id', sa.BigInteger, primary_key=True, nullable=False),
     sa.Column('name', sa.String(length=200), nullable=False),
-    sa.Column('effects', sa.JSON, nullable=False)
+    sa.Column('description', sa.String(length=200), nullable=False),
+    sa.Column('effects', sa.JSON, nullable=False),
+    sa.Column('req_level', sa.BigInteger, nullable=False),
+    sa.Column('max_uses', sa.BigInteger, nullable=False),
+    sa.Column('price', sa.BigInteger, nullable=False),
 )
 
-RPGCharacter = sa.Table(
-    'rpg_character', meta,
+PurchasedWeapon = sa.Table(
+    'purchased_weapon', meta,
     sa.Column('id', sa.BigInteger, primary_key=True, nullable=False),
+    sa.Column('member_id', sa.BigInteger, sa.ForeignKey('members.id', ondelete='CASCADE')),
+    sa.Column('weapon_id', sa.BigInteger, sa.ForeignKey('rpg_weapon.id', ondelete='CASCADE')),
     sa.Column('member', sa.BigInteger, nullable=False),
-    sa.Column('guild', sa.BigInteger, nullable=False),
-    sa.Column('name', sa.String(length=40), nullable=False),
-    sa.Column('level', sa.Integer, nullable=False),
-    sa.Column('game_wallet', sa.BigInteger, nullable=False),
-    sa.Column('weapon_id', sa.BigInteger, sa.ForeignKey('rpg_weapon.id', ondelete='SET NULL')),
-    sa.Column('waifu_id', sa.BigInteger, sa.ForeignKey('waifu.id', ondelete='CASCADE')),
-    sa.Column('purchased_waifu_id',
-              sa.BigInteger, sa.ForeignKey('purchased_waifu.id', ondelete='CASCADE')),
+    sa.Column('level', sa.BigInteger, nullable=False, server_default='0'),
+    sa.Column('used', sa.BigInteger, nullable=False, server_default='0'),
+    sa.Column('equipped', sa.Boolean, nullable=False, server_default='f'),
 )
 
-tables = [Member, Guild, Waifu, PurchasedWaifu]
+tables = [Member, Guild, Waifu, PurchasedWaifu, RPGWeapon, PurchasedWeapon]
 
 engine = None
 
