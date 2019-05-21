@@ -216,7 +216,7 @@ LIMIT 80;
                 f"**[{str(i).zfill(2)}] __{user.name}__**\nWallet: {j[4]}, Waifu Value: {j[3]}, **Total: {j[5]}**")  # noqa
         else:
             rtxt.append(
-                f"[{str(i).zfill(2)}] {user.name}\nWallet: {j[4]}, Waifu Value: {j[3]}, __Total: {j[5]}__")  # noqa
+                f"**[{str(i).zfill(2)}] {user.name}**\nWallet: {j[4]}, Waifu Value: {j[3]}, **Total: {j[5]}**")  # noqa
         i += 1
         if i == 16:
             break
