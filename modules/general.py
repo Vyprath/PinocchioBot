@@ -209,7 +209,7 @@ def _leaderboard_text(client, results):
             rtxt.append(
                 f"**[{str(i).zfill(2)}] {user.name}**\nWallet: {j[4]}, Waifu Value: {j[3]}, **Total: {j[5]}**")  # noqa
         i += 1
-        if i == 16:
+        if i == 11:
             break
     return '\n'.join(rtxt)
 
@@ -251,7 +251,7 @@ FROM members M LEFT JOIN (
 SELECT member_id,sum(purchased_for) as wsum FROM purchased_waifu
 WHERE guild = {message.guild.id} GROUP BY member_id) PW ON (M.id = PW.member_id)
 WHERE (wallet > 0 OR COALESCE(wsum, 0) > 0) AND M.member in {mlist}
-ORDER BY total DESC LIMIT 15;
+ORDER BY total DESC LIMIT 10;
         """
         cursor = await conn.execute(query)
         results = await cursor.fetchall()

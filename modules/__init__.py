@@ -1,4 +1,4 @@
-u"""
+"""
 Note: In this init file, you have to specifically import the individual module's functions
 as a dictionary. Then append that dictionary to the master dictionary in this init module.
 The master dictionary here is called "functions".
@@ -32,6 +32,7 @@ from music import music_functions
 from messages import HELP_MESSAGE
 from variables import PREFIX
 import shlex
+import jellyfish
 
 
 async def message_resolve(client, message, cmd_prefix):

@@ -49,6 +49,10 @@ async def view_stats(client, message, *args):
     await message.channel.send(embed=embed)
 
 
+async def ping(client, message, *args):
+    await message.channel.send(f"Pong! Ping is {client.latency*1000:.03f} ms")
+
+
 async def repeater(client, message, *args):
     print(message.content)
     print(".".join(args))
@@ -96,4 +100,5 @@ devtest_functions = {
     'info': (wrapper(view_stats, 0), None),
     'getmoney': (wrapper(get_money, 4), None),
     'repeater': (wrapper(repeater, 5), None),
+    'ping': (wrapper(ping, 0), None),
 }
