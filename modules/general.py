@@ -212,8 +212,14 @@ LIMIT 80;
         if user is None:
             continue
         if i <= 3:
+            if i == 1:
+                medal = ":first_place:"
+            elif i == 2:
+                medal = ":second_place:"
+            elif i == 3:
+                medal = ":third_place:"
             rtxt.append(
-                f"**[{str(i).zfill(2)}] __{user.name}__**\nWallet: {j[4]}, Waifu Value: {j[3]}, **Total: {j[5]}**")  # noqa
+                f"**[{str(i).zfill(2)}] {medal} __{user.name}__**\nWallet: {j[4]}, Waifu Value: {j[3]}, **Total: {j[5]}**")  # noqa
         else:
             rtxt.append(
                 f"**[{str(i).zfill(2)}] {user.name}**\nWallet: {j[4]}, Waifu Value: {j[3]}, **Total: {j[5]}**")  # noqa
