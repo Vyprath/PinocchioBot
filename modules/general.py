@@ -200,20 +200,26 @@ LEFT JOIN (select member_id, sum(purchased_for) as wsum from purchased_waifu gro
 ON (M.id = PW.member_id)
 WHERE wallet > 0 OR COALESCE(wsum, 0) > 0
 ORDER BY total DESC
-LIMIT 20;
+LIMIT 80;
         """
         cursor = await conn.execute(query)
         results = await cursor.fetchall()
     rtxt = []
     top_user = client.get_user(results[0][1])
-    for i, j in enumerate(results):
+    i = 1
+    for j in results:
         user = client.get_user(j[1])
-        if i < 3:
+        if user is None:
+            continue
+        if i <= 3:
             rtxt.append(
-                f"**[{str(i+1).zfill(2)}] __{user.name}__**\nWallet: {j[4]}, Waifu Value: {j[3]}, **Total: {j[5]}**")  # noqa
+                f"**[{str(i).zfill(2)}] __{user.name}__**\nWallet: {j[4]}, Waifu Value: {j[3]}, **Total: {j[5]}**")  # noqa
         else:
             rtxt.append(
-                f"[{str(i+1).zfill(2)}] {user.name}\nWallet: {j[4]}, Waifu Value: {j[3]}, __Total: {j[5]}__")  # noqa
+                f"[{str(i).zfill(2)}] {user.name}\nWallet: {j[4]}, Waifu Value: {j[3]}, __Total: {j[5]}__")  # noqa
+        i += 1
+        if i == 16:
+            break
     txt = '\n'.join(rtxt)
     embed = discord.Embed(
         title="World Leaderboards", colour=message.author.colour,
