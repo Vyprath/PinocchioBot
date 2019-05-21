@@ -29,10 +29,9 @@ from .fun import fun_functions
 from .waifu_duel import rpg_functions
 from .anime import anime_functions
 from music import music_functions
-from messages import HELP_MESSAGE
+import messages
 from variables import PREFIX
 import shlex
-import jellyfish
 
 
 async def message_resolve(client, message, cmd_prefix):
@@ -44,7 +43,11 @@ async def message_resolve(client, message, cmd_prefix):
         if args[0] == 'help':
             if is_bot:
                 return
-            await print_help(client, message, *args[len(cmd_prefix):])
+            await print_help(client, message, *args[len(cmd_prefix):], full=False)
+        elif args[0] == 'fullhelp':
+            if is_bot:
+                return
+            await print_help(client, message, *args[len(cmd_prefix):], full=True)
         elif args[0] in functions.keys():
             if is_bot:
                 return
@@ -53,11 +56,19 @@ async def message_resolve(client, message, cmd_prefix):
         await handler(client, message)
 
 
-async def print_help(client, message, *args):
-    if len(args) == 0:
-        for text in [HELP_MESSAGE[i:i+1990] for i in range(0, len(HELP_MESSAGE), 1990)]:
-            await message.author.send(text)
-        await message.channel.send("DM-ed the help message!")
+async def print_help(client, message, *args, full=False):
+    if len(args) == 0 or args[0] == 'inchannel':
+        if full:
+            for text in [
+                    messages.full_help_text[i:i+1990] for i in
+                    range(0, len(messages.full_help_text), 1990)]:
+                await message.author.send(text)
+        else:
+            if len(args) == 1 and args[0] == 'inchannel':
+                await message.channel.send(embed=messages.main_help_menu)
+            else:
+                await message.author.send(embed=messages.main_help_menu)
+                await message.channel.send("DM-ed the help message!")
     elif args[0] in functions.keys():
         help_string = functions[args[0]][1]
         if help_string is None:
