@@ -145,7 +145,7 @@ async def cook_user(client, message, *args):
         return
     cooked_user = message.mentions[0]
     profile_pic = Image.open(
-        io.BytesIO(await _get_img_bytes_from_url(cooked_user.avatar_url)), 'r')
+        io.BytesIO(await _get_img_bytes_from_url(str(cooked_user.avatar_url))), 'r')
     profile_pic = profile_pic.resize((294, 294), Image.ANTIALIAS)
     background = Image.open("assets/plate.jpg", 'r')
     bigsize = (profile_pic.size[0] * 3, profile_pic.size[1] * 3)
