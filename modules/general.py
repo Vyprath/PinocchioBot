@@ -189,6 +189,41 @@ where `currency` is the receiving bot's currency name.
     await message.channel.send(embed=embed)
 
 
+async def world_leaderboard(client, message, *args):
+    engine = await database.prepare_engine()
+    async with engine.acquire() as conn:
+        # TODO: Un-hardcode this SQL query?
+        query = """
+SELECT id,M.member,tier,COALESCE(wsum,0) as waifu_sum,wallet,(COALESCE(wsum, 0)+wallet) as total
+FROM members M
+LEFT JOIN (select member_id, sum(purchased_for) as wsum from purchased_waifu group by member_id) PW
+ON (M.id = PW.member_id)
+WHERE wallet > 0 OR COALESCE(wsum, 0) > 0
+ORDER BY total DESC
+LIMIT 20;
+        """
+        cursor = await conn.execute(query)
+        results = await cursor.fetchall()
+    rtxt = []
+    top_user = client.get_user(results[0][1])
+    for i, j in enumerate(results):
+        user = client.get_user(j[1])
+        if i < 3:
+            rtxt.append(
+                f"**[{str(i+1).zfill(2)}] __{user.name}__**\nWallet: {j[4]}, Waifu Value: {j[3]}, **Total: {j[5]}**")  # noqa
+        else:
+            rtxt.append(
+                f"[{str(i+1).zfill(2)}] {user.name}\nWallet: {j[4]}, Waifu Value: {j[3]}, __Total: {j[5]}__")  # noqa
+    txt = '\n'.join(rtxt)
+    embed = discord.Embed(
+        title="World Leaderboards", colour=message.author.colour,
+        description=txt)
+    embed.set_footer(
+        text=f"Current World Champion is {top_user.name}.",
+        icon_url=str(top_user.avatar_url_as(size=64)))
+    await message.channel.send(embed=embed)
+
+
 general_functions = {
     'vote': (vote_bot, "Vote for this bot."),
     'claimreward': (claim_rewards, "Claim your voting rewards."),
@@ -197,5 +232,8 @@ general_functions = {
     'invite': (invite, "Get the invite link for the bot."),
     'poll': (poll, "Create a reactions poll."),
     'whois': (whois, "Get info about an user."),
-    'discoin': (discoin, "Get info about <:Discoin:357656754642747403> Discoin.")
+    'discoin': (discoin, "Get info about <:Discoin:357656754642747403> Discoin."),
+    'worldleaderboard': (world_leaderboard, "Get this world's leaderboard."),
+    'wlb': (world_leaderboard, "Get this world's leaderboard."),
+    'worldlb': (world_leaderboard, "Get this world's leaderboard."),
 }

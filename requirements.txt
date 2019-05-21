@@ -12,4 +12,5 @@ nyaapy
 psycopg2-binary
 psutil
 uvloop
+jellyfish
 git+git://github.com/AWConant/jikanpy.git
