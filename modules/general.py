@@ -189,6 +189,31 @@ where `currency` is the receiving bot's currency name.
     await message.channel.send(embed=embed)
 
 
+def _leaderboard_text(client, results):
+    rtxt = []
+    i = 1
+    for j in results:
+        user = client.get_user(j[1])
+        if user is None:
+            continue
+        if i <= 3:
+            if i == 1:
+                medal = ":first_place:"
+            elif i == 2:
+                medal = ":second_place:"
+            elif i == 3:
+                medal = ":third_place:"
+            rtxt.append(
+                f"**[{str(i).zfill(2)}] __{user.name}__ {medal}**\nWallet: {j[4]}, Waifu Value: {j[3]}, **Total: {j[5]}**")  # noqa
+        else:
+            rtxt.append(
+                f"**[{str(i).zfill(2)}] {user.name}**\nWallet: {j[4]}, Waifu Value: {j[3]}, **Total: {j[5]}**")  # noqa
+        i += 1
+        if i == 16:
+            break
+    return '\n'.join(rtxt)
+
+
 async def world_leaderboard(client, message, *args):
     engine = await database.prepare_engine()
     async with engine.acquire() as conn:
@@ -204,34 +229,39 @@ LIMIT 80;
         """
         cursor = await conn.execute(query)
         results = await cursor.fetchall()
-    rtxt = []
-    top_user = client.get_user(results[0][1])
-    i = 1
-    for j in results:
-        user = client.get_user(j[1])
-        if user is None:
-            continue
-        if i <= 3:
-            if i == 1:
-                medal = ":first_place:"
-            elif i == 2:
-                medal = ":second_place:"
-            elif i == 3:
-                medal = ":third_place:"
-            rtxt.append(
-                f"**[{str(i).zfill(2)}] {medal} __{user.name}__**\nWallet: {j[4]}, Waifu Value: {j[3]}, **Total: {j[5]}**")  # noqa
-        else:
-            rtxt.append(
-                f"**[{str(i).zfill(2)}] {user.name}**\nWallet: {j[4]}, Waifu Value: {j[3]}, **Total: {j[5]}**")  # noqa
-        i += 1
-        if i == 16:
-            break
-    txt = '\n'.join(rtxt)
+    txt = _leaderboard_text(client, results)
     embed = discord.Embed(
-        title="World Leaderboards", colour=message.author.colour,
+        title=":trophy: World Leaderboards", colour=message.author.colour,
         description=txt)
+    top_user = client.get_user(results[0][1])
     embed.set_footer(
         text=f"Current World Champion is {top_user.name}.",
+        icon_url=str(top_user.avatar_url_as(size=64)))
+    await message.channel.send(embed=embed)
+
+
+async def guild_leaderboard(client, message, *args):
+    engine = await database.prepare_engine()
+    async with engine.acquire() as conn:
+        # TODO: Un-hardcode this SQL query?
+        mlist = tuple([m.id for m in message.guild.members])
+        query = f"""
+SELECT id,M.member,tier,COALESCE(wsum,0) as waifu_sum,wallet,(COALESCE(wsum, 0)+wallet) as total
+FROM members M LEFT JOIN (
+SELECT member_id,sum(purchased_for) as wsum FROM purchased_waifu
+WHERE guild = {message.guild.id} GROUP BY member_id) PW ON (M.id = PW.member_id)
+WHERE (wallet > 0 OR COALESCE(wsum, 0) > 0) AND M.member in {mlist}
+ORDER BY total DESC LIMIT 15;
+        """
+        cursor = await conn.execute(query)
+        results = await cursor.fetchall()
+    txt = _leaderboard_text(client, results)
+    embed = discord.Embed(
+        title=":trophy: Guild Leaderboards", colour=message.author.colour,
+        description=txt)
+    top_user = client.get_user(results[0][1])
+    embed.set_footer(
+        text=f"Current Guild Champion is {top_user.name}.",
         icon_url=str(top_user.avatar_url_as(size=64)))
     await message.channel.send(embed=embed)
 
@@ -245,6 +275,10 @@ general_functions = {
     'poll': (poll, "Create a reactions poll."),
     'whois': (whois, "Get info about an user."),
     'discoin': (discoin, "Get info about <:Discoin:357656754642747403> Discoin."),
+    'guildleaderboard': (guild_leaderboard, "Get this guild's leaderboard."),
+    'leaderboard': (guild_leaderboard, "Get this guild's leaderboard."),
+    'glb': (guild_leaderboard, "Get this guild's leaderboard."),
+    'guildlb': (guild_leaderboard, "Get this guild's leaderboard."),
     'worldleaderboard': (world_leaderboard, "Get this world's leaderboard."),
     'wlb': (world_leaderboard, "Get this world's leaderboard."),
     'worldlb': (world_leaderboard, "Get this world's leaderboard."),
