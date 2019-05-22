@@ -275,12 +275,12 @@ async def remove_abandoned_waifus(client, message, *args):
 
 
 admin_functions = {
-    'setpaidroles': (set_paid_roles, "Set up paid roles."),
-    'setwlchannel': (set_welcome_leave_channel, "Set welcome/leave message channel."),
-    'setwelcome': (set_welcome_msg, "Set the text for the welcome message."),
-    'setleave': (set_leave_msg, "Set the text for the leave message."),
-    'setcustomroles': (set_custom_roles, "Change the settings for custom roles."),
-    'purge': (clean, "Purge X messages from this channel."),
-    'coindrops': (set_coin_drops, "Enable/Disable coin drops for a server. Default: disabled."),
-    'rescuewaifus': (remove_abandoned_waifus, "Removes waifus/husbandos from people who left the server.")
+    'setpaidroles': (set_paid_roles, "`{P}setpaidroles`: Set up paid roles."),
+    'setwlchannel': (set_welcome_leave_channel, "`{P}setwlchannel`: Set up welcome/leave message channel, or disable it. Default: disabled."),
+    'setwelcome': (set_welcome_msg, "`{P}setwelcome <new string>`: Change the default welcome string, or disable it by `{P}setwelcome None`."),
+    'setleave': (set_leave_msg, "`{P}setleave <new string>`: Change the default leave string, or disable it by `{P}setleave None`."),
+    'setcustomroles': (set_custom_roles, "`{P}setcustomroles`: Set price or disable custom roles."),
+    'purge': (clean, "`{P}purge <number of messages between 1 to 100>`: Purge messages from the channel."),
+    'coindrops': (set_coin_drops, "`{P}coindrops <disable/enable>`: Enable/Disable coin drops for a server. Default: disabled."),
+    'rescuewaifus': (remove_abandoned_waifus, "`{P}rescuewaifus`: Removes waifus/husbandos from people who left the server.")
 }

@@ -469,11 +469,11 @@ async def short(url):
 
 
 anime_functions = {
-    'anime': (anime, "Get details for an anime."),
-    'manga': (manga, "Get details for an manga."),
-    'animelist': (animelist, "Get the MAL animelist for an user."),
-    'mangalist': (mangalist, "Get the MAL mangalist for an user."),
-    'profile': (profile, "Get profile for an user."),
-    'nyaa': (nyaa_search, "Get anime torrents from nyaa.si"),
-    'whichanime': (which_anime, "Which Anime Is This? Get information about an anime scene. (trace.moe)")  # noqa
+    'anime': (anime, "`{P}anime <anime name>`: Get details about an anime."),
+    'manga': (manga, "`{P}manga <manga name>`: Get details about a manga."),
+    'animelist': (animelist, "`{P}animelist <MAL Username>`: Get someone's MAL animelist."),
+    'mangalist': (mangalist, "`{P}mangalist <MAL Username>`: Get someone's MAL mangalist."),
+    'profile': (profile, "`{P}profile <MAL Username>`: Get someone's MAL profile."),
+    'nyaa': (nyaa_search, "`{P}nyaa <search string>`: Get anime torrents from nyaa.si."),
+    'whichanime': (which_anime, "`{P}whichanime`: Get an anime from a scene picture. Using trace.moe.")  # noqa
 }

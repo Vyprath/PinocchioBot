@@ -273,9 +273,10 @@ async def free_money_handler(client, message):
 
 
 currency_functions = {
-    'wallet': (fetch_wallet, 'Check your wallet.'),
-    'transfer-money': (transfer_money, 'Transfer your money.'),
-    'dailies': (dailies, 'Come, collect your free money.'),
-    'exchange': (exchange, 'Exchange currency with other bots using <:Discoin:357656754642747403> Discoin.'),
+    'wallet': (fetch_wallet, "`{P}wallet [optional: @user mention]`: Check your own wallet or others' wallet."),
+    'transfer-money': (transfer_money, "`{P}transfer-money <@user mention> <amount>`: Transfer some money."),
+    'transfermoney': (transfer_money, "`{P}transfer-money <@user mention> <amount>`: Transfer some money."),
+    'dailies': (dailies, "`{P}dailies`: Get your daily money and become riiiich."),
+    'exchange': (exchange, "`{P}exchange <Pinocchio Coins> <Currency>`: Exchange currency with other bots with <:Discoin:357656754642747403> Discoin."),
 }
 currency_handlers = [free_money_handler]

@@ -95,10 +95,10 @@ Maybe try contacting the ghost for an upgrade?
 
 
 devtest_functions = {
-    'botstats': (wrapper(view_stats, 0), None),
-    'botinfo': (wrapper(view_stats, 0), None),
-    'info': (wrapper(view_stats, 0), None),
-    'getmoney': (wrapper(get_money, 4), None),
-    'repeater': (wrapper(repeater, 5), None),
-    'ping': (wrapper(ping, 0), None),
+    'botstats': (wrapper(view_stats, 0), "`{P}botstats`: General stats about the bot."),
+    'botinfo': (wrapper(view_stats, 0), "`{P}botinfo`: General stats about the bot."),
+    'info': (wrapper(view_stats, 0), "`{P}info`: General stats about the bot."),
+    'getmoney': (wrapper(get_money, 4), "Only for developer to use."),
+    'repeater': (wrapper(repeater, 5), "Just a repeater. Ignore this. Dev-command."),
+    'ping': (wrapper(ping, 0), "`{P}ping`: Get the bot pingrate."),
 }

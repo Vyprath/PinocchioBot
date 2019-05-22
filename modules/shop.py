@@ -129,6 +129,6 @@ Exit this menu by writing `exit`.
 
 
 shop_functions = {
-    'paidroles': (paid_roles, 'Get a role with $$$.'),
-    'customrole': (buy_colored_role, 'Get a custom colored role with $$$$$$.')
+    'paidroles': (paid_roles, '`{P}paidroles`: Get a preset role with $$$.'),
+    'customrole': (buy_colored_role, '`{P}customrole`: Get your custom colored role with $$$$$$.')
 }

@@ -32,6 +32,7 @@ from music import music_functions
 import messages
 from variables import PREFIX
 import shlex
+import jellyfish
 
 
 def split_args(value):
@@ -43,23 +44,25 @@ def split_args(value):
 
 
 async def message_resolve(client, message, cmd_prefix):
-    is_bot = False
     if message.author.bot:
-        is_bot = True
+        return
     if message.content.startswith(cmd_prefix):
         args = split_args(message.content[len(cmd_prefix):])
-        if args[0] == 'help':
-            if is_bot:
-                return
+        command = args[0].lower()
+        if command == 'help':
             await print_help(client, message, *args[len(cmd_prefix):], full=False)
-        elif args[0] == 'fullhelp':
-            if is_bot:
-                return
+        elif command == 'fullhelp':
             await print_help(client, message, *args[len(cmd_prefix):], full=True)
-        elif args[0] in functions.keys():
-            if is_bot:
+        elif command in functions.keys():
+            await functions[command][0](client, message, *args[len(cmd_prefix):])
+        else:
+            jaro_dists = [(i, jellyfish.jaro_distance(command, i)) for i in functions.keys()]
+            jaro_dists = [i for i in jaro_dists if i[1] > 0.8]
+            if len(jaro_dists) == 0:
                 return
-            await functions[args[0]][0](client, message, *args[len(cmd_prefix):])
+            jaro_dists.sort(key=lambda i: i[1], reverse=True)
+            txt = ",".join([f"`{i[0]}`" for i in jaro_dists])
+            await message.channel.send(f"`{PREFIX}{command}` not found. Did you mean: {txt}")
     for handler in handlers:
         await handler(client, message)
 
@@ -81,7 +84,7 @@ async def print_help(client, message, *args, full=False):
         help_string = functions[args[0]][1]
         if help_string is None:
             help_string = "No help message for this command."
-        await message.channel.send("`{2}{0}`: {1}".format(args[0], help_string, PREFIX))
+        await message.channel.send(help_string.replace("{P}", PREFIX))
 
 """
 This is how 'functions' is implemented in a module file:

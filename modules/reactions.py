@@ -70,5 +70,5 @@ reactions_functions = {
     'poke': (gif('poke', "pokes", True), None),
     'stare': (gif('stare', "*Stares*"), None),
     'triggered': (gif('triggered', "*Triggered*"), None),
-    'gif': (gif(), None)
+    'gif': (gif(), "`{P}gif <search string>`: Search for a GIF.")
 }

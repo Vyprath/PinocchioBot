@@ -218,14 +218,15 @@ def get_border(lines, index):
 
 
 fun_functions = {  # Kek, this feels like I am stuttering to say functions.
-    'avatar': (avatar_url, "View yours or someone's avatar."),
-    'chucknorris': (chuck_norris, "A Chuck Norris joke."),
-    'dadjoke': (dad_joke, "A (bad)dad joke."),
-    'catfact': (cat_fact, "Cat facts."),
-    'xkcd': (xkcd, 'xkcd.com'),
-    'lmgtfy': (lmgtfy, "Let me google that for you."),
-    'urbandictionary': (urban_dictionary, "Search urban dictionary."),
-    '8ball': (eight_ball, "Get life advice."),
-    'cowsay': (cowsay, "Cow says moo. And you can order the cow to speak for you."),
-    'cook': (cook_user, "Cook someone tastily."),
+    'avatar': (avatar_url, "`{P}avatar [optional: @user mention]`: View yours or someone's avatar."),
+    'chucknorris': (chuck_norris, "`{P}chucknorris`: A Chuck Norris about joke."),
+    'dadjoke': (dad_joke, "`{P}dadjoke`: A (bad)dad joke."),
+    'catfact': (cat_fact, "`{P}catfact`: Cat facts."),
+    'xkcd': (xkcd, '`{P}xkcd`: Random xkcd comic strip.'),
+    'lmgtfy': (lmgtfy, "`{P}lmgtfy`: Let me google that for you."),
+    'urbandictionary': (urban_dictionary, "`{P}urbandictionary`: Search urban dictionary."),
+    'urbandict': (urban_dictionary, "`{P}urbandict`: Search urban dictionary."),
+    '8ball': (eight_ball, "`{P}8ball`: Get life advice."),
+    'cowsay': (cowsay, "`{P}cowsay`: Cow says moo. And you can order the cow to speak for you."),
+    'cook': (cook_user, "`{P}cook`: Cook someone tastily."),
 }

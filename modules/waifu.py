@@ -999,11 +999,9 @@ You have {2} rolls left! Please try again in {0:02d} hours {1:02d} minutes. You 
 
 
 waifu_functions = {
-    'waifu': (waifu, "For your loneliness."),
-    'harem': (harem, "Your waifu list. Now go, show off."),
-    'randomwaifu': (random_waifu, "Get a random waifu/husbando for cheap."),
-    'rw': (random_waifu, "Get a random waifu/husbando for cheap."),
-    'randomroll': (random_waifu, "Get a random waifu/husbando for cheap."),
-    'rr': (random_waifu, "Get a random waifu/husbando for cheap."),
-    'rolls': (rolls_left, "Rolls left for random waifus.")
+    'waifu': (waifu, "`{P}waifu`: Buy/Sell/View/Search/Trade/Money-Trade/Favorite/Unfavorite Waifus. Will make your loneliness disappear."),
+    'harem': (harem, "`{P}harem [@user mention] [sort option] [gender option] [series name]`: Get the list of your bought waifus. Valid sort options: `name-desc`, `series-desc`, `name-asc`, `series-asc`, `id-asc`, `id-desc`, `price-asc`, `price-desc`. Valid gender options: `waifu`, `husbando`."),
+    'randomroll': (random_waifu, "`{P}randomroll`: Get a random waifu/husbando for a very cheap price. Normal users can do it 10 times per 3 hours, tier 1 donators 30 times, and tier 2 donators 90 times."),
+    'rr': (random_waifu, "`{P}rr`: Get a random waifu/husbando for a very cheap price. Normal users can do it 10 times per 3 hours, tier 1 donators 30 times, and tier 2 donators 90 times."),
+    'rolls': (rolls_left, "`{P}rolls`: Check how many rolls you have left for getting a random waifu. Resets every 3 hours.")
 }
