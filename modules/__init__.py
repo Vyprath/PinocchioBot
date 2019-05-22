@@ -34,12 +34,20 @@ from variables import PREFIX
 import shlex
 
 
+def split_args(value):
+    lex = shlex.shlex(value)
+    lex.quotes = '"'
+    lex.whitespace_split = True
+    lex.commenters = ''
+    return list(lex)
+
+
 async def message_resolve(client, message, cmd_prefix):
     is_bot = False
     if message.author.bot:
         is_bot = True
     if message.content.startswith(cmd_prefix):
-        args = shlex.split(message.content[len(cmd_prefix):])
+        args = split_args(message.content[len(cmd_prefix):])
         if args[0] == 'help':
             if is_bot:
                 return
