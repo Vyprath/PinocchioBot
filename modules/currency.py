@@ -217,7 +217,7 @@ async def free_money_handler(client, message):
         if now - last > 60:
             passive_money_users[message.author.id] = now
             engine = await database.prepare_engine()
-            await _add_money(engine, message.author, random.randint(1, 20))
+            await _add_money(engine, message.author, random.randint(1, 5))
     else:
         passive_money_users.update({message.author.id: now})
     engine = await database.prepare_engine()
