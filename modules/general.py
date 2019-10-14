@@ -6,6 +6,7 @@ from discord.utils import snowflake_time
 from .currency import _add_money
 from variables import VOTE_REWARD, PREFIX
 import variables
+import re
 
 
 async def donate(client, message, *args):
@@ -266,6 +267,25 @@ ORDER BY total DESC LIMIT 10;
     await message.channel.send(embed=embed)
 
 
+async def say(client, message, *args):
+    if len(args) >= 2 and len(message.channel_mentions) >= 1 and re.match(r'^<#\d{18}>', args[0]):
+        channel = message.channel_mentions[0]
+        text = ' '.join(args[1:])
+    elif len(args) >= 1:
+        channel = message.channel
+        text = ' '.join(args)
+    else:
+        await message.channel.send('Usage: `{P}say [channel, default: current] <text>`')
+        return
+    if not channel.permissions_for(message.author).send_messages:
+        await message.channel.send("Cannot send message in that channel with your privileges!")
+        return
+    if ('@everyone' in text or '@here' in text) and not channel.permissions_for(message.author).mention_everyone:  # noqa
+        await message.channel.send("Cannot send messages with @mentions with your privileges!")
+        return
+    await channel.send(text)
+
+
 general_functions = {
     'vote': (vote_bot, "`{0}vote`: Vote for this bot! Isn't Pinocchio kawaii? Vote for her and make her happy."),
     'claimreward': (claim_rewards, "`{0}claimreward`: Pinocchio is happy now! Thanks for voting. Here, collect your reward."),
@@ -282,4 +302,6 @@ general_functions = {
     'worldleaderboard': (world_leaderboard, "`{P}worldleaderboard`: Get this world's leaderboard."),
     'wlb': (world_leaderboard, "`{P}wlb`: Get this world's leaderboard."),
     'worldlb': (world_leaderboard, "`{P}worldlb`: Get this world's leaderboard."),
+    'say': (say, "`{P}say [channel, default: current] <text>`: Speak as Pinocchio!"),
+    'pinosay': (say, "`{P}pinosay [channel, default: current] <text>`: Speak as Pinocchio!"),
 }

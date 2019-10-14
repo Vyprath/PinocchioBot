@@ -12,7 +12,7 @@ To get the old help message with description, do `{P}fullhelp`.
     """)
 main_help_menu.add_field(
     name=":robot: General",
-    value=f"`{P}help`, `{P}donate`, `{P}creator`, `{P}vote`, `{P}claimreward`, `{P}invite`, `{P}botstats/{P}botinfo/{P}info`, `{P}ping`,`{P}poll`, `{P}whois`, `{P}worldleaderboard/{P}wlb/{P}worldlb`, `{P}guildleaderboard/{P}glb/{P}guildlb/{P}leaderboard`")  # noqa
+    value=f"`{P}help`, `{P}donate`, `{P}creator`, `{P}vote`, `{P}claimreward`, `{P}invite`, `{P}botstats/{P}botinfo/{P}info`, `{P}ping`,`{P}poll`, `{P}whois`, `{P}worldleaderboard/{P}wlb/{P}worldlb`, `{P}guildleaderboard/{P}glb/{P}guildlb/{P}leaderboard`, `{P}say/{P}pinosay`")  # noqa
 main_help_menu.add_field(
     name=":moneybag: Financial",
     value=f"`{P}wallet`, `{P}transfer-money`, `{P}dailies`, `{P}paidroles`, `{P}customrole`, `{P}discoin`, `{P}exchange`")  # noqa
@@ -52,6 +52,7 @@ __**Pinocchio Bot Usage:**__
 `{0}botstats`/`{0}botinfo`/`{0}info`: General stats about the bot.
 `{0}worldleaderboard/{0}wlb/{0}worldlb`: Get the world leaderboard.
 `{0}guildleaderboard/{0}glb/{0}guildlb`: Get the guild leaderboard.
+`{0}say [channel, default: current] <text>`: Speak as Pinocchio!
 **Financial**
 `{0}wallet [optional: @user mention]`: Check your own wallet or others' wallet.
 `{0}transfer-money <@user mention> <amount>`: Transfer some money.
