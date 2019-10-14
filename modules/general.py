@@ -1,3 +1,4 @@
+
 import database
 import dborg
 import datetime
@@ -270,10 +271,12 @@ ORDER BY total DESC LIMIT 10;
 async def say(client, message, *args):
     if len(args) >= 2 and len(message.channel_mentions) >= 1 and re.match(r'^<#\d{18}>', args[0]):
         channel = message.channel_mentions[0]
-        text = ' '.join(args[1:])
+        text = message.content
+        text = text[text.find(args[1]):]
     elif len(args) >= 1:
         channel = message.channel
-        text = ' '.join(args)
+        text = message.content
+        text = text[text.find(args[0]):]
     else:
         await message.channel.send('Usage: `{P}say [channel, default: current] <text>`')
         return
