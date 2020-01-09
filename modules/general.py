@@ -56,7 +56,7 @@ async def claim_rewards(client, message, *args):
         resp = await cursor.fetchone()
         member_tier = resp[database.Member.c.tier]
         last_reward = member[database.Member.c.last_reward]
-        if last_reward is None:
+        if not last_reward:
             db_verified = True
         else:
             if ((datetime.datetime.now() - last_reward).days > 1 or
