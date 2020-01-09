@@ -1,4 +1,5 @@
-# discord.py[voice] -- To be installed via the submodule folder.
+discord.py[voice]
+discoin
 PyNaCl
 aiopg
 sqlalchemy

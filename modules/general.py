@@ -178,16 +178,18 @@ async def whois(client, message, *args):
 async def discoin(client, message, *args):
     embed = discord.Embed(title="<:Discoin:357656754642747403> Discoin Information", description=f"""
 Discoin is a platform with which participating bots can exchange money with each other.
-Supported Discord bots and their commands are found here: [https://discoin.gitbook.io/docs/users-guide].
-The conversion rates are found here: [http://discoin.sidetrip.xyz/rates].
-
-For **Pinocchio Coins (PIC)**, conversion rate is __1.00 PIC => 0.20 Discoin => 0.80 PIC__.
-
-**You need to verify your discord account first (http://discoin.sidetrip.xyz/verify) in order to use discoin functionality on any participating bot!**
-
+Dashboard for Discoin is here: https://dash.discoin.zws.im
 Usage: `{PREFIX}exchange <Pinocchio Coins> <Currency>`
 where `currency` is the receiving bot's currency name.
         """)
+    currencies = await variables.discoin_client.fetch_currencies()
+    currencies = [f"{i.name:<19}({i.id}) - {float(i.value):07.4f} - {i.reserve}" for i in currencies]
+    txt = f"{'Name':<19}{'(ID)':<3}  - {'Value':<7} - Reserve"
+    currencies.insert(0, txt)
+    currencies.insert(1, max([len(i) for i in currencies])*"-")
+    embed.add_field(
+        name="**Discoin Currency Table**", inline=False,
+        value='```'+"\n".join(currencies)+'```')
     await message.channel.send(embed=embed)
 
 

@@ -8,6 +8,7 @@ import datetime
 import json
 import discord
 from variables import FREE_MONEY_SPAWN_LIMIT, DAILIES_AMOUNT, PREFIX
+from discoin import InternalServerError, BadRequest, WebTimeoutError
 import variables
 
 
@@ -145,43 +146,14 @@ If you want to know more about this and supported currencies, use `{PREFIX}disco
     processing_msg = await message.channel.send("Processing Transaction...")
     amount = int(args[0])
     to = args[1].upper()
-    transaction_data = {
-        "user": str(message.author.id),
-        "amount": amount,
-        "exchangeTo": to
-    }
-    headers = {'Authorization': variables.DISCOIN_AUTH_KEY}
-    async with aiohttp.ClientSession() as session:
-        async with session.post("http://discoin.sidetrip.xyz/transaction",
-                                data=json.dumps(transaction_data), headers=headers) as response:
-            resp_data = await response.json()
-            if response.status == 200:
-                pass
-            elif response.status == 400:
-                await processing_msg.edit(content=f"""
-:negative_squared_cross_mark: Exchange declined.
-Reason: `{resp_data['reason']}`
-                """)
-                return
-            elif response.status == 403:
-                if resp_data['reason'] == "verify required":
-                    await processing_msg.edit(content=f"""
-:negative_squared_cross_mark: You are not verified to make exchanges.
-Please verify yourself at [http://discoin.sidetrip.xyz/verify]!
-                    """)
-                elif resp_data['reason'] == "per-user limit exceeded":
-                    await processing_msg.edit(content=f"""
-:negative_squared_cross_mark: Per user limit exceeded.
-The limit for {to} is {resp_data['limit']}.
-You have crossed that limit. Please wait till tomorrow.
-                    """)
-                elif resp_data['reason'] == "total limit exceeded":
-                    await processing_msg.edit(content=f"""
-:negative_squared_cross_mark: Bot total limit exceeded.
-The limit for {to} is {resp_data['limit']}.
-The recipient bot has exceeded it's daily limits. Please wait till tomorrow.
-                    """)
-                return
+    try:
+        transaction = await variables.discoin_client.create_transaction(to, amount, message.author.id)
+    except (BadRequest, InternalServerError, WebTimeoutError) as e:
+        await processing_msg.edit(content=f"""
+Hit an error :exploding_head: {type(e).__name__}
+Message: {e}
+        """)
+        return
     engine = await database.prepare_engine()
     await _remove_money(engine, message.author, amount)
     embed = discord.Embed(
@@ -191,13 +163,10 @@ Your Pino-coins are being sent via the top-secret Agent Wumpus. He usually deliv
 See `{PREFIX}discoin` for more info.
         """)
     embed.add_field(name="Pinocchio Coins (PIC) Exchanged", value=amount)
-    embed.add_field(name=f"{to} To Recieve", value=resp_data['resultAmount'])
-    embed.add_field(
-        name="Transfer Limit", inline=False,
-        value=f"You can transfer **{resp_data['limitNow']}** {to} more as of today.")
+    embed.add_field(name=f"{to} To Recieve", value=transaction.payout)
     embed.add_field(
         name="Transaction Receipt", inline=False,
-        value=f"```{resp_data['receipt']}```Keep this code in case Agent Wumpus fails to deliver the coins.")
+        value=f"```{transaction.id}```Keep this code in case Agent Wumpus fails to deliver the coins.")
     embed.set_footer(
         text=f"{message.author.name}#{message.author.discriminator}",
         icon_url=message.author.avatar_url_as(size=128))
