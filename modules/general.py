@@ -19,7 +19,7 @@ Thanks!
 
 async def invite(client, message, *args):
     await message.channel.send("""
-Bot invite link: https://discordbots.org/bot/506878658607054849
+Bot invite link: https://top.gg/bot/506878658607054849
     """)
 
 
@@ -33,7 +33,7 @@ To join support server, use `=help` or go to https://support.pinocchiobot.xyz.
 async def vote_bot(client, message, *args):
     await message.channel.send("""
 Vote for this bot and then claim your reward with `{0}claimreward`.
-Vote URL: https://discordbots.org/bot/506878658607054849/vote
+Vote URL: https://top.gg/bot/506878658607054849/vote
 You can vote once every 12 hours.
 You get 2x rewards for voting on weekends.
     """.format(PREFIX))
