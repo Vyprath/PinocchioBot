@@ -11,28 +11,28 @@ main_help_menu = Embed(
 To get the old help message with description, do `{P}fullhelp`.
     """)
 main_help_menu.add_field(
-    name=":robot: General",
+    name=":robot: General", inline=False,
     value=f"`{P}help`, `{P}donate`, `{P}creator`, `{P}vote`, `{P}claimreward`, `{P}invite`, `{P}botstats/{P}botinfo/{P}info`, `{P}ping`,`{P}poll`, `{P}whois`, `{P}worldleaderboard/{P}wlb/{P}worldlb`, `{P}guildleaderboard/{P}glb/{P}guildlb/{P}leaderboard`, `{P}say/{P}pinosay`")  # noqa
 main_help_menu.add_field(
-    name=":moneybag: Financial",
+    name=":moneybag: Financial", inline=False,
     value=f"`{P}wallet`, `{P}transfer-money`, `{P}dailies`, `{P}paidroles`, `{P}customrole`, `{P}discoin`, `{P}exchange`")  # noqa
 main_help_menu.add_field(
-    name="<a:RainbowWeeb:564012559590752256> Waifu",
+    name="<a:RainbowWeeb:564012559590752256> Waifu", inline=False,
     value=f"`{P}waifu`, `{P}harem`, `{P}randomroll/{P}rr`, `{P}rolls`")  # noqa
 main_help_menu.add_field(
-    name="<:UmaruCool:575381825296400384> Anime",
+    name="<:UmaruCool:575381825296400384> Anime", inline=False,
     value=f"`{P}anime`, `{P}manga`, `{P}animelist`, `{P}mangalist`, `{P}profile`, `{P}nyaa`, `{P}whichanime`")  # noqa
 main_help_menu.add_field(
-    name="<a:MikuKurukurupa:564012084631699456> Fun",
+    name="<a:MikuKurukurupa:564012084631699456> Fun", inline=False,
     value=f"`{P}chucknorris`, `{P}dadjoke`, `{P}xkcd`, `{P}catfact`, `{P}8ball`, `{P}cook`, `{P}lmgtfy`, `{P}urbandictionary`, `{P}cowsay`, `{P}avatar`")  # noqa
 main_help_menu.add_field(
-    name="<a:PKomiEars:575382520179326979> Reactions",
+    name="<a:PKomiEars:575382520179326979> Reactions", inline=False,
     value=f"`{P}hug`, `{P}kiss`, `{P}pat`, `{P}tickle`, `{P}bite`, `{P}kick`, `{P}slap`, `{P}punch`, `{P}poke`, `{P}laugh`, `{P}cry`, `{P}blush`, `{P}confused`, `{P}pout`, `{P}dance`, `{P}jojo`, `{P}megumin`, `{P}satania`, `{P}lick`, `{P}think`, `{P}shrug`, `{P}owo`, `{P}nom`, `{P}eyeroll`, `{P}lewd`, `{P}stare`, `{P}triggered`,`{P}facepalm`, `{P}gif`")  # noqa
 main_help_menu.add_field(
-    name=":musical_note: Music (Donator-only Feature)",
+    name=":musical_note: Music (Donator-only Feature)", inline=False,
     value=f"`{P}play/{P}p`, `{P}pause`, `{P}resume`, `{P}leave`, `{P}skip`, `{P}queue`, `{P}volume`, `{P}status`")  # noqa
 main_help_menu.add_field(
-    name=":tools: Administration",
+    name=":tools: Administration", inline=False,
     value=f"`{P}setpaidroles`, `{P}setcustomroles`, `{P}setwlchannel`, `{P}setwelcome`, `{P}setleave`, `{P}coindrops`, `{P}rescuewaifus`, `{P}purge`")  # noqa
 main_help_menu.set_footer(
     text=f"For additional help, do {P}help <command name>.")
