@@ -166,7 +166,7 @@ See `{PREFIX}discoin` for more info.
     embed.add_field(name=f"{to} To Recieve", value=transaction.payout)
     embed.add_field(
         name="Transaction Receipt", inline=False,
-        value=f"```{transaction.id}```Keep this code in case Agent Wumpus fails to deliver the coins.")
+        value=f"[```{transaction.id}```](https://dash.discoin.zws.im/#/transactions/{transaction.id}/show)Keep this code in case Agent Wumpus fails to deliver the coins.")
     embed.set_footer(
         text=f"{message.author.name}#{message.author.discriminator}",
         icon_url=message.author.avatar_url_as(size=128))

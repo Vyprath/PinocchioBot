@@ -99,7 +99,7 @@ See `{variables.PREFIX}discoin` for more info.
             value=round(transaction.payout))
         embed.add_field(
             name="Transaction Receipt", inline=False,
-            value=f"```{transaction.id}```")
+            value=f"[```{transaction.id}```](https://dash.discoin.zws.im/#/transactions/{transaction.id}/show)")
         rcvd_time = transaction.timestamp.strftime("%I:%M %p")
         embed.set_footer(
             text=f"{user.name}#{user.discriminator} • {rcvd_time}",
