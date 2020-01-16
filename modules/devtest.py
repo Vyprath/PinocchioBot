@@ -94,6 +94,48 @@ Maybe try contacting the ghost for an upgrade?
     return f
 
 
+async def whois_admin(client, message, *args):
+    if len(args) != 1 or not args[0].isdigit():
+        await message.channel.send("Usage: {0}awhois <user ID>. Developer only!".format(PREFIX))
+        return
+    user = client.get_user(int(args[0]))
+    if not user:
+        await message.channel.send("User not found!")
+        return
+    engine = await database.prepare_engine()
+    async with engine.acquire() as conn:
+        query = database.Member.select().where(database.Member.c.member == user.id)
+        cursor = await conn.execute(query)
+        dbuser = await cursor.fetchone()
+    embed = discord.Embed(
+        title="{0}#{1}".format(user.name, user.discriminator), color=user.colour)
+    embed.set_thumbnail(url=user.avatar_url_as(size=4096))
+    embed.add_field(name="User ID", value=user.id)
+    embed.add_field(name="Is Bot", value=user.bot)
+    embed.add_field(name="Wallet", value=dbuser[database.Member.c.wallet])
+    embed.add_field(name="Tier", value=dbuser[database.Member.c.tier])
+    last_dailies = dbuser[database.Member.c.last_dailies]
+    if last_dailies:
+        last_dailies = last_dailies.strftime("%A, %d %B, %Y - %I:%M:%S %p")
+    last_reward = dbuser[database.Member.c.last_reward]
+    if last_reward:
+        last_reward = last_reward.strftime("%A, %d %B, %Y - %I:%M:%S %p")
+    embed.add_field(name="Last Dailies", value=last_dailies)
+    embed.add_field(name="Last Reward", value=last_reward)
+    embed.add_field(
+        name="Account Created On", inline=False,
+        value=user.created_at.strftime("%A, %d %B, %Y - %I:%M:%S %p"))
+    guilds = []
+    for i in client.guilds:
+        if member := i.get_member(user.id):
+            guilds.append(f"{'**[Owner]** ' if (member == i.owner) else ''}{i.name} ({len(i.members)})")
+    embed.add_field(
+        name="In Guilds", inline=False,
+        value=", ".join(guilds))
+    await message.channel.send(embed=embed)
+
+
+
 devtest_functions = {
     'botstats': (wrapper(view_stats, 0), "`{P}botstats`: General stats about the bot."),
     'botinfo': (wrapper(view_stats, 0), "`{P}botinfo`: General stats about the bot."),
@@ -101,4 +143,5 @@ devtest_functions = {
     'getmoney': (wrapper(get_money, 4), "Only for developer to use."),
     'repeater': (wrapper(repeater, 5), "Just a repeater. Ignore this. Dev-command."),
     'ping': (wrapper(ping, 0), "`{P}ping`: Get the bot pingrate."),
+    'awhois': (wrapper(whois_admin, 5), "`{P}awhois`: Get details about an user. Dev only.")
 }
