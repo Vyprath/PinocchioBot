@@ -146,6 +146,11 @@ If you want to know more about this and supported currencies, use `{PREFIX}disco
     processing_msg = await message.channel.send("Processing Transaction...")
     amount = int(args[0])
     to = args[1].upper()
+    engine = await database.prepare_engine()
+    res = await _remove_money(engine, message.author, amount)
+    if not res:
+        await processing_msg.edit(content="You don't have enough balance!")
+        return
     try:
         transaction = await variables.discoin_client.create_transaction(to, amount, message.author.id)
     except (BadRequest, InternalServerError, WebTimeoutError) as e:
@@ -154,8 +159,6 @@ Hit an error :exploding_head: {type(e).__name__}
 Message: {e}
         """)
         return
-    engine = await database.prepare_engine()
-    await _remove_money(engine, message.author, amount)
     embed = discord.Embed(
         title="<:Discoin:357656754642747403> Exchange Successful!",
         description=f"""
