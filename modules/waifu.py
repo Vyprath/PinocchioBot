@@ -338,103 +338,6 @@ async def _favorite(client, message, *args, unfavorite=False):
             await message.channel.send("Successfully marked waifu as unfavorite! :broken_heart:")  # noqa
 
 
-async def _trade(client, message, *args):
-    engine = await database.prepare_engine()
-    if len(message.mentions) == 0:
-        await message.channel.send("Usage: {0}waifu trade <@user mention>".format(PREFIX))
-        return
-    recipient = message.mentions[0]
-    giver = message.author
-    async with engine.acquire() as conn:
-        def check_recpt(m):
-            return (m.author.id != client.user.id and
-                    m.channel == message.channel and recipient.id == m.author.id)
-
-        def check_giver(m):
-            return (m.author.id != client.user.id and
-                    m.channel == message.channel and giver.id == m.author.id)
-
-        try:
-            await message.channel.send("Enter the name or ID of the waifu you want to trade:")
-            msg = await client.wait_for('message', check=check_giver, timeout=120)
-            waifu_name = msg.content
-            if waifu_name.isdigit():
-                search_id = int(waifu_name)
-                query = database.Waifu.select().where(
-                    database.Waifu.c.id == search_id)
-            else:
-                search_string = '%' + waifu_name.lower().strip() + '%'
-                query = database.Waifu.select().where(
-                    database.Waifu.c.name.ilike(search_string))
-            cursor = await conn.execute(query)
-            resp = await cursor.fetchone()
-            if resp is None:
-                await message.channel.send(
-                    "Waifu not found! Don't trade your imaginary waifus.")
-                return
-            query = database.PurchasedWaifu.select().where(
-                database.PurchasedWaifu.c.waifu_id == resp[database.Waifu.c.id]
-            ).where(
-                database.PurchasedWaifu.c.guild == message.guild.id
-            ).where(
-                database.PurchasedWaifu.c.member == message.author.id)
-            cursor = await conn.execute(query)
-            purchased_waifu = await cursor.fetchone()
-            if purchased_waifu is None:
-                await message.channel.send(
-                    "By what logic are you trying to trade a waifu you don't own? :rolling_eyes:")
-                return
-            await message.channel.send("Enter the price you wish to trade this waifu for:")
-            msg = await client.wait_for('message', check=check_giver, timeout=120)
-            if not msg.content.isdigit():
-                await message.channel.send("Not a valid price.")
-                return
-            price = int(msg.content)
-            wallet = await _fetch_wallet(engine, recipient)
-            if wallet - price < 0:
-                await message.channel.send(
-                    "The recipient does not have enough money to finish this trade.")
-                return
-            await message.channel.send(
-                "{0}, do you wish to get {1} from {2} for {3} coins? Type `confirm` or `exit`."
-                .format(recipient.mention, resp[database.Waifu.c.name],
-                        giver.mention, price))
-            msg = await client.wait_for('message', check=check_recpt, timeout=120)
-            if msg.content == 'confirm':
-                pass
-            elif msg.content == 'exit':
-                await message.channel.send("Okay, exiting...")
-                return
-            else:
-                await message.channel.send("Invalid response. Exiting...")
-                return
-        except asyncio.TimeoutError:
-            await message.channel.send('Error: Timeout.')
-            return
-        delete_query = database.PurchasedWaifu.delete().where(
-            database.PurchasedWaifu.c.waifu_id == purchased_waifu[database.PurchasedWaifu.c.waifu_id]  # noqa
-        ).where(
-            database.PurchasedWaifu.c.member_id == purchased_waifu[database.PurchasedWaifu.c.member_id]  # noqa
-        )
-        await conn.execute(delete_query)
-        await _add_money(engine, giver, price)
-        await _remove_money(engine, recipient, price)
-        fetch_query = database.Member.select().where(
-            database.Member.c.member == recipient.id
-        )
-        cursor = await conn.execute(fetch_query)
-        buyer = await cursor.fetchone()
-        create_query = database.PurchasedWaifu.insert().values([{
-            'member_id': buyer[database.Member.c.id],
-            'waifu_id': resp[database.Waifu.c.id],
-            'guild': message.guild.id,
-            'member': buyer[database.Member.c.member],
-            'purchased_for': price,
-        }])
-        await conn.execute(create_query)
-        await message.channel.send("Trade successful :thumbsup:.")
-
-
 async def _direct_trade(client, message, *args):
     engine = await database.prepare_engine()
     if len(message.mentions) == 0:
@@ -566,8 +469,6 @@ async def waifu(client, message, *args):
         return await _buy(client, message, *args)
     elif len(args) > 1 and args[0] == 'sell':
         return await _sell(client, message, *args)
-    elif len(args) > 1 and args[0] == 'moneytrade':
-        return await _trade(client, message, *args)
     elif len(args) > 1 and args[0] == 'trade':
         return await _direct_trade(client, message, *args)
     elif len(args) > 1 and args[0] == 'favorite':
@@ -581,7 +482,6 @@ async def waifu(client, message, *args):
 `{0}waifu buy <name/id>`: Buy a waifu.
 `{0}waifu sell <name/id>`: Sell your waifu.
 `{0}waifu trade <@user mention>`: Trade your waifu for others' waifu.
-`{0}waifu moneytrade <@user mention>`: Trade your waifu with others for money.
 `{0}waifu favorite <waifu name/id>`: Mark a waifu as a favorite.
 `{0}waifu unfavorite <waifu name/id>`: Unmark a waifu as a favorite.
 `{0}harem [@user mention] [sort option] [gender option] [series name]`: Get your harem, aka your bought waifus. Valid sort options: `name-desc`, `series-desc`, `name-asc`, `series-asc`, `id-asc`, `id-desc`, `price-asc`, `price-desc`. Valid gender options: `waifu`, `husbando`.
@@ -999,7 +899,7 @@ You have {2} rolls left! Please try again in {0:02d} hours {1:02d} minutes. You 
 
 
 waifu_functions = {
-    'waifu': (waifu, "`{P}waifu`: Buy/Sell/View/Search/Trade/Money-Trade/Favorite/Unfavorite Waifus. Will make your loneliness disappear."),
+    'waifu': (waifu, "`{P}waifu`: Buy/Sell/View/Search/Trade/Favorite/Unfavorite Waifus. Will make your loneliness disappear."),
     'harem': (harem, "`{P}harem [@user mention] [sort option] [gender option] [series name]`: Get the list of your bought waifus. Valid sort options: `name-desc`, `series-desc`, `name-asc`, `series-asc`, `id-asc`, `id-desc`, `price-asc`, `price-desc`. Valid gender options: `waifu`, `husbando`."),
     'randomroll': (random_waifu, "`{P}randomroll`: Get a random waifu/husbando for a very cheap price. Normal users can do it 10 times per 3 hours, tier 1 donators 30 times, and tier 2 donators 90 times."),
     'rr': (random_waifu, "`{P}rr`: Get a random waifu/husbando for a very cheap price. Normal users can do it 10 times per 3 hours, tier 1 donators 30 times, and tier 2 donators 90 times."),

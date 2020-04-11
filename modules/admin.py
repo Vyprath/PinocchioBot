@@ -7,12 +7,12 @@ async def clean(client, message, *args):
     if not message.author.guild_permissions.administrator:
         await message.channel.send("This command is restricted, to be used only by admins.")
         return
-    if len(args) != 1 or not args[0].isdigit() or not (1 <= int(args[0]) <= 100):
-        await message.channel.send("Usage: {0}purge <limit between 1 to 100>".format(PREFIX))
+    if len(args) != 1 or not args[0].isdigit() or not 1 <= int(args[0]) <= 100:
+        await message.channel.send(f"Usage: {PREFIX}purge <limit between 1 to 100>")
         return
     limit = int(args[0])
     await message.channel.purge(limit=limit)
-    msg = await message.channel.send("Successfully deleted {0} messages. :thumbsup:".format(limit))
+    msg = await message.channel.send(f"Successfully deleted {limit} messages. :thumbsup:")
     await asyncio.sleep(3)
     await msg.delete()
 
@@ -36,12 +36,11 @@ async def set_welcome_leave_channel(client, message, *args):
         else:
             channel_string = "None"
         await message.channel.send(
+            f"""
+Current welcome/leave message channel: {channel_string}\n
+To set, run `{PREFIX}setwlchannel set <channel id>`. To get channel ID, please Google.
+To disable, run `{PREFIX}setwlchannel disable`.
             """
-Current welcome/leave message channel: {0}\n
-To set, run `{1}setwlchannel set <channel id>`. To get channel ID, please Google.
-To disable, run `{1}setwlchannel disable`.
-            """
-            .format(channel_string, PREFIX)
         )
     elif len(args) == 2 and args[0] == "set" and args[1].isdigit():
         new_channel = message.guild.get_channel(int(args[1]))
@@ -90,17 +89,17 @@ async def set_paid_roles(client, message, *args):
         else:
             shop_roles_string = "No paid roles set."
         await message.channel.send(
+            f"""
+Current paid roles are: ```{shop_roles_string}```\n
+To set, run `{PREFIX}setpaidroles set <amount> "<role name>"`\n
+To remove, run `{PREFIX}setpaidroles delete <role name>`
             """
-Current paid roles are: ```{0}```\n
-To set, run `{1}setpaidroles set <amount> "<role name>"`\n
-To remove, run `{1}setpaidroles delete <role name>`
-            """
-            .format(shop_roles_string, PREFIX)
         )
     elif len(args) >= 3 and args[0] == "set" and args[1].isdigit():
         mentioned_role = " ".join(args[2:])
         if mentioned_role.lower().strip() in available_role_names.keys():
-            mentioned_role = available_role_names[mentioned_role.lower().strip()]
+            mentioned_role = available_role_names[mentioned_role.lower(
+            ).strip()]
         else:
             await message.channel.send("No role in server with that name.")
             return
@@ -118,7 +117,8 @@ To remove, run `{1}setpaidroles delete <role name>`
     elif len(args) >= 2 and args[0] == "delete":
         mentioned_role = " ".join(args[1:])
         if mentioned_role.lower().strip() in available_role_names.keys():
-            mentioned_role = available_role_names[mentioned_role.lower().strip()]
+            mentioned_role = available_role_names[mentioned_role.lower(
+            ).strip()]
         else:
             await message.channel.send("No role in server with that name.")
             return
@@ -142,7 +142,7 @@ async def set_welcome_msg(client, message, *args):
         return
     if len(args) == 0:
         await message.channel.send(
-            "Usage: `{0}setwelcome` <welcome text, less than 61 chars. Write \"None\" for no welcome message>".format(PREFIX))  # noqa
+            f"Usage: `{PREFIX}setwelcome` <welcome text, less than 61 chars. Write \"None\" for no welcome message>")
         return
     welcome_str = " ".join(args)
     if len(welcome_str) > 60:
@@ -168,7 +168,7 @@ async def set_leave_msg(client, message, *args):
         return
     if len(args) == 0:
         await message.channel.send(
-            "Usage: `{0}setleave` <leave text, less than 61 chars. Write \"None\" for no leave message>".format(PREFIX))  # noqa
+            f"Usage: `{PREFIX}setleave` <leave text, less than 61 chars. Write \"None\" for no leave message>")
         return
     leave_str = " ".join(args)
     if len(leave_str) > 60:
@@ -194,7 +194,7 @@ async def set_coin_drops(client, message, *args):
         return
     if len(args) == 0:
         await message.channel.send(
-            "Usage: `{0}coindrops` <disable/enable>".format(PREFIX))  # noqa
+            f"Usage: `{PREFIX}coindrops` <disable/enable>")
         return
     input_str = " ".join(args).lower()
     if input_str == "enable":
@@ -223,7 +223,7 @@ async def set_custom_roles(client, message, *args):
         return
     if len(args) != 1 or not args[0].lstrip("-").isdigit():
         await message.channel.send(
-            "Usage: {}setcustomroles <price (-1 for disabling)>".format(PREFIX))
+            f"Usage: {PREFIX}setcustomroles <price (-1 for disabling)>")
         return
     price = int(args[0])
     engine = await database.prepare_engine()
@@ -235,7 +235,7 @@ async def set_custom_roles(client, message, *args):
     if price < 0:
         await message.channel.send("Successfully disabled custom roles.")
     else:
-        await message.channel.send("Set custom roles price to {}.".format(price))
+        await message.channel.send(f"Set custom roles price to {price}.")
 
 
 async def remove_abandoned_waifus(client, message, *args):
@@ -271,7 +271,6 @@ async def remove_abandoned_waifus(client, message, *args):
         )
         await conn.execute(delete_query)
     await message.channel.send(":skull_crossbones: Removed waifus from people who left the server.")
-
 
 
 admin_functions = {
