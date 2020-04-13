@@ -2,20 +2,20 @@ import os
 from aiohttp import BasicAuth
 
 # Core
-PREFIX = os.environ.get('PREFIX', 'p!')
-TOKEN = os.environ.get('TOKEN')
-DBL_TOKEN = os.environ.get('DBL_TOKEN')
-DISCOIN_AUTH_KEY = os.environ.get('DISCOIN_AUTH_KEY')
+PREFIX = os.environ.get("PREFIX", "p!")
+TOKEN = os.environ.get("TOKEN")
+DBL_TOKEN = os.environ.get("DBL_TOKEN")
+DISCOIN_AUTH_KEY = os.environ.get("DISCOIN_AUTH_KEY")
 discoin_client = None
 CLIENT_ID = "506878658607054849"
 if TOKEN is None:
-    raise Exception('The TOKEN environmental variable is not set.')
+    raise Exception("The TOKEN environmental variable is not set.")
 if DISCOIN_AUTH_KEY is None:
-    raise Exception('The Discoin Auth Key is not set.')
+    raise Exception("The Discoin Auth Key is not set.")
 # Proxy
 PROXY = None
 PROXY_AUTH = None
-proxy_str = os.environ.get('PROXY_STR')
+proxy_str = os.environ.get("PROXY_STR")
 if proxy_str:
     proxy_parts = proxy_str.split("@")
     PROXY = proxy_parts[0]
@@ -25,21 +25,26 @@ if proxy_str:
 
 
 # Database
-DB_USERNAME = os.environ.get('DB_USERNAME')
-DB_PASSWORD = os.environ.get('DB_PASSWORD')
-DB_NAME = os.environ.get('DB_NAME')
+DB_USERNAME = os.environ.get("DB_USERNAME")
+DB_PASSWORD = os.environ.get("DB_PASSWORD")
+DB_NAME = os.environ.get("DB_NAME")
 if DB_USERNAME is None or DB_NAME is None:
-    raise Exception('Environmental variables for database not set')
-ENGINE_URL = "postgresql://{0}:{1}@localhost:5432/{2}".format(DB_USERNAME, DB_PASSWORD, DB_NAME)
+    raise Exception("Environmental variables for database not set")
+ENGINE_URL = "postgresql://{0}:{1}@localhost:5432/{2}".format(
+    DB_USERNAME, DB_PASSWORD, DB_NAME
+)
 
 
 # GIF (tenor.com)
-GIF_API_KEY = 'XV5HX3J1KYK7'
-GIF_ANON_ID = ''  # Set in main.py during runtime.
-GET_ANON_ID_URL = 'https://api.tenor.com/v1/anonid?key={}'.format(GIF_API_KEY)
+GIF_API_KEY = "XV5HX3J1KYK7"
+GIF_ANON_ID = ""  # Set in main.py during runtime.
+GET_ANON_ID_URL = "https://api.tenor.com/v1/anonid?key={}".format(GIF_API_KEY)
+
+
 def GIF_SEARCH_URL(term, inline=False):  # noqa
-    return 'https://api.tenor.com/v1/random?q={0}&key={1}&limit={2}&anon_id={3}&media_filter=minimal'.format(  # noqa
-        term, GIF_API_KEY, 1, GIF_ANON_ID)
+    return "https://api.tenor.com/v1/random?q={0}&key={1}&limit={2}&anon_id={3}&media_filter=minimal".format(  # noqa
+        term, GIF_API_KEY, 1, GIF_ANON_ID
+    )
 
 
 # Bot
@@ -51,7 +56,7 @@ DAILIES_DATE = None
 DONATOR_TIER_1 = 1
 DONATOR_TIER_2 = 2
 DEV_TIER = 4
-ROLL_INTERVAL = 3*3600  # 3 hours in seconds
+ROLL_INTERVAL = 3 * 3600  # 3 hours in seconds
 PRICE_CUT = 0.08
 
 # APIs

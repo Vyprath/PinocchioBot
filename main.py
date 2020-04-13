@@ -11,19 +11,21 @@ from modules.special_handlers import send_on_member_join, send_on_member_leave, 
     discoin_watcher
 from music import functions
 from discoin import Discoin
-# import uvloop
+import uvloop
 
 
 logging.basicConfig(level=logging.DEBUG)
-# asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 loop = asyncio.get_event_loop()
 loop.create_task(database.prepare_tables())
-client = discord.Client(
+
+client = discord.AutoShardedClient(
     loop=loop,
     proxy=variables.PROXY,
     proxy_auth=variables.PROXY_AUTH,
     activity=discord.Game(
         name="{0}help | Playing around in 100 servers".format(variables.PREFIX)))
+
 tenor_anon_id_request = requests.get(variables.GET_ANON_ID_URL)
 if tenor_anon_id_request.status_code == 200:
     variables.GIF_ANON_ID = json.loads(tenor_anon_id_request.content)['anon_id']
@@ -77,5 +79,6 @@ async def on_guild_remove(guild):
 @client.event
 async def on_voice_state_update(member, before, after):
     await functions.on_voice_state_update(member, before, after)
+
 
 client.run(variables.TOKEN)
