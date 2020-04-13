@@ -43,9 +43,7 @@ async def on_ready():
         dborg.init_dbl(client)
         await dborg.dbl_api.update_stats()
     await start_logging()
-    while True:
-        await discoin_watcher(client)
-        await asyncio.sleep(30)
+    await discoin_watcher(client)
 
 
 @client.event

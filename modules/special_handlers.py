@@ -2,6 +2,7 @@ from PIL import Image, ImageDraw, ImageFont
 from .currency import _add_money, _remove_money
 from datetime import datetime
 import aiohttp
+import asyncio
 import discord
 import database
 import variables
@@ -77,35 +78,37 @@ async def send_on_member_leave(member):
 
 
 async def discoin_watcher(client):
-    transactions = await variables.discoin_client.fetch_transactions()
-    engine = await database.prepare_engine()
-    for i in transactions:
-        if i.handled:
-            continue
-        transaction = await variables.discoin_client.handle_transaction(i.id)
-        user = client.get_user(int(transaction.user_id))
-        await _add_money(engine, user, round(transaction.payout))
-        embed = discord.Embed(
-            title=f"<:Discoin:357656754642747403> Recieved {round(transaction.payout)} <:PIC:668725298388271105>!",
-            description=f"""
-Recieved coins via exchange!
-See `{variables.PREFIX}discoin` for more info.
-            """,
-        )
-        embed.add_field(
-            name=f"{transaction.currency_from} Exchanged", value=transaction.amount
-        )
-        embed.add_field(
-            name=f"Pinocchio Coins <:PIC:668725298388271105> (PIC) Recieved", value=round(transaction.payout)
-        )
-        embed.add_field(
-            name="Transaction Receipt",
-            inline=False,
-            value=f"[{transaction.id}](https://dash.discoin.zws.im/#/transactions/{transaction.id}/show)",
-        )
-        rcvd_time = transaction.timestamp.strftime("%I:%M %p")
-        embed.set_footer(
-            text=f"{user.name}#{user.discriminator} • {rcvd_time}",
-            icon_url=user.avatar_url_as(size=128),
-        )
-        await user.send(embed=embed)
+    while True:
+        transactions = await variables.discoin_client.fetch_transactions()
+        engine = await database.prepare_engine()
+        for i in transactions:
+            if i.handled:
+                continue
+            transaction = await variables.discoin_client.handle_transaction(i.id)
+            user = client.get_user(int(transaction.user_id))
+            await _add_money(engine, user, round(transaction.payout))
+            embed = discord.Embed(
+                title=f"<:Discoin:357656754642747403> Recieved {round(transaction.payout)} <:PIC:668725298388271105>!",
+                description=f"""
+    Recieved coins via exchange!
+    See `{variables.PREFIX}discoin` for more info.
+                """,
+            )
+            embed.add_field(
+                name=f"{transaction.currency_from} Exchanged", value=transaction.amount
+            )
+            embed.add_field(
+                name=f"Pinocchio Coins <:PIC:668725298388271105> (PIC) Recieved", value=round(transaction.payout)
+            )
+            embed.add_field(
+                name="Transaction Receipt",
+                inline=False,
+                value=f"[{transaction.id}](https://dash.discoin.zws.im/#/transactions/{transaction.id}/show)",
+            )
+            rcvd_time = transaction.timestamp.strftime("%I:%M %p")
+            embed.set_footer(
+                text=f"{user.name}#{user.discriminator} • {rcvd_time}",
+                icon_url=user.avatar_url_as(size=128),
+            )
+            await user.send(embed=embed)
+        await asyncio.sleep(30)
