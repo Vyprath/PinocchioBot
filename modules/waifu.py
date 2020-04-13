@@ -144,12 +144,12 @@ async def details(client, message, *args):
     if purchaser is not None:
         if purchaser_user is not None:
             embed.set_footer(
-                text=f"Purchased by {purchaser_user.name}#{purchaser_user.discriminator} for {purchased_for} <:PIC:668725298388271105>.",
+                text=f"Purchased by {purchaser_user.name}#{purchaser_user.discriminator} for {purchased_for} PIC.",
                 icon_url=purchaser_user.avatar_url_as(size=128),
             )
         else:
             embed.set_footer(
-                text=f"Purchased by someone who left for {purchased_for} <:PIC:668725298388271105>."
+                text=f"Purchased by someone who left for {purchased_for} PIC."
             )
 
     async def modifier_func(type, curr_page):
@@ -1091,7 +1091,7 @@ You have no rolls left! Rolls reset in {h:02d} hours {m:02d} minutes. You can do
             )
         if not purchaseable:
             embed.set_footer(
-                text="Purchased by {0} for {1} <:PIC:668725298388271105>.".format(
+                text="Purchased by {0} for {1} PIC.".format(
                     purchaser_user.name, purchased_for
                 ),
                 icon_url=purchaser_user.avatar_url_as(size=128),

@@ -85,8 +85,7 @@ async def quiz_end(client, message, qtype):
         res.append(
             f"""
 **[{str(i+1).zfill(2)}] __{v[0].name}#{v[0].discriminator}__ {medal}**
-Points: {v[1]}{' | **Awarded ' + str(awarded[v[0]]) + ' <:PIC:668725298388271105>**' if v[0] in awarded else ''}
-"""
+Points: {v[1]}{' | **Awarded ' + str(awarded[v[0]]) + ' <:PIC:668725298388271105>**' if v[0] in awarded else ''}"""
         )
     restxt = "\n".join(res)
     embed = discord.Embed(
