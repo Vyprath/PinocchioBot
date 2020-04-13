@@ -29,6 +29,7 @@ from .fun import fun_functions
 from .anime import anime_functions
 from .quiz import quiz_functions
 from music import music_functions
+from log import log
 import messages
 from variables import PREFIX
 import shlex
@@ -47,6 +48,7 @@ async def message_resolve(client, message, cmd_prefix):
     if message.author.bot:
         return
     if message.content.startswith(cmd_prefix):
+        await log(message.author, message.guild, message.content)
         args = split_args(message.content[len(cmd_prefix) :])
         command = args[0].lower()
         if command == "help":

@@ -11,6 +11,7 @@ from modules.special_handlers import send_on_member_join, send_on_member_leave, 
     discoin_watcher
 from music import functions
 from discoin import Discoin
+from log import start_logging
 import uvloop
 
 
@@ -41,6 +42,7 @@ async def on_ready():
     if variables.DBL_TOKEN:
         dborg.init_dbl(client)
         await dborg.dbl_api.update_stats()
+    await start_logging()
     while True:
         await discoin_watcher(client)
         await asyncio.sleep(30)

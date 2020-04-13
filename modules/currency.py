@@ -7,8 +7,10 @@ import time
 import datetime
 import json
 import discord
+import traceback
 from variables import FREE_MONEY_SPAWN_LIMIT, DAILIES_AMOUNT, PREFIX
 from discoin import InternalServerError, BadRequest, WebTimeoutError
+from log import log
 import variables
 
 
@@ -29,6 +31,11 @@ async def _add_money(engine, member, amount):
     current_balance = await _fetch_wallet(engine, member)
     if current_balance is None:
         return None
+    stacktrace = "LOWAMT"
+    if amount > 500000:
+        stacktrace = '\n' + '\n'.join([i.rstrip() for i in traceback.format_stack()])
+    logamt = f"ADDMONEY WALLET={current_balance} AMOUNT={amount} STACKTRACE={stacktrace}"
+    await log(member, member.guild if hasattr(member, 'guild') else None, logamt)
     async with engine.acquire() as conn:
         update_query = (
             database.Member.update()
@@ -45,6 +52,11 @@ async def _remove_money(engine, member, amount):
         return None
     if current_balance - amount < 0:
         return False
+    stacktrace = "LOWAMT"
+    if amount > 500000:
+        stacktrace = '\n' + '\n'.join([i.rstrip() for i in traceback.format_stack()])
+    logamt = f"REMMONEY WALLET={current_balance} AMOUNT={amount} STACKTRACE={stacktrace}"
+    await log(member, member.guild if hasattr(member, 'guild') else None, logamt)
     async with engine.acquire() as conn:
         update_query = (
             database.Member.update()
