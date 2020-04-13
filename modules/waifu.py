@@ -691,7 +691,9 @@ Enter Yes/No:
             )
             await conn.execute(delete_query)
             await conn.execute(create_query)
-            if not using_money:
+            if using_money:
+                await _add_money(engine, sender, receiver_money)
+            else:
                 delete_query = (
                     database.PurchasedWaifu.delete()
                     .where(

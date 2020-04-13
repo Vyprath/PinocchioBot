@@ -5,6 +5,7 @@ import discord
 from discord.utils import snowflake_time
 from .currency import _add_money
 from variables import VOTE_REWARD, PREFIX
+from .utils import num_to_emote, num_to_uni_emote
 import variables
 import re
 
@@ -119,32 +120,6 @@ Remember to keep number options below or equal to 10.
         options[9] = " ".join(options[9:])
         options = options[:10]
     desc = ""
-    num_to_emote = {
-        0: "zero",
-        1: "one",
-        2: "two",
-        3: "three",
-        4: "four",
-        5: "five",
-        6: "six",
-        7: "seven",
-        8: "eight",
-        9: "nine",
-        10: "keycap_ten",
-    }
-    num_to_uni_emote = {
-        0: "0⃣",
-        1: "1⃣",
-        2: "2⃣",
-        3: "3⃣",
-        4: "4⃣",
-        5: "5⃣",
-        6: "6⃣",
-        7: "7⃣",
-        8: "8⃣",
-        9: "9⃣",
-        10: "🔟",
-    }
     for i, opt in enumerate(options):
         desc += ":{0}: : {1}\n".format(num_to_emote[i], opt)
     embed = discord.Embed(title=title, color=message.author.colour, description=desc)
