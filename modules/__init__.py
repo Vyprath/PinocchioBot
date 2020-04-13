@@ -27,6 +27,7 @@ from .waifu import waifu_functions
 from .reactions import reactions_functions
 from .fun import fun_functions
 from .anime import anime_functions
+from .quiz import quiz_functions
 from music import music_functions
 import messages
 from variables import PREFIX
@@ -114,6 +115,7 @@ functions.update(waifu_functions)
 functions.update(fun_functions)
 functions.update(reactions_functions)
 functions.update(anime_functions)
+functions.update(quiz_functions)
 functions.update(music_functions)
 
 handlers += currency_handlers

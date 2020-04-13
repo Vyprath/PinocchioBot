@@ -72,7 +72,7 @@ async def details(client, message, *args):
     engine = await database.prepare_engine()
     async with engine.acquire() as conn:
         if len(args) == 1 and args[0].isdigit():
-            search_id = int(args[1])
+            search_id = int(args[0])
             query = database.Waifu.select().where(database.Waifu.c.id == search_id)
         else:
             search_string = "%" + " ".join(args).lower().strip() + "%"
@@ -1017,7 +1017,7 @@ async def random_waifu(client, message, *args):
         h = s // 3600
         m = s // 60 - h * 60
         await message.channel.send(
-            """
+            f"""
 You have no rolls left! Rolls reset in {h:02d} hours {m:02d} minutes. You can donate to me and get more rolls!
             """
         )
