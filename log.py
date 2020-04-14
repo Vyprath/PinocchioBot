@@ -1,13 +1,14 @@
 import asyncio
 import variables
+import aiofiles
 from datetime import datetime
 import time
 
 queue = None
 
-def log_to_file(items):
-    with open(variables.LOG_FILE, "a") as f:
-        f.write("\n".join(items) + "\n")
+async def log_to_file(items):
+    async with aiofiles.open(variables.LOG_FILE, "a") as f:
+        await f.write("\n".join(items) + "\n")
 
 
 async def start_logging():
@@ -19,7 +20,7 @@ async def start_logging():
         item = await queue.get()
         buffer.append(item)
         if len(buffer) >= variables.LOG_BUFFER or time.time() - last > variables.LOG_WAIT_MAX_SEC:
-            log_to_file(buffer)
+            await log_to_file(buffer)
             last = time.time()
             buffer.clear()
 

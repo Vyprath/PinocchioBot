@@ -334,7 +334,7 @@ async def buy(client, message, *args):
                 buy_lock.remove(f"{waifu_id}:{message.guild.id}")
                 ug_lock.remove(f"{message.guild.id}:{message.author.id}")
                 return
-        await _remove_money(engine, message.author, cost)
+        await _remove_money(None, message.author, cost, conn)
         fetch_query = database.Member.select().where(
             database.Member.c.member == message.author.id
         )
@@ -574,7 +574,7 @@ def trade(using_money=False):
                             ug_lock.remove(f"{message.guild.id}:{receiver.id}")
                             ug_lock.remove(f"{message.guild.id}:{sender.id}")
                             return
-                        await _remove_money(engine, receiver, receiver_money)
+                        await _remove_money(None, receiver, receiver_money, conn)
                     else:
                         await message.channel.send("Invalid amount entered! Exiting...")
                         ug_lock.remove(f"{message.guild.id}:{receiver.id}")
@@ -1166,7 +1166,7 @@ You have no rolls left! Rolls reset in {h:02d} hours {m:02d} minutes. You can do
             await roll_msg.edit(embed=embed)
             await message.channel.send("You do not have enough money :angry:")
             return
-        await _remove_money(engine, purchaser, price)
+        await _remove_money(None, purchaser, price, conn)
         fetch_query = database.Member.select().where(
             database.Member.c.member == purchaser.id
         )

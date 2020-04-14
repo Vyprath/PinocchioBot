@@ -3,8 +3,21 @@ import discord
 import psutil
 import os
 import time
-from datetime import timedelta
+import aiohttp
+import aiofiles
+import variables
+from datetime import timedelta, datetime
 from .currency import _add_money
+
+
+async def upload_data(content, extension="txt"):
+    send_data = aiohttp.FormData()
+    send_data.add_field("auth", variables.FILE_UPLOAD_AUTH)
+    send_data.add_field("file", content, filename=f"file.{extension}")
+    async with aiohttp.ClientSession() as sess:
+        async with sess.post("https://f.sed.lol/upload", data=send_data) as resp:
+            url = await resp.text()
+    return url
 
 
 async def view_stats(client, message, *args):
@@ -91,30 +104,6 @@ async def get_money(client, message, *args):
         )
 
 
-def wrapper(func, tier):
-    async def f(client, message, *args):
-        engine = await database.prepare_engine()
-        member = message.author
-        async with engine.acquire() as conn:
-            fetch_query = database.Member.select().where(
-                database.Member.c.member == member.id
-            )
-            cursor = await conn.execute(fetch_query)
-            conn = await cursor.fetchone()
-            member_tier = conn[database.Member.c.tier]
-            if member_tier >= tier:
-                await func(client, message, *args)
-            else:
-                await message.channel.send(
-                    """
-Beyond this lies something too valuable to be obtained by humans.
-Careful, for all those who attempted to enter, never could exit.
-                """
-                )
-
-    return f
-
-
 async def whois_admin(client, message, *args):
     if len(args) != 1 or not args[0].isdigit():
         await message.channel.send("Usage: {PREFIX}awhois <user ID>. Developer only!")
@@ -157,7 +146,112 @@ async def whois_admin(client, message, *args):
     await message.channel.send(embed=embed)
 
 
+async def process_logs(client, message, *args):
+    msg = await message.channel.send("Please wait, processing log files...")
+    huge_transactions = []
+    commands_freq = {}
+    guild_freq = {}
+    user_freq = {}
+    file_size = 0
+    async with aiofiles.open(variables.LOG_FILE) as f:
+        async for line in f:
+            if line.startswith("$"):
+                if "LOWAMT" in line:
+                    pass
+                elif "MONEY WALLET=" in line:
+                    huge_transactions.append(line)
+                else:
+                    thirdsep = line.rfind("-")
+                    secondsep = line.rfind("-", 0, thirdsep)
+                    firstsep = line.rfind("-", 0, secondsep)
+                    userstr = " ".join(
+                        line[firstsep + 2 : secondsep - 1].strip().split()
+                    )
+                    guildstr = " ".join(
+                        line[secondsep + 2 : thirdsep - 1].strip().split()
+                    )
+                    cmd = line[thirdsep + 2 :].strip().split(" ")[0].strip()
+                    commands_freq[cmd] = commands_freq.get(cmd, 0) + 1
+                    if guildstr not in guild_freq:
+                        guild_freq[guildstr] = {}
+                    guild_freq[guildstr][cmd] = guild_freq[guildstr].get(cmd, 0) + 1
+                    user_freq[userstr] = user_freq.get(userstr, 0) + 1
+            else:
+                huge_transactions[-1] += "\n\t" + line.strip()
+        file_size = await f.tell()
+    if len(huge_transactions) > 0:
+        transactions_txt = (
+            f"All the suspicious transactions (value over 500,000 PIC):\n{'-'*50}\n"
+            + f"{'-'*50}\n".join(huge_transactions) + "\n"
+        )
+        transactions_url = await upload_data(transactions_txt)
+        embed_trans_txt = f"[Suspicious Transactions]({transactions_url})"
+    else:
+        embed_trans_txt = f"No suspicious transactions, yay!"
+    general_stats_txt = (
+        f"Pinocchio Bot Statistics (Dump Date: {str(datetime.now())}, File Size: {file_size} bytes)\n\n"
+    )
+    general_stats_txt += "Command Frequency (Universal):\n"
+    cmd_freq_items = list(commands_freq.items())
+    cmd_freq_items.sort(reverse=True, key=lambda x: x[1])
+    for cmd, cnt in cmd_freq_items:
+        general_stats_txt += f"\t- {cmd} | {cnt} time{'s' if cnt > 1 else ''}\n"
+    general_stats_txt += f"\nCommand Frequency (Per Guild):\n"
+    guild_freq_items = list(guild_freq.items())
+    guild_freq_items.sort(reverse=True, key=lambda x: len(x[1]))
+    for guild, data in guild_freq_items:
+        cmd_freq_items = list(data.items())
+        cmd_freq_items.sort(reverse=True, key=lambda x: x[1])
+        total = sum([x[1] for x in cmd_freq_items])
+        general_stats_txt += f"\t- {guild} | Total: {total}\n"
+        for cmd, cnt in cmd_freq_items:
+            general_stats_txt += f"\t\t- {cmd} | {cnt} time{'s' if cnt > 1 else ''}\n"
+    general_stats_txt += f"\nUser Frequency:\n"
+    usr_freq_items = list(user_freq.items())
+    usr_freq_items.sort(reverse=True, key=lambda x: x[1])
+    for usr, cnt in usr_freq_items:
+        general_stats_txt += f"\t- {usr} | {cnt} time{'s' if cnt > 1 else ''}\n"
+    general_stats_txt += "\n-----------------DUMP OVER-----------------\n"
+    general_stats_url = await upload_data(general_stats_txt)
+
+    embed = discord.Embed(
+        title="Bot Logs (Dev-Only)",
+        description=f"[General Statistics]({general_stats_url})",
+        color=0x0,
+    )
+    embed.add_field(name="Suspicious Transactions", value=embed_trans_txt)
+    embed.set_footer(
+        text="Pinocchio Bot powered by RandomGhost#0666",
+        icon_url=client.user.avatar_url_as(size=32),
+    )
+    await msg.edit(content=None, embed=embed)
+
+
 # TODO: Implement guild info/search + user search
+
+
+def wrapper(func, tier):
+    async def f(client, message, *args):
+        engine = await database.prepare_engine()
+        member = message.author
+        async with engine.acquire() as conn:
+            fetch_query = database.Member.select().where(
+                database.Member.c.member == member.id
+            )
+            cursor = await conn.execute(fetch_query)
+            conn = await cursor.fetchone()
+            member_tier = conn[database.Member.c.tier]
+            if member_tier >= tier:
+                await func(client, message, *args)
+            else:
+                await message.channel.send(
+                    """
+Beyond this lies something too valuable to be obtained by humans.
+Careful, for all those who attempted to enter, never could exit.
+                """
+                )
+
+    return f
 
 
 devtest_functions = {
@@ -171,4 +265,5 @@ devtest_functions = {
         wrapper(whois_admin, 5),
         "`{P}awhois`: Get details about an user. Dev only.",
     ),
+    "processlogs": (wrapper(process_logs, 5), "`{P}processlogs`: Dev-only command."),
 }

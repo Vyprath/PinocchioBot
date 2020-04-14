@@ -14,11 +14,17 @@ from log import log
 import variables
 
 
-async def _fetch_wallet(engine, member):
-    async with engine.acquire() as conn:
-        fetch_query = database.Member.select().where(
-            database.Member.c.member == member.id
-        )
+async def _fetch_wallet(engine, member, conn=None):
+    fetch_query = database.Member.select().where(database.Member.c.member == member.id)
+    if not conn:
+        async with engine.acquire() as conn:
+            cursor = await conn.execute(fetch_query)
+            resp = await cursor.fetchone()
+            if resp is None:
+                return None
+            else:
+                return resp[database.Member.c.wallet]
+    else:
         cursor = await conn.execute(fetch_query)
         resp = await cursor.fetchone()
         if resp is None:
@@ -27,42 +33,52 @@ async def _fetch_wallet(engine, member):
             return resp[database.Member.c.wallet]
 
 
-async def _add_money(engine, member, amount):
-    current_balance = await _fetch_wallet(engine, member)
+async def _add_money(engine, member, amount, conn=None):
+    current_balance = await _fetch_wallet(engine, member, conn)
     if current_balance is None:
         return None
     stacktrace = "LOWAMT"
     if amount > 500000:
-        stacktrace = '\n' + '\n'.join([i.rstrip() for i in traceback.format_stack()])
-    logamt = f"ADDMONEY WALLET={current_balance} AMOUNT={amount} STACKTRACE={stacktrace}"
-    await log(member, member.guild if hasattr(member, 'guild') else None, logamt)
-    async with engine.acquire() as conn:
-        update_query = (
-            database.Member.update()
-            .where(database.Member.c.member == member.id)
-            .values(wallet=current_balance + amount)
-        )
+        stacktrace = "\n" + "\n".join([i.rstrip() for i in traceback.format_stack()])
+    logamt = (
+        f"ADDMONEY WALLET={current_balance} AMOUNT={amount} STACKTRACE={stacktrace}"
+    )
+    await log(member, member.guild if hasattr(member, "guild") else None, logamt)
+    update_query = (
+        database.Member.update()
+        .where(database.Member.c.member == member.id)
+        .values(wallet=current_balance + amount)
+    )
+    if not conn:
+        async with engine.acquire() as conn:
+            await conn.execute(update_query)
+    else:
         await conn.execute(update_query)
     return current_balance + amount
 
 
-async def _remove_money(engine, member, amount):
-    current_balance = await _fetch_wallet(engine, member)
+async def _remove_money(engine, member, amount, conn=None):
+    current_balance = await _fetch_wallet(engine, member, conn)
     if current_balance is None:
         return None
     if current_balance - amount < 0:
         return False
     stacktrace = "LOWAMT"
     if amount > 500000:
-        stacktrace = '\n' + '\n'.join([i.rstrip() for i in traceback.format_stack()])
-    logamt = f"REMMONEY WALLET={current_balance} AMOUNT={amount} STACKTRACE={stacktrace}"
-    await log(member, member.guild if hasattr(member, 'guild') else None, logamt)
-    async with engine.acquire() as conn:
-        update_query = (
-            database.Member.update()
-            .where(database.Member.c.member == member.id)
-            .values(wallet=current_balance - amount)
-        )
+        stacktrace = "\n" + "\n".join([i.rstrip() for i in traceback.format_stack()])
+    logamt = (
+        f"REMMONEY WALLET={current_balance} AMOUNT={amount} STACKTRACE={stacktrace}"
+    )
+    await log(member, member.guild if hasattr(member, "guild") else None, logamt)
+    update_query = (
+        database.Member.update()
+        .where(database.Member.c.member == member.id)
+        .values(wallet=current_balance - amount)
+    )
+    if not conn:
+        async with engine.acquire() as conn:
+            await conn.execute(update_query)
+    else:
         await conn.execute(update_query)
     return current_balance + amount
 

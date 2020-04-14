@@ -4,6 +4,7 @@ PyNaCl
 aiopg
 sqlalchemy
 aiohttp
+aiofiles
 requests
 youtube-dl
 dblpy

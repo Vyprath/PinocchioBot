@@ -34,6 +34,7 @@ import messages
 from variables import PREFIX
 import shlex
 import jellyfish
+from discord.errors import Forbidden
 
 
 def split_args(value):
@@ -85,8 +86,14 @@ async def print_help(client, message, *args, full=False):
             if len(args) == 1 and args[0] == "inchannel":
                 await message.channel.send(embed=messages.main_help_menu)
             else:
-                await message.author.send(embed=messages.main_help_menu)
-                await message.channel.send("DM-ed the help message!")
+                try:
+                    await message.author.send(embed=messages.main_help_menu)
+                    await message.channel.send("DM-ed the help message!")
+                except Forbidden:
+                    await message.channel.send(
+                        "Could not DM help message! Is inbox disabled?",
+                        embed=messages.main_help_menu,
+                    )
     elif args[0] in functions.keys():
         help_string = functions[args[0]][1]
         if help_string is None:
