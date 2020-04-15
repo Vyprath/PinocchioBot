@@ -110,16 +110,21 @@ async def details(client, message, *args):
     from_anime = resp[database.Waifu.c.from_anime]
     coins_req = resp[database.Waifu.c.price]
     gender = gender.lower()
+    waifu_description = resp[database.Waifu.c.description]
+    if waifu_description is None or waifu_description == "":
+        waifu_description = f"Hi! I am a {gender} from {from_anime}."
+    if len(waifu_description) > 1900:
+        waifu_description = waifu_description[:1900] + "..."
     if purchaseable:
-        waifu_description = f"Hi! I am a {gender} from {from_anime}. You need {coins_req} <:PIC:668725298388271105> to buy me!"
+        waifu_description += f" You need {coins_req} <:PIC:668725298388271105> to buy them."
     else:
         if purchaser_user is not None:
             rstatus = (
                 "deep" if purchaser[database.PurchasedWaifu.c.favorite] else "casual"
             )
-            waifu_description = f"Hi! I am a {gender} from {from_anime}. I am already in a {rstatus} relationship with {purchaser_user.name}#{purchaser_user.discriminator}."
+            waifu_description += f"They are already in a {rstatus} relationship with {str(purchaser_user)}."
         else:
-            waifu_description = f"Hi! I am a {gender} from {from_anime}. I was purchased an abandoned by someone who left this server. Rescue me with `{PREFIX}rescuewaifus`!"
+            waifu_description += f"They were purchased and abandoned by someone who left this server. Rescue them with `{PREFIX}rescuewaifus`!"
     embed = discord.Embed(
         title=resp[database.Waifu.c.name],
         description=waifu_description,
@@ -130,7 +135,7 @@ async def details(client, message, *args):
         images = resp[database.Waifu.c.image_url].split(",")
         embed.set_image(url=images[0])
     embed.add_field(name="From", value=resp[database.Waifu.c.from_anime])
-    embed.add_field(name="Cost", value=resp[database.Waifu.c.price])
+    embed.add_field(name="Cost", value=f"{resp[database.Waifu.c.price]} <:PIC:668725298388271105>")
     embed.add_field(name="ID", value=resp[database.Waifu.c.id])
     embed.add_field(name="Gender", value=gender)
     image_field_id = 4
@@ -1080,7 +1085,7 @@ You have no rolls left! Rolls reset in {h:02d} hours {m:02d} minutes. You can do
             embed.set_image(url=images[0])
             curr_img = 0
         embed.add_field(name="From", value=resp[database.Waifu.c.from_anime])
-        embed.add_field(name="Cost", value=price)
+        embed.add_field(name="Cost", value=f"{price} <:PIC:668725298388271105>")
         embed.add_field(name="ID", value=resp[database.Waifu.c.id])
         embed.add_field(name="Gender", value=gender)
         if len(images) > 1:

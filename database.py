@@ -51,6 +51,7 @@ Waifu = sa.Table(
     sa.Column("from_anime", sa.String(length=200), nullable=False),
     sa.Column("gender", sa.String(length=1)),
     sa.Column("price", sa.BigInteger, nullable=False),
+    sa.Column("description", sa.Text),
     sa.Column("image_url", sa.Text),
 )
 
