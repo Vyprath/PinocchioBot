@@ -64,15 +64,58 @@ async def quiz_end(client, message, qtype):
     res = []
     members = list(quiz["members"].items())
     members.sort(reverse=True, key=lambda x: x[1])
-    winpts = members[0][1]
+    allpts = list(set([i[1] for i in members]))
     awarded = {}
-    if winpts > 0 and len(members) >= 3:
-        winners = [m[0] for m in members if m[1] == winpts]
+    awardable = quiz["win_bonus"]
+    if allpts[-1] > 0 and len(members) >= 3:
+        awardable += 1000
+    firstplace = [m[0] for m in members if m[1] == allpts[-1]]
+    secondplace = (
+        [m[0] for m in members if m[1] == allpts[-2]]
+        if len(allpts) >= 2 and allpts[-2] > 0
+        else []
+    )
+    thirdplace = (
+        [m[0] for m in members if m[1] == allpts[-3]]
+        if len(allpts) >= 3 and allpts[-3] > 0
+        else []
+    )
+    ptsum = (
+        allpts[-1]
+        + (allpts[-2] if len(secondplace) > 0 else 0)
+        + (allpts[-3] if len(thirdplace) > 0 else 0)
+    )
+    if awardable > 0 and ptsum > 0:
         engine = await database.prepare_engine()
-        for w in winners:
-            amt = round((1000 + quiz["win_bonus"] / len(winners)))
-            await _add_money(engine, w, amt)
-            awarded.update({w: amt})
+
+        thirdaward = (
+            0
+            if len(thirdplace) == 0
+            else round(awardable * allpts[-3] / ptsum / len(thirdplace))
+        )
+        secondaward = (
+            0
+            if len(secondplace) == 0
+            else round(awardable * allpts[-2] / ptsum / len(secondplace))
+        )
+        firstaward = (
+            0
+            if len(firstplace) == 0
+            else round(awardable * allpts[-1] / ptsum / len(firstplace))
+        )
+        print(firstaward, firstplace)
+        print(secondaward, secondplace)
+        print(thirdaward, thirdplace)
+        print(awardable, allpts)
+        for m in firstplace:
+            await _add_money(engine, m, firstaward)
+            awarded.update({m: firstaward})
+        for m in secondplace:
+            await _add_money(engine, m, secondaward)
+            awarded.update({m: secondaward})
+        for m in thirdplace:
+            await _add_money(engine, m, thirdaward)
+            awarded.update({m: thirdaward})
 
     for i, v in enumerate(members):
         medal = ""
@@ -160,7 +203,11 @@ Currently, you have **{members[member]} points**.
 __You have 15 seconds, good luck!__
                 """,
             )
-            embed.add_field(name="Difficulty", inline=False, value=question["difficulty"].capitalize())
+            embed.add_field(
+                name="Difficulty",
+                inline=False,
+                value=question["difficulty"].capitalize(),
+            )
             embed.add_field(name="Question", inline=False, value=question["question"])
             anstxt = "\n".join(
                 [
@@ -246,11 +293,16 @@ async def text_quiz(client, message, *args):
 
 
 async def quiz(client, message, *args):
+    argstxt = " ".join(args)
+    if len(args) > 0:
+        return await message.channel.send(
+            f"`{PREFIX}quiz` is just for the rules and info. Maybe you meant `{PREFIX}textquiz {argstxt}` or `{PREFIX}waifuquiz {argstxt}`?"
+        )
     await message.channel.send(
         f"""
-For now, the text quiz is done, and picture quiz (recognising quiz) is WIP.
+For now, the text quiz is done, and waifu recognising quiz is WIP.
 
-**Text Quiz**
+**Rules of Quiz**
 
 Test your knowledge on anime and/or compete with friends! You'll be asked either a multiple choice question or a true/false question.
 Pick one that you think is correct, and get:
@@ -258,14 +310,14 @@ Pick one that you think is correct, and get:
 +0 points for skipping/not choosing.
 -1 points for choosing the wrong answer.
 
-In a multiplayer game with more than 2 players, the winner gets 1000 <:PIC:668725298388271105> per win!
-Regardless of multi/single-player, you can provide a bonus amount yourself that will be taken from your balance.
- 
-**Usage:**
-1. Create a quiz with `=textquiz create [bonus]`. You will be added to the quiz by default as the host. Optionally, you can give your <:PIC:668725298388271105> that will be provided to the winner of the quiz!
-2. Your friends will need to join with `=textquiz join <@quiz host>`. If you're solo playing, ignore this step. Max 50 users at once.
-3. Start the quiz with `=textquiz start [easy|medium|hard]`!
-4. The quiz will end after it has done enough rounds (max 5) or you can manually end it with `=textquiz end` at the end of a round!
+In a multiplayer game with more than 2 players, the 1000 <:PIC:668725298388271105> is added to the money pool! (Provided winner scores >0 points).
+Regardless of multi/single-player, you can provide a bonus amount yourself that will be taken from your balance. WARNING: Not scoring >0 points will result in loss of that money!
+
+**Usage (Replace =quiz below with the type of quiz you want to play. For example, for text quiz use `=textquiz`, for waifu use `=waifuquiz` etc.):**
+1. Create a quiz with `=quiz create [bonus]`. You will be added to the quiz by default as the host. Optionally, you can give your <:PIC:668725298388271105> that will be provided to the winners of the quiz!
+2. Your friends will need to join with `=quiz join <@quiz host>`. If you're solo playing, ignore this step. Max 50 users at once.
+3. Start the quiz with `=quiz start [easy|medium|hard]`!
+4. The quiz will end after it has done enough rounds (max 5) or you can manually end it with `=quiz end` at the end of a round!
         """
     )
 

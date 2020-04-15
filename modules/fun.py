@@ -81,7 +81,7 @@ async def xkcd(client, message, *args):
 
 async def lmgtfy(client, message, *args):
     if len(args) == 0:
-        await message.channel.send(f"{PREFIX}lmgtfy <search string>".format)
+        await message.channel.send(f"{PREFIX}lmgtfy <search string>")
         return
     query = " ".join(args)
     url = variables.LMGTFY_URL + quote(query)
