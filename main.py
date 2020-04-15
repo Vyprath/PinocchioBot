@@ -42,7 +42,7 @@ async def on_ready():
     if variables.DBL_TOKEN:
         dborg.init_dbl(client)
         await dborg.dbl_api.update_stats()
-    cors = asyncio.wait_for([start_logging(), discoin_watcher(client)])
+    cors = asyncio.wait([start_logging(), discoin_watcher(client)])
     loop.run_until_complete(cors)
 
 
