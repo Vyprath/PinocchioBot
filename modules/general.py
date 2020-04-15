@@ -280,8 +280,10 @@ LIMIT 80;
     )
     top_user = client.get_user(results[0][1])
     embed.set_footer(
-        text=f"Current World Champion is {top_user.name}.",
-        icon_url=str(top_user.avatar_url_as(size=64)),
+        text=f"Current World Champion is {top_user.name if top_user else results[0][1]}.",
+        icon_url=str(top_user.avatar_url_as(size=64))
+        if top_user
+        else "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png",
     )
     await message.channel.send(embed=embed)
 
