@@ -319,6 +319,95 @@ async def remove_abandoned_waifus(client, message, *args):
     )
 
 
+async def purge_all_waifus(client, message, *args):
+    if not message.author.guild_permissions.administrator:
+        await message.channel.send(
+            "This command is restricted, to be used only by admins."
+        )
+        return
+    await message.channel.send(
+        ":skull_crossbones: This command will remove all purchased waifus from all users. Do you want to proceed? Type `confirm` in 15s."
+    )
+
+    def check(m):
+        return (
+            m.author.id != client.user.id
+            and m.channel == message.channel
+            and message.author.id == m.author.id
+        )
+
+    sure = False
+    while not sure:
+        try:
+            msg = await client.wait_for("message", check=check, timeout=60)
+            if msg.content == "confirm":
+                sure = True
+            elif msg.content == "exit":
+                await message.channel.send("Okay, exiting...")
+                return
+            else:
+                await message.channel.send("Respond properly. Write `exit` to exit.")
+        except asyncio.TimeoutError:
+            await message.channel.send("Error: Timeout.")
+            return
+    engine = await database.prepare_engine()
+    async with engine.acquire() as conn:
+        delete_query = (
+            database.PurchasedWaifu.delete()
+            .where(database.PurchasedWaifu.c.guild == message.guild.id)
+        )
+        await conn.execute(delete_query)
+    await message.channel.send(
+        ":skull_crossbones: Removed waifus from everyone!"
+    )
+
+
+async def purge_waifus(client, message, *args):
+    if not message.author.guild_permissions.administrator:
+        await message.channel.send(
+            "This command is restricted, to be used only by admins."
+        )
+        return
+    if len(message.mentions) != 1:
+        return await message.channel.send(f"Usage: `{PREFIX}forcedivorcewaifus <@user>`: Remove all waifus from a user.")
+    user = message.mentions[0]
+    await message.channel.send(
+        f":skull_crossbones: This command will remove all purchased waifus from {str(user)}. Do you want to proceed? Type `confirm` in 15s."
+    )
+
+    def check(m):
+        return (
+            m.author.id != client.user.id
+            and m.channel == message.channel
+            and message.author.id == m.author.id
+        )
+
+    sure = False
+    while not sure:
+        try:
+            msg = await client.wait_for("message", check=check, timeout=60)
+            if msg.content == "confirm":
+                sure = True
+            elif msg.content == "exit":
+                await message.channel.send("Okay, exiting...")
+                return
+            else:
+                await message.channel.send("Respond properly. Write `exit` to exit.")
+        except asyncio.TimeoutError:
+            await message.channel.send("Error: Timeout.")
+            return
+    engine = await database.prepare_engine()
+    async with engine.acquire() as conn:
+        delete_query = (
+            database.PurchasedWaifu.delete()
+            .where(database.PurchasedWaifu.c.member == user.id)
+        )
+        await conn.execute(delete_query)
+    await message.channel.send(
+        f":skull_crossbones: Removed waifus from {str(user)}!"
+    )
+
+
 admin_functions = {
     "setpaidroles": (set_paid_roles, "`{P}setpaidroles`: Set up paid roles."),
     "setwlchannel": (
@@ -348,5 +437,13 @@ admin_functions = {
     "rescuewaifus": (
         remove_abandoned_waifus,
         "`{P}rescuewaifus`: Removes waifus/husbandos from people who left the server.",
+    ),
+    "forcedivorceallwaifus": (
+        purge_all_waifus,
+        "`{P}forcedivorceallwaifus`: Force divorce all waifus in this server. Red alert.",
+    ),
+    "forcedivorcewaifus": (
+        purge_waifus,
+        "`{P}forcedivorcewaifus <@user>`: Force divorce all waifus for a particular user. Red alert.",
     ),
 }

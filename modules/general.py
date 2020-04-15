@@ -12,8 +12,9 @@ import re
 
 async def donate(client, message, *args):
     await message.channel.send(
-        """
-Please go to this site to donate: https://www.patreon.com/RandomGhost
+        f"""
+Please go to this site to donate: https://www.patreon.com/RandomGhost (PayPal only).
+I also accept Bitcoin and other crypto payments. Please contact me (RandomGhost#0666) or on the support server (`{PREFIX}support`) for other payment methods.
 Thanks! <a:thanks:699004469610020964>
     """
     )

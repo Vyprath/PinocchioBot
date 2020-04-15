@@ -34,7 +34,7 @@ main_help_menu.add_field(
 main_help_menu.add_field(
     name="<:SmartHuh:575382892520275980> Quiz **NEW**",
     inline=False,
-    value=f"`{P}quiz`, `{P}tquiz/{P}textquiz`",
+    value=f"`{P}quiz`, `{P}tquiz/{P}textquiz`, `{P}wquiz/{P}waifuquiz`",
 )
 main_help_menu.add_field(
     name="<a:MikuKurukurupa:564012084631699456> Fun",
@@ -54,7 +54,7 @@ main_help_menu.add_field(
 main_help_menu.add_field(
     name=":tools: Administration",
     inline=False,
-    value=f"`{P}setpaidroles`, `{P}setcustomroles`, `{P}setwlchannel`, `{P}setwelcome`, `{P}setleave`, `{P}coindrops`, `{P}rescuewaifus`, `{P}purge`",
+    value=f"`{P}setpaidroles`, `{P}setcustomroles`, `{P}setwlchannel`, `{P}setwelcome`, `{P}setleave`, `{P}coindrops`, `{P}rescuewaifus`, `{P}forcedivorceallwaifus`, `{P}forcedivorcewaifus`, `{P}purge`",
 )
 main_help_menu.set_footer(text=f"For additional help, do {P}help <command name>.")
 
