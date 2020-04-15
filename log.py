@@ -26,6 +26,8 @@ async def start_logging():
 
 
 async def log(user, guild, item):
+    if not queue:
+        return
     guildtxt = f"[{str(guild) }]({ guild.id })" if guild else "DM"
     content = str(item).replace("\n", "\n\t")
     await queue.put(
