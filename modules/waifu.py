@@ -116,15 +116,15 @@ async def details(client, message, *args):
     if len(waifu_description) > 1900:
         waifu_description = waifu_description[:1900] + "..."
     if purchaseable:
-        waifu_description += f" You need {coins_req} <:PIC:668725298388271105> to buy them."
+        waifu_description += f"\n\nYou need {coins_req} <:PIC:668725298388271105> to buy them."
     else:
         if purchaser_user is not None:
             rstatus = (
                 "deep" if purchaser[database.PurchasedWaifu.c.favorite] else "casual"
             )
-            waifu_description += f"They are already in a {rstatus} relationship with {str(purchaser_user)}."
+            waifu_description += f"\n\nThey are already in a {rstatus} relationship with {str(purchaser_user)}."
         else:
-            waifu_description += f"They were purchased and abandoned by someone who left this server. Rescue them with `{PREFIX}rescuewaifus`!"
+            waifu_description += f"\n\nThey were purchased and abandoned by someone who left this server. Rescue them with `{PREFIX}rescuewaifus`!"
     embed = discord.Embed(
         title=resp[database.Waifu.c.name],
         description=waifu_description,
