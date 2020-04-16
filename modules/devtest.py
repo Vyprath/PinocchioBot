@@ -148,7 +148,7 @@ async def whois_admin(client, message, *args):
 
 async def process_logs(client, message, *args):
     msg = await message.channel.send("Please wait, processing log files...")
-    huge_transactions = []
+    huge_transactions = ['']
     commands_freq = {}
     guild_freq = {}
     user_freq = {}
