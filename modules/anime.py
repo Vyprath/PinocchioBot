@@ -12,14 +12,18 @@ import datetime
 import aiohttp
 import json
 
-jikan = AioJikan(loop=asyncio.get_event_loop())
 
-
-async def make_anime_embed(mal_id, color=0x00000000, init_fields=[]):
+async def make_anime_embed(loop, mal_id, color=0x00000000, init_fields=[]):
+    jikan = AioJikan(loop=loop)
     anime = await jikan.anime(mal_id)
-    embed = discord.Embed(title=anime["title"], url=anime["url"], color=color)
+    synopsis = anime["synopsis"]
+    if len(synopsis) > 1500:
+        synopsis = synopsis[:1500] + "..."
+    embed = discord.Embed(
+        title=anime["title"], description=synopsis, url=anime["url"], color=color
+    )
     if "image_url" in anime.keys() and anime["image_url"]:
-        embed.set_thumbnail(url=anime["image_url"])
+        embed.set_image(url=anime["image_url"])
     if len(init_fields) > 0:
         for field in init_fields:
             embed.add_field(name=field[0], value=field[1], inline=field[2])
@@ -35,39 +39,35 @@ async def make_anime_embed(mal_id, color=0x00000000, init_fields=[]):
     embed.add_field(
         name="Score", value=f"{anime['score']} by {anime['scored_by']} members"
     )
-    embed.add_field(name="Rating", value=anime["rating"], inline=False)
+    embed.add_field(name="Rating", value=anime["rating"], inline=True)
     genres = ", ".join([g["name"] for g in anime["genres"]])
-    embed.add_field(name="Genres", value=genres, inline=False)
+    embed.add_field(name="Genres", value=genres, inline=True)
     if "Adaptation" in anime["related"].keys():
         adaptations = ", ".join(
             [f"{i['name']} ({i['type']})" for i in anime["related"]["Adaptation"]]
         )
-        embed.add_field(name="Adaptations", value=adaptations, inline=False)
+        embed.add_field(name="Adaptations", value=adaptations, inline=True)
     if "Prequel" in anime["related"].keys():
         prequels = ", ".join(
             [f"{i['name']} ({i['type']})" for i in anime["related"]["Prequel"]]
         )
-        embed.add_field(name="Prequels", value=prequels, inline=False)
+        embed.add_field(name="Prequels", value=prequels, inline=True)
     if "Sequel" in anime["related"].keys():
         sequels = ", ".join(
             [f"{i['name']} ({i['type']})" for i in anime["related"]["Sequel"]]
         )
-        embed.add_field(name="Sequels", value=sequels, inline=False)
-    synopsis = anime["synopsis"]
-    if len(synopsis) > 805:
-        synopsis = synopsis[:800] + "..."
-    embed.add_field(name="Synopsis", value=synopsis, inline=False)
+        embed.add_field(name="Sequels", value=sequels, inline=True)
     if len(anime["opening_themes"]) > 0:
         embed.add_field(
             name="Opening Theme Song",
-            value=", ".join(anime["opening_themes"]),
-            inline=False,
+            value="\n".join([f"{i+1}. {j}" for i, j in enumerate(anime["opening_themes"])]),
+            inline=True,
         )
     if len(anime["ending_themes"]) > 0:
         embed.add_field(
             name="Ending Theme Song",
-            value=", ".join(anime["ending_themes"]),
-            inline=False,
+            value="\n".join([f"{i+1}. {j}" for i, j in enumerate(anime["ending_themes"])]),
+            inline=True,
         )
     embed.set_footer(text="Taken from MyAnimeList.net")
     return embed
@@ -81,9 +81,10 @@ async def anime(client, message, *args):
     if len(search_str) < 3:
         await message.channel.send("Anime name must be atleast 3 letters.")
         return
+    jikan = AioJikan(loop=client.loop)
     _search_result = await jikan.search(search_type="anime", query=search_str)
     search_result = _search_result["results"][0]["mal_id"]
-    embed = await make_anime_embed(search_result, message.author.color)
+    embed = await make_anime_embed(client.loop, search_result, message.author.color)
     await message.channel.send(embed=embed)
 
 
@@ -95,14 +96,21 @@ async def manga(client, message, *args):
     if len(search_str) < 3:
         await message.channel.send("Manga name must be atleast 3 letters.")
         return
+    jikan = AioJikan(loop=client.loop)
     _search_result = await jikan.search(search_type="manga", query=search_str)
     search_result = _search_result["results"][0]["mal_id"]
     manga = await jikan.manga(search_result)
+    synopsis = manga["synopsis"]
+    if len(synopsis) > 1500:
+        synopsis = synopsis[:1500] + "..."
     embed = discord.Embed(
-        title=manga["title"], url=manga["url"], color=message.author.colour
+        title=manga["title"],
+        description=synopsis,
+        url=manga["url"],
+        color=message.author.colour,
     )
     if "image_url" in manga.keys() and manga["image_url"]:
-        embed.set_thumbnail(url=manga["image_url"])
+        embed.set_image(url=manga["image_url"])
     embed.add_field(name="Type", value=manga["type"])
     embed.add_field(
         name="Chapters", value=f"{manga['chapters']} ({manga['volumes']} volumes)"
@@ -114,16 +122,12 @@ async def manga(client, message, *args):
         name="Score", value=f"{manga['score']} by {manga['scored_by']} members"
     )
     genres = ", ".join([g["name"] for g in manga["genres"]])
-    embed.add_field(name="Genres", value=genres, inline=False)
+    embed.add_field(name="Genres", value=genres, inline=True)
     if "Adaptation" in manga["related"].keys():
         adaptations = ", ".join(
             [f"{i['name']} ({i['type']})" for i in manga["related"]["Adaptation"]]
         )
-        embed.add_field(name="Adaptations", value=adaptations, inline=False)
-    synopsis = manga["synopsis"]
-    if len(synopsis) > 840:
-        synopsis = synopsis[:840] + "..."
-    embed.add_field(name="Synopsis", value=synopsis, inline=False)
+        embed.add_field(name="Adaptations", value=adaptations, inline=True)
     embed.set_footer(text="Taken from MyMangaList.net")
     await message.channel.send(embed=embed)
 
@@ -134,6 +138,7 @@ async def animelist(client, message, *args):
         return
     search_str = " ".join(args)
     try:
+        jikan = AioJikan(loop=client.loop)
         raw_animelist = await jikan.user(username=search_str, request="animelist")
     except APIException:
         await message.channel.send("Username not found on MAL, or account is private.")
@@ -171,7 +176,9 @@ async def animelist(client, message, *args):
     pages = list(chunks(sentences, 5))
     page_num = 1
     total_pages = len(pages)
-    embed = discord.Embed(title="{search_str}'s AnimeList", color=message.author.colour)
+    embed = discord.Embed(
+        title=f"{search_str}'s AnimeList", color=message.author.colour
+    )
     embed.add_field(name="Total Anime", value=len(animelist))
     embed.add_field(name="List", value="\n".join(pages[page_num - 1]), inline=False)
     embed.set_footer(text=f"Page: {page_num}/{total_pages}")
@@ -225,6 +232,7 @@ async def mangalist(client, message, *args):
         return
     search_str = " ".join(args)
     try:
+        jikan = AioJikan(loop=client.loop)
         raw_mangalist = await jikan.user(username=search_str, request="mangalist")
     except APIException:
         await message.channel.send("Username not found on MAL, or account is private.")
@@ -317,6 +325,7 @@ async def profile(client, message, *args):
         return
     search_str = " ".join(args)
     try:
+        jikan = AioJikan(loop=client.loop)
         profile = await jikan.user(username=search_str, request="profile")
     except APIException:
         await message.channel.send("Username not found on MAL, or account is private.")
@@ -525,7 +534,10 @@ Send a picture (PNG/JPG/GIF only):
     ]
     if result["mal_id"]:
         embed = await make_anime_embed(
-            result["mal_id"], color=message.author.color, init_fields=fields
+            client.loop,
+            result["mal_id"],
+            color=message.author.color,
+            init_fields=fields,
         )
     else:
         embed = discord.Embed(title=result["title_romaji"], color=message.author.color)
