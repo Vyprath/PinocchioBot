@@ -66,6 +66,7 @@ async def quiz_end(client, message, qtype):
     members = list(quiz["members"].items())
     members.sort(reverse=True, key=lambda x: x[1])
     allpts = list(set([i[1] for i in members]))
+    allpts.sort()
     awarded = {}
     awardable = quiz["win_bonus"]
     if allpts[-1] > 0 and len(members) >= 3:
