@@ -66,6 +66,7 @@ async def quiz_end(client, message, qtype):
     members = list(quiz["members"].items())
     members.sort(reverse=True, key=lambda x: x[1])
     allpts = list(set([i[1] for i in members]))
+    allpts.sort()
     awarded = {}
     awardable = quiz["win_bonus"]
     if allpts[-1] > 0 and len(members) >= 3:
@@ -83,8 +84,8 @@ async def quiz_end(client, message, qtype):
     )
     ptsum = (
         allpts[-1]
-        + (allpts[-2] if len(secondplace) > 0 else 0)
-        + (allpts[-3] if len(thirdplace) > 0 else 0)
+        + (allpts[-2] if len(allpts) >= 2 and allpts[-2] > 0 else 0)
+        + (allpts[-3] if len(allpts) >= 3 and allpts[-3] > 0 else 0)
     )
     if awardable > 0 and ptsum > 0:
         engine = await database.prepare_engine()
