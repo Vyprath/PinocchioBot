@@ -34,9 +34,16 @@ else:
     raise Exception("Tenor not working.")
 
 
+started = False
+
+
 @client.event
 async def on_ready():
+    global started
     logging.info("Logged in as {0} - {1}.".format(client.user.name, client.user.id))
+    if started:
+        return
+    started = True
     variables.discoin_client = Discoin(f"{variables.DISCOIN_AUTH_KEY}", "PIC", loop=loop)
     # await database.make_member_profile(client.get_all_members(), client.user.id)
     if variables.DBL_TOKEN:
