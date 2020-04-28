@@ -19,7 +19,7 @@ main_help_menu.add_field(
 main_help_menu.add_field(
     name=":moneybag: Financial",
     inline=False,
-    value=f"`{P}wallet`, `{P}transfer`, `{P}dailies`, `{P}paidroles`, `{P}customrole`, `{P}discoin`, `{P}exchange`",
+    value=f"`{P}wallet`, `{P}transfer`, `{P}dailies/{P}daily`, `{P}paidroles`, `{P}customrole`, `{P}discoin`, `{P}exchange`",
 )
 main_help_menu.add_field(
     name="<a:RainbowWeeb:564012559590752256> Waifu",

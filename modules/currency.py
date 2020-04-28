@@ -312,6 +312,7 @@ currency_functions = {
         transfer_money,
         "`{P}transfer-money <@user mention> <amount>`: Transfer some money.",
     ),
+    "daily": (dailies, "`{P}daily`: Get your daily money and become riiiich."),
     "dailies": (dailies, "`{P}dailies`: Get your daily money and become riiiich."),
     "exchange": (
         exchange,
