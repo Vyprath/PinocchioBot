@@ -7,8 +7,11 @@ import requests
 import json
 import dborg
 from modules import message_resolve
-from modules.special_handlers import send_on_member_join, send_on_member_leave, \
-    discoin_watcher
+from modules.special_handlers import (
+    send_on_member_join,
+    send_on_member_leave,
+    discoin_watcher,
+)
 from music import functions
 from discoin import Discoin
 from log import start_logging
@@ -25,11 +28,13 @@ client = discord.AutoShardedClient(
     proxy=variables.PROXY,
     proxy_auth=variables.PROXY_AUTH,
     activity=discord.Game(
-        name="{0}help | Playing around in 100 servers".format(variables.PREFIX)))
+        name="{0}help | Playing around in 100 servers".format(variables.PREFIX)
+    ),
+)
 
 tenor_anon_id_request = requests.get(variables.GET_ANON_ID_URL)
 if tenor_anon_id_request.status_code == 200:
-    variables.GIF_ANON_ID = json.loads(tenor_anon_id_request.content)['anon_id']
+    variables.GIF_ANON_ID = json.loads(tenor_anon_id_request.content)["anon_id"]
 else:
     raise Exception("Tenor not working.")
 
@@ -41,14 +46,18 @@ started = False
 async def on_ready():
     global started
     logging.info("Logged in as {0} - {1}.".format(client.user.name, client.user.id))
-    if started:
-        return
-    started = True
-    variables.discoin_client = Discoin(f"{variables.DISCOIN_AUTH_KEY}", "PIC", loop=loop)
     # await database.make_member_profile(client.get_all_members(), client.user.id)
     if variables.DBL_TOKEN:
         dborg.init_dbl(client)
         await dborg.dbl_api.update_stats()
+
+    if started:
+        return
+    started = True
+
+    variables.discoin_client = Discoin(
+        f"{variables.DISCOIN_AUTH_KEY}", "PIC", loop=loop
+    )
     cors = [start_logging(), discoin_watcher(client)]
     await asyncio.gather(*cors)
 
