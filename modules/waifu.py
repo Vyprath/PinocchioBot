@@ -252,10 +252,10 @@ def handle_lock(uid, lock, type):
         lock.pop(uid)
     elif type == "GET":
         if last and time.time() - last < 125:
-            return False
+            return True
         if last:
             lock.pop(uid)
-        return True
+        return False
     raise Exception(f"Unknown type for lock: {type}")
 
 
