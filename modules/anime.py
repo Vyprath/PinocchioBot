@@ -207,22 +207,12 @@ async def animelist(client, message, *args):
                 if not page_num - 1 > 0:
                     continue
                 page_num -= 1
-                embed.set_field_at(
-                    index=1,
-                    name="List",
-                    value="\n".join(pages[page_num - 1]),
-                    inline=False,
-                )
+                embed.description = "\n".join(pages[page_num - 1])
             elif emoji == "➡":
                 if not page_num + 1 <= total_pages:
                     continue
                 page_num += 1
-                embed.set_field_at(
-                    index=1,
-                    name="List",
-                    value="\n".join(pages[page_num - 1]),
-                    inline=False,
-                )
+                embed.description = "\n".join(pages[page_num - 1])
             else:
                 continue
             embed.set_footer(text=f"Page: {page_num}/{total_pages}")
@@ -271,14 +261,15 @@ async def mangalist(client, message, *args):
                 manga["score"],
             )
         )
-    pages = list(chunks(sentences, 5))
+    pages = list(chunks(sentences, 15))
     page_num = 1
     total_pages = len(pages)
     embed = discord.Embed(
-        title=f"{search_str}'s MangaList", color=message.author.colour
+        title=f"{search_str}'s MangaList",
+        color=message.author.colour,
+        description="\n".join(pages[page_num - 1]),
     )
     embed.add_field(name="Total Manga", value=len(mangalist))
-    embed.add_field(name="List", value="\n".join(pages[page_num - 1]), inline=False)
     embed.set_footer(text=f"Page: {page_num}/{total_pages}")
     msg = await message.channel.send(embed=embed)
     if total_pages == 1:
@@ -300,25 +291,15 @@ async def mangalist(client, message, *args):
                 if not page_num - 1 > 0:
                     continue
                 page_num -= 1
-                embed.set_field_at(
-                    index=1,
-                    name="List",
-                    value="\n".join(pages[page_num - 1]),
-                    inline=False,
-                )
+                embed.description = "\n".join(pages[page_num - 1])
             elif emoji == "➡":
                 if not page_num + 1 <= total_pages:
                     continue
                 page_num += 1
-                embed.set_field_at(
-                    index=1,
-                    name="List",
-                    value="\n".join(pages[page_num - 1]),
-                    inline=False,
-                )
+                embed.description = "\n".join(pages[page_num - 1])
             else:
                 continue
-            embed.set_footer(text="Page: {0}/{1}".format(page_num, total_pages))
+            embed.set_footer(text=f"Page: {page_num}/{total_pages}")
             await msg.edit(embed=embed)
     except asyncio.TimeoutError:
         pass  # Ignore.
