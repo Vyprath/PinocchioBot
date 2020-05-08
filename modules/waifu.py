@@ -1,6 +1,7 @@
 import database
 import discord
 import asyncio
+import time
 from datetime import datetime
 from random import randint
 from .currency import _fetch_wallet, _remove_money, _add_money
@@ -116,7 +117,9 @@ async def details(client, message, *args):
     if len(waifu_description) > 1900:
         waifu_description = waifu_description[:1900] + "..."
     if purchaseable:
-        waifu_description += f"\n\nYou need {coins_req} <:PIC:668725298388271105> to buy them."
+        waifu_description += (
+            f"\n\nYou need {coins_req} <:PIC:668725298388271105> to buy them."
+        )
     else:
         if purchaser_user is not None:
             rstatus = (
@@ -135,7 +138,9 @@ async def details(client, message, *args):
         images = resp[database.Waifu.c.image_url].split(",")
         embed.set_image(url=images[0])
     embed.add_field(name="From", value=resp[database.Waifu.c.from_anime])
-    embed.add_field(name="Cost", value=f"{resp[database.Waifu.c.price]} <:PIC:668725298388271105>")
+    embed.add_field(
+        name="Cost", value=f"{resp[database.Waifu.c.price]} <:PIC:668725298388271105>"
+    )
     embed.add_field(name="ID", value=resp[database.Waifu.c.id])
     embed.add_field(name="Gender", value=gender)
     image_field_id = 4
@@ -228,8 +233,29 @@ def favorite(unfavorite=False):
     return _favorite
 
 
-buy_lock = []
-ug_lock = []
+buy_lock = {}
+ug_lock = {}
+sell_lock = {}
+
+
+def handle_lock(uid, lock, type):
+    last = lock.get(uid)
+    if type == "ADD":
+        if last and time.time() - last < 125:
+            return False
+        lock[uid] = time.time()
+        return True
+    elif type == "REMOVE":
+        if not last:
+            return False
+        lock.pop(uid)
+    elif type == "GET":
+        if last and time.time() - last < 125:
+            return False
+        if last:
+            lock.pop(uid)
+        return True
+    raise Exception(f"Unknown type for lock: {type}")
 
 
 async def buy(client, message, *args):
@@ -258,13 +284,13 @@ async def buy(client, message, *args):
         waifu_name = resp[database.Waifu.c.name]
         waifu_id = resp[database.Waifu.c.id]
 
-        if f"{message.guild.id}:{message.author.id}" in ug_lock:
+        if handle_lock(f"{message.guild.id}:{message.author.id}", ug_lock, "GET"):
             await message.channel.send(
                 "You are already trying to do something! You should do things one at a time <:KannaBlob:575373833763028993>"
             )
             return
 
-        if f"{waifu_id}:{message.guild.id}" in buy_lock:
+        if handle_lock(f"{waifu_id}:{message.guild.id}", buy_lock, "GET"):
             await message.channel.send(
                 "Someone is already trying to buy this waifu! You should do things one at a time <:KannaBlob:575373833763028993>"
             )
@@ -306,8 +332,8 @@ async def buy(client, message, *args):
             )
             return
 
-        ug_lock.append(f"{message.guild.id}:{message.author.id}")
-        buy_lock.append(f"{waifu_id}:{message.guild.id}")
+        handle_lock(f"{message.guild.id}:{message.author.id}", ug_lock, "ADD")
+        handle_lock(f"{waifu_id}:{message.guild.id}", buy_lock, "ADD")
         await message.channel.send(
             f"Want to buy {waifu_name} for sure? Reply with `confirm` in 60s or `exit`."
         )
@@ -327,8 +353,10 @@ async def buy(client, message, *args):
                     sure = True
                 elif msg.content == "exit":
                     await message.channel.send("Okay, exiting...")
-                    buy_lock.remove(f"{waifu_id}:{message.guild.id}")
-                    ug_lock.remove(f"{message.guild.id}:{message.author.id}")
+                    handle_lock(
+                        f"{message.guild.id}:{message.author.id}", ug_lock, "REMOVE"
+                    )
+                    handle_lock(f"{waifu_id}:{message.guild.id}", buy_lock, "REMOVE")
                     return
                 else:
                     await message.channel.send(
@@ -336,8 +364,10 @@ async def buy(client, message, *args):
                     )
             except asyncio.TimeoutError:
                 await message.channel.send("Error: Timeout.")
-                buy_lock.remove(f"{waifu_id}:{message.guild.id}")
-                ug_lock.remove(f"{message.guild.id}:{message.author.id}")
+                handle_lock(
+                    f"{message.guild.id}:{message.author.id}", ug_lock, "REMOVE"
+                )
+                handle_lock(f"{waifu_id}:{message.guild.id}", buy_lock, "REMOVE")
                 return
         await _remove_money(None, message.author, cost, conn)
         fetch_query = database.Member.select().where(
@@ -357,14 +387,11 @@ async def buy(client, message, *args):
             ]
         )
         await conn.execute(create_query)
-        buy_lock.remove(f"{waifu_id}:{message.guild.id}")
-        ug_lock.remove(f"{message.guild.id}:{message.author.id}")
+        handle_lock(f"{message.guild.id}:{message.author.id}", ug_lock, "REMOVE")
+        handle_lock(f"{waifu_id}:{message.guild.id}", buy_lock, "REMOVE")
         await message.channel.send(
             f"You're now in a relationship with {waifu_name} <:SataniaThumb:575384688714317824>\nDon't lewd them! <:uwu:575372762583924757>"
         )
-
-
-sell_lock = []
 
 
 async def sell(client, message, *args):
@@ -393,13 +420,13 @@ async def sell(client, message, *args):
         waifu_id = resp[database.Waifu.c.id]
         waifu_name = resp[database.Waifu.c.name]
 
-        if f"{message.guild.id}:{message.author.id}" in ug_lock:
+        if handle_lock(f"{message.guild.id}:{message.author.id}", ug_lock, "GET"):
             await message.channel.send(
                 "You are already trying to do something! You should do things one at a time <:KannaBlob:575373833763028993>"
             )
             return
 
-        if f"{waifu_id}:{message.guild.id}" in sell_lock:
+        if handle_lock(f"{waifu_id}:{message.guild.id}", sell_lock, "GET"):
             await message.channel.send(
                 "Someone is already trying to sell this waifu! You should do things one at a time <:KannaBlob:575373833763028993>"
             )
@@ -419,8 +446,8 @@ async def sell(client, message, *args):
             )
             return
 
-        ug_lock.append(f"{message.guild.id}:{message.author.id}")
-        sell_lock.append(f"{waifu_id}:{message.guild.id}")
+        handle_lock(f"{message.guild.id}:{message.author.id}", ug_lock, "ADD")
+        handle_lock(f"{waifu_id}:{message.guild.id}", sell_lock, "ADD")
 
         cost = (
             purchased_waifu[database.PurchasedWaifu.c.purchased_for]
@@ -446,8 +473,10 @@ async def sell(client, message, *args):
                     sure = True
                 elif msg.content == "exit":
                     await message.channel.send("Okay, exiting...")
-                    sell_lock.remove(f"{waifu_id}:{message.guild.id}")
-                    ug_lock.remove(f"{message.guild.id}:{message.author.id}")
+                    handle_lock(
+                        f"{message.guild.id}:{message.author.id}", ug_lock, "REMOVE"
+                    )
+                    handle_lock(f"{waifu_id}:{message.guild.id}", sell_lock, "REMOVE")
                     return
                 else:
                     await message.channel.send(
@@ -455,8 +484,10 @@ async def sell(client, message, *args):
                     )
             except asyncio.TimeoutError:
                 await message.channel.send("Error: Timeout.")
-                sell_lock.remove(f"{waifu_id}:{message.guild.id}")
-                ug_lock.remove(f"{message.guild.id}:{message.author.id}")
+                handle_lock(
+                    f"{message.guild.id}:{message.author.id}", ug_lock, "REMOVE"
+                )
+                handle_lock(f"{waifu_id}:{message.guild.id}", sell_lock, "REMOVE")
                 return
         delete_query = (
             database.PurchasedWaifu.delete()
@@ -471,8 +502,8 @@ async def sell(client, message, *args):
         )
         await conn.execute(delete_query)
         await _add_money(engine, message.author, cost)
-        sell_lock.remove(f"{waifu_id}:{message.guild.id}")
-        ug_lock.remove(f"{message.guild.id}:{message.author.id}")
+        handle_lock(f"{message.guild.id}:{message.author.id}", ug_lock, "REMOVE")
+        handle_lock(f"{waifu_id}:{message.guild.id}", sell_lock, "REMOVE")
         await message.channel.send(
             f"You successfully broke up with {waifu_name} and they are being sent back to the Dungeon! <:SataniaThumb:575384688714317824>"
         )
@@ -488,16 +519,16 @@ def trade(using_money=False):
         receiver = message.mentions[0]
         sender = message.author
 
-        if (
-            f"{message.guild.id}:{receiver.id}" in ug_lock
-            or f"{message.guild.id}:{sender.id}" in ug_lock
-        ):
+        if handle_lock(
+            f"{message.guild.id}:{receiver.id}", ug_lock, "GET"
+        ) or handle_lock(f"{message.guild.id}:{sender.id}", ug_lock, "GET"):
             await message.channel.send(
                 "You are already trying to do something! You should do things one at a time <:KannaBlob:575373833763028993>"
             )
             return
-        ug_lock.append(f"{message.guild.id}:{receiver.id}")
-        ug_lock.append(f"{message.guild.id}:{sender.id}")
+
+        handle_lock(f"{message.guild.id}:{receiver.id}", ug_lock, "ADD")
+        handle_lock(f"{message.guild.id}:{sender.id}", ug_lock, "ADD")
 
         engine = await database.prepare_engine()
         async with engine.acquire() as conn:
@@ -535,8 +566,9 @@ def trade(using_money=False):
                     await message.channel.send(
                         "Waifu not found! Don't trade your imaginary waifus <:smug:575373306715439151>"
                     )
-                    ug_lock.remove(f"{message.guild.id}:{receiver.id}")
-                    ug_lock.remove(f"{message.guild.id}:{sender.id}")
+                    
+                    handle_lock(f"{message.guild.id}:{receiver.id}", ug_lock, "REMOVE")
+                    handle_lock(f"{message.guild.id}:{sender.id}", ug_lock, "REMOVE")
                     return
                 query = (
                     database.PurchasedWaifu.select()
@@ -553,8 +585,8 @@ def trade(using_money=False):
                     await message.channel.send(
                         "By what logic are you trying to trade a waifu you don't own? <:smug:575373306715439151>"
                     )
-                    ug_lock.remove(f"{message.guild.id}:{receiver.id}")
-                    ug_lock.remove(f"{message.guild.id}:{sender.id}")
+                    handle_lock(f"{message.guild.id}:{receiver.id}", ug_lock, "REMOVE")
+                    handle_lock(f"{message.guild.id}:{sender.id}", ug_lock, "REMOVE")
                     return
 
                 if using_money:
@@ -576,14 +608,14 @@ def trade(using_money=False):
                             await message.channel.send(
                                 f"You do not have enough money! <:Eww:575373991640956938>\nYou need {receiver_money-receiver_wallet} <:PIC:668725298388271105> more."
                             )
-                            ug_lock.remove(f"{message.guild.id}:{receiver.id}")
-                            ug_lock.remove(f"{message.guild.id}:{sender.id}")
+                            handle_lock(f"{message.guild.id}:{receiver.id}", ug_lock, "REMOVE")
+                            handle_lock(f"{message.guild.id}:{sender.id}", ug_lock, "REMOVE")
                             return
                         await _remove_money(None, receiver, receiver_money, conn)
                     else:
                         await message.channel.send("Invalid amount entered! Exiting...")
-                        ug_lock.remove(f"{message.guild.id}:{receiver.id}")
-                        ug_lock.remove(f"{message.guild.id}:{sender.id}")
+                    handle_lock(f"{message.guild.id}:{receiver.id}", ug_lock, "REMOVE")
+                    handle_lock(f"{message.guild.id}:{sender.id}", ug_lock, "REMOVE")
                         return
                 else:
                     if msg.content.isdigit():
@@ -602,8 +634,8 @@ def trade(using_money=False):
                         await message.channel.send(
                             "Waifu not found! Don't trade your imaginary waifus <:smug:575373306715439151>"
                         )
-                        ug_lock.remove(f"{message.guild.id}:{receiver.id}")
-                        ug_lock.remove(f"{message.guild.id}:{sender.id}")
+                        handle_lock(f"{message.guild.id}:{receiver.id}", ug_lock, "REMOVE")
+                        handle_lock(f"{message.guild.id}:{sender.id}", ug_lock, "REMOVE")
                         return
                     query = (
                         database.PurchasedWaifu.select()
@@ -620,8 +652,8 @@ def trade(using_money=False):
                         await message.channel.send(
                             "By what logic are you trying to trade a waifu you don't own? <:smug:575373306715439151>"
                         )
-                        ug_lock.remove(f"{message.guild.id}:{receiver.id}")
-                        ug_lock.remove(f"{message.guild.id}:{sender.id}")
+                        handle_lock(f"{message.guild.id}:{receiver.id}", ug_lock, "REMOVE")
+                        handle_lock(f"{message.guild.id}:{sender.id}", ug_lock, "REMOVE")
                         return
 
                 if using_money:
@@ -648,23 +680,23 @@ Enter Yes/No:
                     await message.channel.send("Okay, cancelling trade...")
                     if using_money:
                         await _add_money(engine, receiver, receiver_money)
-                    ug_lock.remove(f"{message.guild.id}:{receiver.id}")
-                    ug_lock.remove(f"{message.guild.id}:{sender.id}")
+                    handle_lock(f"{message.guild.id}:{receiver.id}", ug_lock, "REMOVE")
+                    handle_lock(f"{message.guild.id}:{sender.id}", ug_lock, "REMOVE")
                     return
                 else:
                     await message.channel.send("Invalid option. Exiting...")
                     if using_money:
                         await _add_money(engine, receiver, receiver_money)
-                    ug_lock.remove(f"{message.guild.id}:{receiver.id}")
-                    ug_lock.remove(f"{message.guild.id}:{sender.id}")
+                    handle_lock(f"{message.guild.id}:{receiver.id}", ug_lock, "REMOVE")
+                    handle_lock(f"{message.guild.id}:{sender.id}", ug_lock, "REMOVE")
                     return
 
             except asyncio.TimeoutError:
                 await message.channel.send("Error: Timeout.")
                 if using_money:
                     await _add_money(engine, receiver, receiver_money)
-                ug_lock.remove(f"{message.guild.id}:{receiver.id}")
-                ug_lock.remove(f"{message.guild.id}:{sender.id}")
+                handle_lock(f"{message.guild.id}:{receiver.id}", ug_lock, "REMOVE")
+                handle_lock(f"{message.guild.id}:{sender.id}", ug_lock, "REMOVE")
                 return
 
             fetch_query = database.Member.select().where(
@@ -726,8 +758,8 @@ Enter Yes/No:
                 await conn.execute(delete_query)
                 await conn.execute(create_query)
 
-            ug_lock.remove(f"{message.guild.id}:{receiver.id}")
-            ug_lock.remove(f"{message.guild.id}:{sender.id}")
+                handle_lock(f"{message.guild.id}:{receiver.id}", ug_lock, "REMOVE")
+                handle_lock(f"{message.guild.id}:{sender.id}", ug_lock, "REMOVE")
             await message.channel.send(
                 "Trade successful! <:SataniaThumb:575384688714317824>"
             )

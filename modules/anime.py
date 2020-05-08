@@ -60,13 +60,17 @@ async def make_anime_embed(loop, mal_id, color=0x00000000, init_fields=[]):
     if len(anime["opening_themes"]) > 0:
         embed.add_field(
             name="Opening Theme Song",
-            value="\n".join([f"{i+1}. {j}" for i, j in enumerate(anime["opening_themes"])]),
+            value="\n".join(
+                [f"{i+1}. {j}" for i, j in enumerate(anime["opening_themes"])]
+            ),
             inline=True,
         )
     if len(anime["ending_themes"]) > 0:
         embed.add_field(
             name="Ending Theme Song",
-            value="\n".join([f"{i+1}. {j}" for i, j in enumerate(anime["ending_themes"])]),
+            value="\n".join(
+                [f"{i+1}. {j}" for i, j in enumerate(anime["ending_themes"])]
+            ),
             inline=True,
         )
     embed.set_footer(text="Taken from MyAnimeList.net")
@@ -173,14 +177,15 @@ async def animelist(client, message, *args):
                 anime["score"],
             )
         )
-    pages = list(chunks(sentences, 5))
+    pages = list(chunks(sentences, 15))
     page_num = 1
     total_pages = len(pages)
     embed = discord.Embed(
-        title=f"{search_str}'s AnimeList", color=message.author.colour
+        title=f"{search_str}'s AnimeList",
+        color=message.author.colour,
+        description="\n".join(pages[page_num - 1]),
     )
     embed.add_field(name="Total Anime", value=len(animelist))
-    embed.add_field(name="List", value="\n".join(pages[page_num - 1]), inline=False)
     embed.set_footer(text=f"Page: {page_num}/{total_pages}")
     msg = await message.channel.send(embed=embed)
     if total_pages == 1:
