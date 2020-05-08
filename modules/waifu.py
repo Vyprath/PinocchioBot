@@ -116,6 +116,7 @@ async def details(client, message, *args):
         waifu_description = f"Hi! I am a {gender} from {from_anime}."
     if len(waifu_description) > 1900:
         waifu_description = waifu_description[:1900] + "..."
+    waifu_description = waifu_description.replace("\\n", "\n")
     if purchaseable:
         waifu_description += (
             f"\n\nYou need {coins_req} <:PIC:668725298388271105> to buy them."
@@ -614,8 +615,8 @@ def trade(using_money=False):
                         await _remove_money(None, receiver, receiver_money, conn)
                     else:
                         await message.channel.send("Invalid amount entered! Exiting...")
-                    handle_lock(f"{message.guild.id}:{receiver.id}", ug_lock, "REMOVE")
-                    handle_lock(f"{message.guild.id}:{sender.id}", ug_lock, "REMOVE")
+                        handle_lock(f"{message.guild.id}:{receiver.id}", ug_lock, "REMOVE")
+                        handle_lock(f"{message.guild.id}:{sender.id}", ug_lock, "REMOVE")
                         return
                 else:
                     if msg.content.isdigit():
