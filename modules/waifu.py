@@ -971,7 +971,7 @@ async def _harem(
                     )
                     await harem_msg.edit(embed=embed)
                 try:
-                    await await harem_msg.remove_reaction("⬅", user)
+                    await harem_msg.remove_reaction("⬅", user)
                 except:
                     pass
             else:
