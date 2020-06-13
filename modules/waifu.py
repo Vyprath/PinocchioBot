@@ -955,7 +955,10 @@ async def _harem(
                         icon_url=member.avatar_url_as(size=128),
                     )
                     await harem_msg.edit(embed=embed)
-                await harem_msg.remove_reaction("➡", user)
+                try:
+                    await harem_msg.remove_reaction("➡", user)
+                except:
+                    pass
             elif str(reaction.emoji) == "⬅" and len(pages) > 1:
                 if curr_page > 0:
                     curr_page -= 1
@@ -967,12 +970,18 @@ async def _harem(
                         icon_url=member.avatar_url_as(size=128),
                     )
                     await harem_msg.edit(embed=embed)
-                await harem_msg.remove_reaction("⬅", user)
+                try:
+                    await await harem_msg.remove_reaction("⬅", user)
+                except:
+                    pass
             else:
                 continue
     except asyncio.TimeoutError:
-        await harem_msg.remove_reaction("⬅", client.user)
-        await harem_msg.remove_reaction("➡", client.user)
+        try:
+            await harem_msg.remove_reaction("⬅", client.user)
+            await harem_msg.remove_reaction("➡", client.user)
+        except:
+            pass
     return
 
 
