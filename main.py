@@ -11,6 +11,7 @@ from modules.special_handlers import (
     send_on_member_join,
     send_on_member_leave,
     discoin_watcher,
+    blacklist_updater,
 )
 from music import functions
 from discoin import Discoin
@@ -58,7 +59,7 @@ async def on_ready():
     variables.discoin_client = Discoin(
         f"{variables.DISCOIN_AUTH_KEY}", "PIC", loop=loop
     )
-    cors = [start_logging(), discoin_watcher(client)]
+    cors = [start_logging(), discoin_watcher(client), blacklist_updater()]
     await asyncio.gather(*cors)
 
 

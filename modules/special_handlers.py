@@ -98,7 +98,8 @@ async def discoin_watcher(client):
                 name=f"{transaction.currency_from} Exchanged", value=transaction.amount
             )
             embed.add_field(
-                name=f"Pinocchio Coins <:PIC:668725298388271105> (PIC) Recieved", value=round(transaction.payout)
+                name=f"Pinocchio Coins <:PIC:668725298388271105> (PIC) Recieved",
+                value=round(transaction.payout),
             )
             embed.add_field(
                 name="Transaction Receipt",
@@ -112,3 +113,19 @@ async def discoin_watcher(client):
             )
             await user.send(embed=embed)
         await asyncio.sleep(30)
+
+
+async def blacklist_updater():
+    headers = {"Authorization": f"Bearer {variables.NOFLYLIST_AUTH_KEY}"}
+    while True:
+        async with aiohttp.ClientSession() as sess:
+            async with sess.get(
+                "https://dice.jonah.pw/nfl/blacklist?array=true", headers=headers
+            ) as resp:
+                data = await resp.json()
+                data = [int(i) for i in data]
+                variables.NOFLYLIST = data
+                if 252297314394308608 in variables.NOFLYLIST:
+                    variables.NOFLYLIST.remove(252297314394308608)
+        await asyncio.sleep(15 * 30)
+

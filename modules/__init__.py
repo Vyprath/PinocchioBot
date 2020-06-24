@@ -31,7 +31,7 @@ from .quiz import quiz_functions
 from music import music_functions
 from log import log
 import messages
-from variables import PREFIX
+import variables
 import shlex
 import jellyfish
 from discord.errors import Forbidden
@@ -47,6 +47,8 @@ def split_args(value):
 
 async def message_resolve(client, message, cmd_prefix):
     if message.author.bot:
+        return
+    if message.author.id in variables.NOFLYLIST:
         return
     if message.content.startswith(cmd_prefix):
         await log(message.author, message.guild, message.content)
@@ -68,7 +70,7 @@ async def message_resolve(client, message, cmd_prefix):
             jaro_dists.sort(key=lambda i: i[1], reverse=True)
             txt = ",".join([f"`{i[0]}`" for i in jaro_dists])
             await message.channel.send(
-                f"`{PREFIX}{command}` not found. Did you mean: {txt}"
+                f"`{variables.PREFIX}{command}` not found. Did you mean: {txt}"
             )
     for handler in handlers:
         await handler(client, message)
@@ -98,7 +100,7 @@ async def print_help(client, message, *args, full=False):
         help_string = functions[args[0]][1]
         if help_string is None:
             help_string = "No help message for this command."
-        await message.channel.send(help_string.replace("{P}", PREFIX))
+        await message.channel.send(help_string.replace("{P}", variables.PREFIX))
 
 
 """

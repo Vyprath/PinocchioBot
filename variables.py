@@ -7,6 +7,7 @@ TOKEN = os.environ.get("TOKEN")
 DBL_TOKEN = os.environ.get("DBL_TOKEN")
 DISCOIN_AUTH_KEY = os.environ.get("DISCOIN_AUTH_KEY")
 FILE_UPLOAD_AUTH = os.environ.get("FILE_UPLOAD_AUTH")
+NOFLYLIST_AUTH_KEY = os.environ.get("NOFLYLIST_AUTH_KEY")
 discoin_client = None
 CLIENT_ID = "506878658607054849"
 if TOKEN is None:
@@ -63,6 +64,7 @@ DONATOR_TIER_2 = 2
 DEV_TIER = 4
 ROLL_INTERVAL = 3 * 3600  # 3 hours in seconds
 PRICE_CUT = 0.08
+NOFLYLIST = []
 
 # APIs
 ICNDB_RANDOM_JOKE_URL = "http://api.icndb.com/jokes/random"
