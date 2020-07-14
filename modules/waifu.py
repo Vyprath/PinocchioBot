@@ -16,16 +16,18 @@ async def search(client, message, *args):
             f"USAGE: `{PREFIX}search`: <waifu name or ID or anime name>"
         )
         return
-    search_string = "%" + " ".join(args).lower().strip() + "%"
+    search_string = " ".join(args).lower().strip()
     if len(search_string) < 5:
         await message.channel.send("Please enter atleast 3 or more characters!")
         return
     engine = await database.prepare_engine()
     async with engine.acquire() as conn:
-        query = database.Waifu.select().where(
-            database.Waifu.c.name.ilike(search_string)
-            | database.Waifu.c.from_anime.ilike(search_string)
-        )
+        query = f"""
+SELECT *, name <-> '{search_string}' as sim FROM waifu
+UNION
+SELECT *, from_anime <-> '{search_string}' as sim FROM waifu
+ORDER BY sim LIMIT 30;
+        """
         cursor = await conn.execute(query)
         resp = await cursor.fetchall()
         if resp is None or len(resp) == 0:
@@ -33,7 +35,6 @@ async def search(client, message, *args):
                 "Waifu not found! You can add the waifu yourself, please join the support server! (`=support`) <a:thanks:699004469610020964>"
             )
             return
-        resp = resp[:30]
     pages = []
     resp_string = ""
     for row in resp:
@@ -76,10 +77,11 @@ async def details(client, message, *args):
             search_id = int(args[0])
             query = database.Waifu.select().where(database.Waifu.c.id == search_id)
         else:
-            search_string = "%" + " ".join(args).lower().strip() + "%"
-            query = database.Waifu.select().where(
-                database.Waifu.c.name.ilike(search_string)
-            )
+            search_string = " ".join(args).lower().strip()
+            query = f"""
+SELECT *, name <-> '{search_string}' as sim FROM waifu
+ORDER BY sim LIMIT 1;
+        """
         cursor = await conn.execute(query)
         resp = await cursor.fetchone()
         if resp is None:
