@@ -44,7 +44,7 @@ main_help_menu.add_field(
 main_help_menu.add_field(
     name="<a:PKomiEars:575382520179326979> Reactions",
     inline=False,
-    value=f"`{P}hug`, `{P}kiss`, `{P}pat`, `{P}tickle`, `{P}bite`, `{P}kick`, `{P}slap`, `{P}punch`, `{P}poke`, `{P}laugh`, `{P}cry`, `{P}blush`, `{P}confused`, `{P}pout`, `{P}dance`, `{P}jojo`, `{P}megumin`, `{P}satania`, `{P}lick`, `{P}think`, `{P}shrug`, `{P}owo`, `{P}nom`, `{P}eyeroll`, `{P}lewd`, `{P}stare`, `{P}triggered`,`{P}facepalm`, `{P}gif`",
+    value=f"`{P}hug`, `{P}kiss`, `{P}pat`, `{P}tickle`, `{P}bite`, `{P}kick`, `{P}slap`, `{P}punch`, `{P}poke`, `{P}laugh`, `{P}cry`, `{P}blush`, `{P}confused`, `{P}pout`, `{P}dance`, `{P}jojo`, `{P}megumin`, `{P}satania`, `{P}lick`, `{P}think`, `{P}shrug`, `{P}owo`, `{P}nom`, `{P}eyeroll`, `{P}lewd`, `{P}stare`, `{P}triggered`,`{P}facepalm`, `{P}gif`, `{P}stab`",
 )
 main_help_menu.add_field(
     name=":musical_note: Music (Donator-only Feature)",
