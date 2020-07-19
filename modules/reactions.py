@@ -62,6 +62,7 @@ reactions_functions = {
     "tickle": (gif("tickle", "tickles", True), None),
     "bite": (gif("bite", "bites", True), None),
     "stab": (gif("stab", "stabs", True), None),
+    "seduce": (gif("seduce", "seduces", True), None),
     "kick": (gif("kick", "kicks", True), None),
     "slap": (gif("slap", "slaps", True), None),
     "punch": (gif("punch", "punches", True), None),
