@@ -14,7 +14,7 @@ import json
 
 
 async def make_anime_embed(loop, mal_id, color=0x00000000, init_fields=[]):
-    jikan = AioJikan(loop=loop)
+    jikan = AioJikan()
     anime = await jikan.anime(mal_id)
     synopsis = anime["synopsis"]
     if len(synopsis) > 1500:
@@ -85,7 +85,7 @@ async def anime(client, message, *args):
     if len(search_str) < 3:
         await message.channel.send("Anime name must be atleast 3 letters.")
         return
-    jikan = AioJikan(loop=client.loop)
+    jikan = AioJikan()
     _search_result = await jikan.search(search_type="anime", query=search_str)
     search_result = _search_result["results"][0]["mal_id"]
     embed = await make_anime_embed(client.loop, search_result, message.author.color)
@@ -100,7 +100,7 @@ async def manga(client, message, *args):
     if len(search_str) < 3:
         await message.channel.send("Manga name must be atleast 3 letters.")
         return
-    jikan = AioJikan(loop=client.loop)
+    jikan = AioJikan()
     _search_result = await jikan.search(search_type="manga", query=search_str)
     search_result = _search_result["results"][0]["mal_id"]
     manga = await jikan.manga(search_result)
@@ -142,7 +142,7 @@ async def animelist(client, message, *args):
         return
     search_str = " ".join(args)
     try:
-        jikan = AioJikan(loop=client.loop)
+        jikan = AioJikan()
         raw_animelist = await jikan.user(username=search_str, request="animelist")
     except APIException:
         await message.channel.send("Username not found on MAL, or account is private.")
@@ -227,7 +227,7 @@ async def mangalist(client, message, *args):
         return
     search_str = " ".join(args)
     try:
-        jikan = AioJikan(loop=client.loop)
+        jikan = AioJikan()
         raw_mangalist = await jikan.user(username=search_str, request="mangalist")
     except APIException:
         await message.channel.send("Username not found on MAL, or account is private.")
@@ -311,7 +311,7 @@ async def profile(client, message, *args):
         return
     search_str = " ".join(args)
     try:
-        jikan = AioJikan(loop=client.loop)
+        jikan = AioJikan()
         profile = await jikan.user(username=search_str, request="profile")
     except APIException:
         await message.channel.send("Username not found on MAL, or account is private.")
