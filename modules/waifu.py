@@ -17,7 +17,7 @@ async def search(client, message, *args):
         )
         return
     search_string = " ".join(args).lower().strip()
-    if len(search_string) < 5:
+    if len(search_string) < 3:
         await message.channel.send("Please enter atleast 3 or more characters!")
         return
     engine = await database.prepare_engine()
