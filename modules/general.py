@@ -324,11 +324,11 @@ async def say(client, message, *args):
     ):
         channel = message.channel_mentions[0]
         text = message.content
-        text = text[text.find(args[1]) :]
+        text = text.replace(" ", "x", 1)[text.find(" ")+1 :]  # Whatever works /shrug
     elif len(args) >= 1:
         channel = message.channel
         text = message.content
-        text = text[text.find(args[0]) :]
+        text = text[text.find(" ")+1 :]
     else:
         await message.channel.send(
             f"Usage: `{PREFIX}say [channel, default: current] <text>`"
