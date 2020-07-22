@@ -24,7 +24,7 @@ async def view_stats(client, message, *args):
     app_info = await client.application_info()
     process = psutil.Process(os.getpid())
     embed = discord.Embed(
-        title="Bot Stats", description="Running on a dedicated server with 32GB of RAM."
+        title="Bot Stats", description="Running on Server-Miku 8GB of RAM."
     )
     embed.add_field(name="**__General Info__**", inline=False, value="\u200b")
     embed.add_field(
@@ -76,7 +76,7 @@ async def view_stats(client, message, *args):
         value="[https://waifu.pinocchiobot.xyz](https://waifu.pinocchiobot.xyz)",
     )
     embed.set_footer(
-        text=f"Running on Node-Megumin • Made by {app_info.owner.name}#{app_info.owner.discriminator}",
+        text=f"Running on Miku • Made by {app_info.owner.name}#{app_info.owner.discriminator}",
         icon_url=app_info.owner.avatar_url_as(size=128),
     )
     await message.channel.send(embed=embed)
