@@ -20,7 +20,8 @@ async def start_logging():
         item = await queue.get()
         buffer.append(item)
         if len(buffer) >= variables.LOG_BUFFER or time.time() - last > variables.LOG_WAIT_MAX_SEC:
-            await log_to_file(buffer)
+            if variables.LOG_FILE is not None:
+                await log_to_file(buffer)
             last = time.time()
             buffer.clear()
 

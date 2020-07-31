@@ -46,7 +46,7 @@ started = False
 @client.event
 async def on_ready():
     global started
-    logging.info("Logged in as {0} - {1}.".format(client.user.name, client.user.id))
+    logging.info(f"Logged in as {client.user.name} - {client.user.id}.")
     # await database.make_member_profile(client.get_all_members(), client.user.id)
     if variables.DBL_TOKEN:
         dborg.init_dbl(client)
@@ -56,10 +56,17 @@ async def on_ready():
         return
     started = True
 
-    variables.discoin_client = Discoin(
-        f"{variables.DISCOIN_AUTH_KEY}", "PIC", loop=loop
-    )
-    cors = [start_logging(), discoin_watcher(client), blacklist_updater()]
+    cors = [start_logging()]
+
+    if variables.DISCOIN_AUTH_KEY:
+        variables.discoin_client = Discoin(
+            f"{variables.DISCOIN_AUTH_KEY}", "PIC", loop=loop
+        )
+        cors.append(discoin_watcher(client))
+
+    if variables.NOFLYLIST_AUTH_KEY:
+        cors.append(blacklist_updater())
+
     await asyncio.gather(*cors)
 
 

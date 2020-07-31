@@ -12,11 +12,9 @@ discoin_client = None
 CLIENT_ID = "506878658607054849"
 if TOKEN is None:
     raise Exception("The TOKEN environmental variable is not set.")
-if DISCOIN_AUTH_KEY is None:
-    raise Exception("The Discoin Auth Key is not set.")
 LOG_BUFFER = 30
 LOG_WAIT_MAX_SEC = 30.0
-LOG_FILE = 'log.txt'
+LOG_FILE = None
 
 # Proxy
 PROXY = None
