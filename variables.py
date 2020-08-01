@@ -77,3 +77,6 @@ TRACE_MOE_URL = "https://trace.moe/api/search?token=" + TRACE_MOE_API
 
 # Developer's special
 CMD_POPULARITY = {}
+
+# Music
+MUSIC_CACHE_DIR = os.environ.get("MUSIC_CACHE_DIR", "./cache/")

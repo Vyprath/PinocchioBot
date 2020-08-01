@@ -194,3 +194,4 @@ pip-selfcheck.json
 run
 media/
 log.txt
+cache/
