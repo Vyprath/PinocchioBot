@@ -4,7 +4,7 @@ from variables import PREFIX
 
 
 async def clean(client, message, *args):
-    if not message.author.guild_permissions.administrator:
+    if not message.author.guild_permissions.administrator and not message.author.permissions_in(message.channel).manage_messages:
         await message.channel.send(
             "This command is restricted, to be used only by admins."
         )
@@ -427,6 +427,10 @@ admin_functions = {
         "`{P}setcustomroles`: Set price or disable custom roles.",
     ),
     "purge": (
+        clean,
+        "`{P}purge <number of messages between 1 to 100>`: Purge messages from the channel.",
+    ),
+    "clean": (
         clean,
         "`{P}purge <number of messages between 1 to 100>`: Purge messages from the channel.",
     ),
