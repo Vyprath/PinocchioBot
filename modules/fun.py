@@ -154,7 +154,8 @@ async def cowsay(client, message, *args):
     if len(args) == 0:
         await message.channel.send(f"USAGE: {PREFIX}cowsay <text>")
         return
-    await message.channel.send("```css\n" + _cowsay(" ".join(args)) + "```")
+    text = discord.utils.escape_mentions(" ".join(args))
+    await message.channel.send("```css\n" + _cowsay(text) + "```")
 
 
 async def cook_user(client, message, *args):
@@ -183,6 +184,36 @@ async def cook_user(client, message, *args):
     await message.channel.send(
         file=discord.File(
             fp=byte_io, filename=f'cooked_{cooked_user.name.replace(" ", "_")}.png'
+        )
+    )
+
+
+async def hjail(client, message, *args):
+    if len(message.mentions) == 0:
+        await message.channel.send(f"USAGE: {PREFIX}hjail <@user mention>")
+        return
+    cooked_user = message.mentions[0]
+    profile_pic = Image.open(
+        io.BytesIO(await _get_img_bytes_from_url(str(cooked_user.avatar_url))), "r"
+    )
+    profile_pic = profile_pic.resize((294, 294), Image.ANTIALIAS)
+    background = Image.open("assets/hjail.png", "r")
+    bigsize = (profile_pic.size[0] * 3, profile_pic.size[1] * 3)
+    mask = Image.new("L", bigsize, 0)
+    draw = ImageDraw.Draw(mask)
+    draw.ellipse((0, 0) + bigsize, fill=255)
+    mask = mask.resize(profile_pic.size, Image.ANTIALIAS)
+    profile_pic.putalpha(mask)
+    w, h = profile_pic.size
+    pts = (1074 - w // 2, 582 - h // 2)
+    background.paste(profile_pic, pts, profile_pic)
+    byte_io = io.BytesIO()
+    background.save(byte_io, "PNG")
+    byte_io.flush()
+    byte_io.seek(0)
+    await message.channel.send(
+        file=discord.File(
+            fp=byte_io, filename=f'jailed_{cooked_user.name.replace(" ", "_")}.png'
         )
     )
 
@@ -258,4 +289,5 @@ fun_functions = {  # Kek, this feels like I am stuttering to say functions.
         "`{P}cowsay`: Cow says moo. And you can order the cow to speak for you.",
     ),
     "cook": (cook_user, "`{P}cook`: Cook someone tastily."),
+    "hjail": (hjail, "`{P}cook`: Send someone to the horny jail."),
 }

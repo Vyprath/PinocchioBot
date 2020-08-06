@@ -39,7 +39,7 @@ main_help_menu.add_field(
 main_help_menu.add_field(
     name="<a:MikuKurukurupa:564012084631699456> Fun",
     inline=False,
-    value=f"`{P}chucknorris`, `{P}dadjoke`, `{P}xkcd`, `{P}catfact`, `{P}8ball`, `{P}cook`, `{P}lmgtfy`, `{P}urbandictionary`, `{P}cowsay`, `{P}avatar`",
+    value=f"`{P}chucknorris`, `{P}dadjoke`, `{P}xkcd`, `{P}catfact`, `{P}8ball`, `{P}cook`, `{P}lmgtfy`, `{P}urbandictionary`, `{P}cowsay`, `{P}avatar`, `{P}hjail`",
 )
 main_help_menu.add_field(
     name="<a:PKomiEars:575382520179326979> Reactions",
