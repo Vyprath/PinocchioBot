@@ -1,13 +1,15 @@
 import database
 import discord
 import psutil
-import os
 import time
 import aiohttp
 import aiofiles
 import variables
 from datetime import timedelta, datetime
 from .currency import _add_money
+
+process = psutil.Process()
+process.cpu_percent()
 
 
 async def upload_data(content, extension="txt"):
@@ -22,7 +24,6 @@ async def upload_data(content, extension="txt"):
 
 async def view_stats(client, message, *args):
     app_info = await client.application_info()
-    process = psutil.Process(os.getpid())
     embed = discord.Embed(
         title="Bot Stats", description="Running on Server-Miku 8GB of RAM."
     )
