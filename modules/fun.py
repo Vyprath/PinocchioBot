@@ -157,7 +157,7 @@ async def cowsay(client, message, *args):
     if len(args) == 0:
         await message.channel.send(f"USAGE: {PREFIX}cowsay <text>")
         return
-    text = discord.utils.escape_mentions(" ".join(args)).replace("`", "")
+    text = discord.utils.escape_mentions(" ".join(args)).replace("`", "\u200b`")
     await message.channel.send("```css\n" + _cowsay(text) + "```")
 
 
