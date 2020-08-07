@@ -107,6 +107,9 @@ async def urban_dictionary(client, message, *args):
     if len(ud_reply) == 0:
         await message.channel.send("No results found for this search string.")
         return
+    exact_ud_reply = [i for i in ud_reply if i.lower() == query.lower()]
+    if len(exact_ud_reply) > 0:
+        ud_reply = exact_ud_reply
     rand_id = randint(0, len(ud_reply) - 1)
     ud_def = ud_reply[rand_id]
     embed = discord.Embed(
@@ -282,6 +285,7 @@ fun_functions = {  # Kek, this feels like I am stuttering to say functions.
         urban_dictionary,
         "`{P}urbandictionary`: Search urban dictionary.",
     ),
+    "udict": (urban_dictionary, "`{P}urbandict`: Search urban dictionary."),
     "urbandict": (urban_dictionary, "`{P}urbandict`: Search urban dictionary."),
     "8ball": (eight_ball, "`{P}8ball`: Get life advice."),
     "cowsay": (
