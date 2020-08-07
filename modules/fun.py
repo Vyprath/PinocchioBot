@@ -107,7 +107,7 @@ async def urban_dictionary(client, message, *args):
     if len(ud_reply) == 0:
         await message.channel.send("No results found for this search string.")
         return
-    exact_ud_reply = [i for i in ud_reply if i.lower() == query.lower()]
+    exact_ud_reply = [i for i in ud_reply if i['word'].lower() == query.lower()]
     if len(exact_ud_reply) > 0:
         ud_reply = exact_ud_reply
     rand_id = randint(0, len(ud_reply) - 1)
