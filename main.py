@@ -14,7 +14,7 @@ from modules.special_handlers import (
     blacklist_updater,
 )
 from music import functions
-from discoin import Discoin
+from discoin import Client
 from log import start_logging
 import uvloop
 
