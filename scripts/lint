@@ -1,0 +1,12 @@
+#!/bin/sh -e
+
+export PREFIX=""
+if [ -d 'venv' ] ; then
+    export PREFIX="venv/bin/"
+fi
+
+set -x
+
+${PREFIX}autoflake --in-place --recursive --exclude "venv" .
+${PREFIX}black .
+${PREFIX}isort --multi-line=3 --balanced --trailing-comma --force-grid-wrap=0 --combine-as --skip "venv" --recursive --apply .

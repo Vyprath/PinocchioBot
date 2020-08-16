@@ -1,0 +1,25 @@
+discord.py[voice]
+discoin
+PyNaCl
+databases
+asyncpg
+aiosqlite
+python-dotenv
+sqlalchemy
+aiohttp
+aiofiles
+youtube-dl
+dblpy
+Pillow
+nyaapy
+psutil
+uvloop
+jellyfish
+jikanpy
+
+# Linter, Formatter, etc.
+pylint
+autoflake
+black
+pyflakes
+isort<5,>=4.2.5

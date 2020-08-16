@@ -1,0 +1,13 @@
+#!/bin/sh -e
+
+export PREFIX=""
+if [ -d 'venv' ] ; then
+    export PREFIX="venv/bin/"
+fi
+
+set -x
+
+# PYTHONPATH=. ${PREFIX}pytest --ignore venv -W ignore::DeprecationWarning --cov=databases --cov=tests --cov-fail-under=100 --cov-report=term-missing ${@}
+${PREFIX}autoflake --recursive --exclude "venv" ../PinocchioBot
+${PREFIX}black --check .
+${PREFIX}pyflakes $(find . -type d -name 'venv' -prune -o -type f -name '*.py' | grep -v 'venv')
