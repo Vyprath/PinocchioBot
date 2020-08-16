@@ -139,7 +139,8 @@ async def whois_admin(client, message, *args):
     )
     guilds = []
     for i in client.guilds:
-        if member := i.get_member(user.id):
+        member = i.get_member(user.id)
+        if member:
             guilds.append(
                 f"{'**[Owner]** ' if (member == i.owner) else ''}{i.name} ({len(i.members)})"
             )
