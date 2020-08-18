@@ -27,22 +27,21 @@ async def _get_gif_url(search_string):
 def gif(gif_name=None, action="", requires_mention=False):
     async def _gif(client, message, *args):
         if gif_name is not None:
-            try:
+            if len(message.mentions) > 0:
                 mention = message.mentions[0]  # Check if mentions is @user
                 mention_name = (
                     mention.name if mention.id != message.author.id else "themself ;-;"
                 )
-            except IndexError:
-                mention_name = (
-                    discord.utils.escape_mentions(
-                        " ".join(args)
-                    )  # or args[0] to show only mentions?
-                    if args[0] in ["@​here", "@​everyone"]
-                    else ""
-                )
-            if requires_mention and mention_name != "":
+            else:
+                if args[0] == "@here":
+                    mention_name = "everyone here!"
+                elif args[0] == "@everyone":
+                    mention_name = "everyone!"
+                else:
+                    mention_name = " ".join(args)
+            if requires_mention and mention_name == "":
                 await message.channel.send(
-                    f"Usage: `{PREFIX}{gif_name} <@mention>`"  # No longer limited to user mentions yey
+                    f"Usage: `{PREFIX}{gif_name} <@mention>`"
                 )
                 return
             search_str = "anime " + gif_name
