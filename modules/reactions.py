@@ -40,9 +40,7 @@ def gif(gif_name=None, action="", requires_mention=False):
                 else:
                     mention_name = " ".join(args)
             if requires_mention and mention_name == "":
-                await message.channel.send(
-                    f"Usage: `{PREFIX}{gif_name} <@mention>`"
-                )
+                await message.channel.send(f"Usage: `{PREFIX}{gif_name} <@mention>`")
                 return
             search_str = "anime " + gif_name
         else:
