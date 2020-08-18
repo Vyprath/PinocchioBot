@@ -41,14 +41,12 @@ async def make_join_leave_image(image_url, header, subtitle):
 
 async def send_on_member_join(member):
     engine = await database.prepare_engine()
-    async with engine.acquire() as conn:
-        fetch_query = database.Guild.select().where(
-            database.Guild.c.guild == member.guild.id
-        )
-        cursor = await conn.execute(fetch_query)
-        result = await cursor.fetchone()
-        channel = member.guild.get_channel(result[database.Guild.c.join_leave_channel])
-        welcome_str = result[database.Guild.c.welcome_str]
+    fetch_query = database.Guild.select().where(
+        database.Guild.c.guild == member.guild.id
+    )
+    result = await engine.fetch_one(query=fetch_query)
+    channel = member.guild.get_channel(result[database.Guild.c.join_leave_channel])
+    welcome_str = result[database.Guild.c.welcome_str]
     if channel is None or welcome_str is None:
         return
     img = await make_join_leave_image(
