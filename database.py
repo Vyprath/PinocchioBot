@@ -73,15 +73,15 @@ PurchasedWaifu = sa.Table(
 
 tables = [Member, Guild, Waifu, PurchasedWaifu]
 
-engine = None
+ENGINE = None
 
 
 async def prepare_engine():
-    global engine
-    if engine is None:
-        engine = Database(DATABASE_URL)
-        await engine.connect()
-    return engine
+    global ENGINE
+    if ENGINE is None:
+        ENGINE = Database(DATABASE_URL)
+        await ENGINE.connect()
+    return ENGINE
 
 
 async def prepare_tables():
@@ -103,7 +103,7 @@ async def make_member_profile(members_list, self_id):
         res = await engine.fetch_all(query=exists_query)
         if len(res) == 0:
             create_query_values.append({"member": member.id, "wallet": 0})
-            logging.debug(f"Creating profile for member {member.name}.")
+            logging.debug("Creating profile for member %s.", member.name)
     if len(create_query_values) > 0:
         create_query = Member.insert(None)
         await engine.execute_many(query=create_query, values=create_query_values)
@@ -119,7 +119,7 @@ async def make_guild_entry(guilds_list):
             create_query_values.append(
                 {"guild": guild.id,}
             )
-        logging.debug(f"Creating entry for guild {guild.name}.")
+        logging.debug("Creating entry for guild %s.", guild.name)
     if len(create_query_values) > 0:
         create_query = Guild.insert(None)
         await engine.execute_many(query=create_query, values=create_query_values)
