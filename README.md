@@ -1,10 +1,10 @@
-# Pinocchio Bot [![Discord Bots](https://discordbots.org/api/widget/status/506878658607054849.svg)](https://discordbots.org/bot/506878658607054849) [![CI Status](https://drone.sohamsen.me/api/badges/GhostDev/PinocchioBot/status.svg)](https://drone.sohamsen.me/GhostDev/PinocchioBot)
+# Pinocchio Bot [![Discord Bots](https://discordbots.org/api/widget/status/506878658607054849.svg)](https://discordbots.org/bot/506878658607054849) [![CI Status](https://drone.sohamsen.me/api/badges/Pinocchio/PinocchioBot/status.svg)](https://drone.sohamsen.me/Pinocchio/PinocchioBot)
 
 [![Discord Bots](https://discordbots.org/api/widget/506878658607054849.svg)](https://discordbots.org/bot/506878658607054849)
 
 **Support Server:** https://discord.gg/BzaksqP
 
-**Requirements:** Python 3.6+, PostgreSQL (optional but reccomended. Some features won't work/will bug out without it)
+**Requirements:** Python 3.6+, PostgreSQL (optional but recommended. Some features won't work/will bug out without it)
 
 ## Installation
 
