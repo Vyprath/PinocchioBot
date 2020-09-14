@@ -8,10 +8,3 @@ steps:
   commands:
   - scripts/install
   - scripts/test
-
-trigger:
-  branch:
-    - master
-  event:
-    exclude:
-    - push
