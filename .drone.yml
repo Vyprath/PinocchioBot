@@ -8,3 +8,10 @@ steps:
   commands:
   - scripts/install
   - scripts/test
+
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/pull/**
+    - refs/tags/**
+
