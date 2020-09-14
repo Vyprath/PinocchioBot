@@ -1,0 +1,16 @@
+---
+kind: pipeline
+name: compliance
+
+steps:
+- name: "Compliance"
+  image: python:3.8
+  commands:
+  - scripts/install
+  - scripts/test
+
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/pull/**
+    - refs/tags/**

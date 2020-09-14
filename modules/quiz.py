@@ -316,7 +316,11 @@ async def fetch_waifu_questions(num_q, num_choices):
             anss[0] = cans
         random.shuffle(anss)
         questions.append(
-            {"question": img_url, "correct_answer": cans, "answers": anss,}
+            {
+                "question": img_url,
+                "correct_answer": cans,
+                "answers": anss,
+            }
         )
     random.shuffle(questions)
     return questions
@@ -483,8 +487,20 @@ quiz_functions = {
         quiz,
         "`{P}quiz`: Time to battle with your friends or yourself and test your anime knowledge!",
     ),
-    "textquiz": (text_quiz, "`{P}textquiz`: Text quiz based on anime!",),
-    "tquiz": (text_quiz, "`{P}textquiz`: Text quiz based on anime!",),
-    "waifuquiz": (waifu_quiz, "`{P}waifuquiz`: Text quiz based on anime!",),
-    "wquiz": (waifu_quiz, "`{P}waifuquiz`: Text quiz based on anime!",),
+    "textquiz": (
+        text_quiz,
+        "`{P}textquiz`: Text quiz based on anime!",
+    ),
+    "tquiz": (
+        text_quiz,
+        "`{P}textquiz`: Text quiz based on anime!",
+    ),
+    "waifuquiz": (
+        waifu_quiz,
+        "`{P}waifuquiz`: Text quiz based on anime!",
+    ),
+    "wquiz": (
+        waifu_quiz,
+        "`{P}waifuquiz`: Text quiz based on anime!",
+    ),
 }

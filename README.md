@@ -1,4 +1,4 @@
-# Pinocchio Bot [![Discord Bots](https://discordbots.org/api/widget/status/506878658607054849.svg)](https://discordbots.org/bot/506878658607054849) ![Tests](https://github.com/FadedCoder/PinocchioBot/workflows/Test%20Suite/badge.svg)
+# Pinocchio Bot [![Discord Bots](https://discordbots.org/api/widget/status/506878658607054849.svg)](https://discordbots.org/bot/506878658607054849) [![CI Status](https://drone.sohamsen.me/api/badges/GhostDev/PinocchioBot/status.svg)](https://drone.sohamsen.me/GhostDev/PinocchioBot)
 
 [![Discord Bots](https://discordbots.org/api/widget/506878658607054849.svg)](https://discordbots.org/bot/506878658607054849)
 

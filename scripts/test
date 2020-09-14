@@ -8,6 +8,6 @@ fi
 set -x
 
 # PYTHONPATH=. ${PREFIX}pytest --ignore venv -W ignore::DeprecationWarning --cov=databases --cov=tests --cov-fail-under=100 --cov-report=term-missing ${@}
-${PREFIX}autoflake --recursive --exclude "venv" ../PinocchioBot
+${PREFIX}autoflake --recursive --exclude "venv" .
 ${PREFIX}black --check .
 ${PREFIX}pyflakes $(find . -type d -name 'venv' -prune -o -type f -name '*.py' | grep -v 'venv')

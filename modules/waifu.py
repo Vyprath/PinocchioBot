@@ -40,7 +40,10 @@ ORDER BY sim LIMIT 30;
     resp_string = ""
     for row in resp:
         resp_string += "**{0}**: ID is {1}, from *{2}*. Costs **{3}** <:PIC:668725298388271105>\n".format(
-            row["name"], row["id"], row["from_anime"], row["price"],
+            row["name"],
+            row["id"],
+            row["from_anime"],
+            row["price"],
         )
         if len(resp_string) > 1900:
             pages.append(resp_string)
@@ -127,7 +130,9 @@ ORDER BY sim LIMIT 1;
         else:
             waifu_description += f"\n\nThey were purchased and abandoned by someone who left this server. Rescue them with `{PREFIX}rescuewaifus`!"
     embed = discord.Embed(
-        title=resp["name"], description=waifu_description, color=message.author.colour,
+        title=resp["name"],
+        description=waifu_description,
+        color=message.author.colour,
     )
     images = []
     if resp["image_url"] is not None:

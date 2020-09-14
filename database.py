@@ -117,7 +117,9 @@ async def make_guild_entry(guilds_list):
         res = await engine.fetch_all(query=exists_query)
         if len(res) == 0:
             create_query_values.append(
-                {"guild": guild.id,}
+                {
+                    "guild": guild.id,
+                }
             )
         logging.debug("Creating entry for guild %s.", guild.name)
     if len(create_query_values) > 0:
