@@ -54,4 +54,10 @@ Create an issue or pull request as you see fit!
 If you are creating a pull request, ensure:
 1. To use `black` as your PEP-8 formatter, **NOT** the default `autopep8`. (It's better!)
 2. If you're on Linux, it's highly recommended to do `./scripts/lint` to lint your code and `./scripts/test` to test it.
-3. If you're on Windows (and for Linux peeps too), well ¯\_(ツ)_/¯. Set up your IDE/editor with `black`, `pylint`, `autoflake` and `isort`.
+3. If you're on Windows (and for Linux peeps too), well ¯\\\_(ツ)\_/¯. Set up your IDE/editor with `black`, `pylint`, `autoflake` and `isort`.
+
+## Mirrors
+
+This repository is hosted on https://git.sohamsen.me/Pinocchio/PinocchioBot.
+
+Mirror is available on [GitHub.com](https://github.com/FadedCoder/PinocchioBot).
