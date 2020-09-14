@@ -27,7 +27,9 @@ class DiscordBotsOrgAPI:
             )
             await self.bot.change_presence(activity=activity)
         except Exception as e:
-            logging.exception(f"Failed to post server count\n{type(e).__name__}: {e}")
+            logging.exception(
+                "Failed to post server count\n%s: %s", type(e).__name__, e
+            )
 
     async def has_voted(self, user_id):
         try:
@@ -35,7 +37,7 @@ class DiscordBotsOrgAPI:
             return voted
         except Exception as e:
             logging.exception(
-                f"Failed to get votes for {user_id} \n{type(e).__name__}: {e}"
+                "Failed to get votes for %s \n%s: %s", user_id, type(e).__name__, e
             )
 
     async def is_weekend(self):
@@ -43,13 +45,15 @@ class DiscordBotsOrgAPI:
             weekend = await self.dblpy.get_weekend_status()
             return weekend
         except Exception as e:
-            logging.exception(f"Failed to check if weekend \n{type(e).__name__}: {e}")
+            logging.exception(
+                "Failed to check if weekend \n%s: %s", type(e).__name__, e
+            )
 
 
-dbl_api = None
+DBL_API = None
 
 
 def init_dbl(bot):
 
-    global dbl_api
-    dbl_api = DiscordBotsOrgAPI(bot)
+    global DBL_API
+    DBL_API = DiscordBotsOrgAPI(bot)

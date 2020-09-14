@@ -6,7 +6,7 @@ import aiofiles
 
 import variables
 
-queue = None
+QUEUE = None
 
 
 async def log_to_file(items):
@@ -15,12 +15,12 @@ async def log_to_file(items):
 
 
 async def start_logging():
-    global queue
+    global QUEUE
     buffer = []
-    queue = asyncio.Queue()
+    QUEUE = asyncio.Queue()
     last = time.time()
     while True:
-        item = await queue.get()
+        item = await QUEUE.get()
         buffer.append(item)
         if (
             len(buffer) >= variables.LOG_BUFFER
@@ -33,10 +33,10 @@ async def start_logging():
 
 
 async def log(user, guild, item):
-    if not queue:
+    if not QUEUE:
         return
     guildtxt = f"[{str(guild) }]({ guild.id })" if guild else "DM"
     content = str(item).replace("\n", "\n\t")
-    await queue.put(
+    await QUEUE.put(
         f"$ {str(datetime.now())} - [{ str(user) }]({ user.id }) - {guildtxt} - {content}"
     )

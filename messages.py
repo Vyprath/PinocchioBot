@@ -14,22 +14,38 @@ To get the old help message with description, do `{P}fullhelp`.
 main_help_menu.add_field(
     name=":robot: General",
     inline=False,
-    value=f"`{P}help`, `{P}support`, `{P}donate`, `{P}creator`, `{P}vote`, `{P}claimreward`, `{P}invite`, `{P}botstats/{P}botinfo/{P}info`, `{P}ping`,`{P}poll`, `{P}whois`, `{P}worldleaderboard/{P}wlb/{P}worldlb`, `{P}guildleaderboard/{P}glb/{P}guildlb/{P}leaderboard`, `{P}say/{P}pinosay`",
+    value=(
+        f"`{P}help`, `{P}support`, `{P}donate`, `{P}creator`, "
+        f"`{P}vote`, `{P}claimreward`, `{P}invite`, `{P}botstats/{P}botinfo/{P}info`, "
+        f"`{P}ping`,`{P}poll`, `{P}whois`, `{P}worldleaderboard/{P}wlb/{P}worldlb`, "
+        f"`{P}guildleaderboard/{P}glb/{P}guildlb/{P}leaderboard`, `{P}say/{P}pinosay`"
+    ),
 )
 main_help_menu.add_field(
     name=":moneybag: Financial",
     inline=False,
-    value=f"`{P}wallet`, `{P}transfer`, `{P}dailies/{P}daily`, `{P}paidroles`, `{P}customrole`, `{P}discoin`, `{P}exchange`",
+    value=(
+        f"`{P}wallet`, `{P}transfer`, `{P}dailies/{P}daily`, "
+        f"`{P}paidroles`, `{P}customrole`, `{P}discoin`, `{P}exchange`",
+    ),
 )
 main_help_menu.add_field(
     name="<a:RainbowWeeb:564012559590752256> Waifu",
     inline=False,
-    value=f"`{P}waifu`, `{P}search`, `{P}buy`, `{P}sell`, `{P}details`, `{P}trade`, `{P}moneytrade`, `{P}favorite`, `{P}unfavorite`, `{P}harem`, `{P}randomroll/{P}rr`, `{P}rolls`",
+    value=(
+        f"`{P}waifu`, `{P}search`, `{P}buy`, `{P}sell`, "
+        f"`{P}details`, `{P}trade`, `{P}moneytrade`, "
+        f"`{P}favorite`, `{P}unfavorite`, `{P}harem`, "
+        f"`{P}randomroll/{P}rr`, `{P}rolls`",
+    ),
 )
 main_help_menu.add_field(
     name="<:UmaruCool:575381825296400384> Anime",
     inline=False,
-    value=f"`{P}anime`, `{P}manga`, `{P}animelist`, `{P}mangalist`, `{P}profile`, `{P}nyaa`, `{P}whichanime`",
+    value=(
+        f"`{P}anime`, `{P}manga`, `{P}animelist`, `{P}mangalist`, "
+        f"`{P}profile`, `{P}nyaa`, `{P}whichanime`",
+    ),
 )
 main_help_menu.add_field(
     name="<:SmartHuh:575382892520275980> Quiz **NEW**",
@@ -39,27 +55,46 @@ main_help_menu.add_field(
 main_help_menu.add_field(
     name="<a:MikuKurukurupa:564012084631699456> Fun",
     inline=False,
-    value=f"`{P}chucknorris`, `{P}dadjoke`, `{P}xkcd`, `{P}catfact`, `{P}8ball`, `{P}cook`, `{P}lmgtfy`, `{P}urbandictionary`, `{P}cowsay`, `{P}avatar`, `{P}hjail`",
+    value=(
+        f"`{P}chucknorris`, `{P}dadjoke`, `{P}xkcd`, `{P}catfact`, "
+        f"`{P}8ball`, `{P}cook`, `{P}lmgtfy`, `{P}urbandictionary`, "
+        f"`{P}cowsay`, `{P}avatar`, `{P}hjail`",
+    ),
 )
 main_help_menu.add_field(
     name="<a:PKomiEars:575382520179326979> Reactions",
     inline=False,
-    value=f"`{P}hug`, `{P}kiss`, `{P}pat`, `{P}tickle`, `{P}bite`, `{P}kick`, `{P}slap`, `{P}punch`, `{P}poke`, `{P}laugh`, `{P}cry`, `{P}blush`, `{P}confused`, `{P}pout`, `{P}dance`, `{P}jojo`, `{P}megumin`, `{P}satania`, `{P}lick`, `{P}think`, `{P}shrug`, `{P}owo`, `{P}nom`, `{P}eyeroll`, `{P}lewd`, `{P}stare`, `{P}triggered`,`{P}facepalm`, `{P}gif`, `{P}stab`, `{P}seduce`",
+    value=(
+        f"`{P}hug`, `{P}kiss`, `{P}pat`, `{P}tickle`, `{P}bite`, "
+        f"`{P}kick`, `{P}slap`, `{P}punch`, `{P}poke`, `{P}laugh`, "
+        f"`{P}cry`, `{P}blush`, `{P}confused`, `{P}pout`, `{P}dance`, "
+        f"`{P}jojo`, `{P}megumin`, `{P}satania`, `{P}lick`, "
+        f"`{P}think`, `{P}shrug`, `{P}owo`, `{P}nom`, `{P}eyeroll`, "
+        f"`{P}lewd`, `{P}stare`, `{P}triggered`,`{P}facepalm`, `{P}gif`, "
+        f"`{P}stab`, `{P}seduce`",
+    ),
 )
 main_help_menu.add_field(
     name=":musical_note: Music (Donator-only Feature)",
     inline=False,
-    value=f"`{P}play/{P}p`, `{P}pause`, `{P}resume`, `{P}leave`, `{P}skip`, `{P}queue`, `{P}volume`, `{P}status`",
+    value=(
+        f"`{P}play/{P}p`, `{P}pause`, `{P}resume`, `{P}leave`, "
+        f"`{P}skip`, `{P}queue`, `{P}volume`, `{P}status`",
+    ),
 )
 main_help_menu.add_field(
     name=":tools: Administration",
     inline=False,
-    value=f"`{P}setpaidroles`, `{P}setcustomroles`, `{P}setwlchannel`, `{P}setwelcome`, `{P}setleave`, `{P}coindrops`, `{P}rescuewaifus`, `{P}forcedivorceallwaifus`, `{P}forcedivorcewaifus`, `{P}purge`",
+    value=(
+        f"`{P}setpaidroles`, `{P}setcustomroles`, `{P}setwlchannel`, "
+        f"`{P}setwelcome`, `{P}setleave`, `{P}coindrops`, `{P}rescuewaifus`, "
+        f"`{P}forcedivorceallwaifus`, `{P}forcedivorcewaifus`, `{P}purge`",
+    ),
 )
 main_help_menu.set_footer(text=f"For additional help, do {P}help <command name>.")
 
 
-full_help_text = """
+FULL_HELP_TEXT = """
 __**Pinocchio Bot Usage:**__
 **NOTE:** Arguments inside <> are necessary, and inside [] are optional.
 **Bot**
