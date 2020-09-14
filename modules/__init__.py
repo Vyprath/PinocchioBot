@@ -83,8 +83,8 @@ async def print_help(client, message, *args, full=False):
     if len(args) == 0 or args[0] == "inchannel":
         if full:
             for text in [
-                messages.full_help_text[i : i + 1990]
-                for i in range(0, len(messages.full_help_text), 1990)
+                messages.FULL_HELP_TEXT[i : i + 1990]
+                for i in range(0, len(messages.FULL_HELP_TEXT), 1990)
             ]:
                 await message.author.send(text)
         else:

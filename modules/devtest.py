@@ -191,7 +191,10 @@ async def process_logs(client, message, *args):
         embed_trans_txt = f"[Suspicious Transactions]({transactions_url})"
     else:
         embed_trans_txt = "No suspicious transactions, yay!"
-    general_stats_txt = f"Pinocchio Bot Statistics (Dump Date: {str(datetime.now())}, File Size: {file_size} bytes)\n\n"
+    general_stats_txt = (
+        "Pinocchio Bot Statistics "
+        f"(Dump Date: {str(datetime.now())}, File Size: {file_size} bytes)\n\n"
+    )
     general_stats_txt += "Command Frequency (Universal):\n"
     cmd_freq_items = list(commands_freq.items())
     cmd_freq_items.sort(reverse=True, key=lambda x: x[1])
