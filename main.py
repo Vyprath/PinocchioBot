@@ -37,19 +37,19 @@ client = discord.AutoShardedClient(
 
 loop.create_task(database.prepare_tables())
 
-one_time_done = False
+ONE_TIME_DONE = False
 
 
 async def on_start(client):
-    global one_time_done
-    if one_time_done:
+    global ONE_TIME_DONE
+    if ONE_TIME_DONE:
         return
-    one_time_done = True
+    ONE_TIME_DONE = True
 
     cors = [start_logging()]
 
     if variables.DISCOIN_TOKEN:
-        variables.discoin_client = Discoin(
+        variables.DISCOIN_CLIENT = Discoin(
             f"{variables.DISCOIN_TOKEN}", variables.DISCOIN_SELF_CURRENCY, loop=loop
         )
         cors.append(discoin_watcher(client))
@@ -62,11 +62,11 @@ async def on_start(client):
 
 @client.event
 async def on_ready():
-    logging.info(f"Logged in as {client.user} - {client.user.id}.")
+    logging.info("Logged in as %s - %s.", client.user, client.user.id)
     await database.make_member_profile(client.get_all_members(), client.user.id)
     if variables.DBL_TOKEN:
         dborg.init_dbl(client)
-        await dborg.dbl_api.update_stats()
+        await dborg.DBL_API.update_stats()
 
     await on_start(client)
 
@@ -94,12 +94,12 @@ async def on_member_remove(member):
 async def on_guild_join(guild):
     await database.make_guild_entry([guild])
     await database.make_member_profile(guild.members, client.user.id)
-    await dborg.dbl_api.update_stats()
+    await dborg.DBL_API.update_stats()
 
 
 @client.event
 async def on_guild_remove(guild):
-    await dborg.dbl_api.update_stats()
+    await dborg.DBL_API.update_stats()
 
 
 @client.event

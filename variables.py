@@ -57,4 +57,4 @@ DISCOIN_SELF_CURRENCY = os.getenv("DISCOIN_SELF_CURRENCY", "PIC")
 
 # Dynamic (loaded/modified during runtime)
 noflylist = []
-discoin_client = None
+DISCOIN_CLIENT = None
