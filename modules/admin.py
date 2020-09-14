@@ -91,17 +91,16 @@ async def set_paid_roles(client, message, *args):
         database.Guild.c.guild == message.guild.id
     )
     resp = await engine.fetch_one(query=fetch_query)
-    shop_roles = None
-    if resp is not None:
-        shop_roles = resp[database.Guild.c.shop_roles]
+    shop_roles = resp[database.Guild.c.shop_roles] if resp else None
     if len(args) == 0:
-        if shop_roles:
-            shop_roles_string = "\n".join(
+        shop_roles_string = (
+            "\n".join(
                 ": ".join((str(message.guild.get_role(int(k)).name), str(v)))
                 for k, v in shop_roles.items()
             )
-        else:
-            shop_roles_string = "No paid roles set."
+            if shop_roles
+            else "No paid roles set"
+        )
         await message.channel.send(
             f"""
 Current paid roles are: ```{shop_roles_string}```\n
@@ -158,12 +157,13 @@ async def set_welcome_msg(client, message, *args):
         return
     if len(args) == 0:
         await message.channel.send(
-            f'Usage: `{PREFIX}setwelcome` <welcome text, less than 61 chars. Write "None" for no welcome message>'
+            f"Usage: `{PREFIX}setwelcome` <welcome text, "
+            'less than 61 chars. Write "None" for no welcome message>'
         )
         return
     welcome_str = " ".join(args)
     if len(welcome_str) > 60:
-        await message.channel.send("Error: Text larger than 60 characters.")
+        await message.channel.send("Error: Text longer than 60 characters.")
         return
     if welcome_str == "None":
         welcome_str = None
@@ -188,7 +188,8 @@ async def set_leave_msg(client, message, *args):
         return
     if len(args) == 0:
         await message.channel.send(
-            f'Usage: `{PREFIX}setleave` <leave text, less than 61 chars. Write "None" for no leave message>'
+            f"Usage: `{PREFIX}setleave` <leave text, less than 61 chars. "
+            'Write "None" for no leave message>'
         )
         return
     leave_str = " ".join(args)
@@ -274,7 +275,8 @@ async def remove_abandoned_waifus(client, message, *args):
         )
         return
     await message.channel.send(
-        ":skull_crossbones: This command will remove all waifus from users who left the server. Do you want to proceed? Type `confirm` in 15s."
+        ":skull_crossbones: This command will remove all waifus from users "
+        "who left the server. Do you want to proceed? Type `confirm` in 15s."
     )  # noqa
 
     def check(m):
@@ -318,7 +320,8 @@ async def purge_all_waifus(client, message, *args):
         )
         return
     await message.channel.send(
-        ":skull_crossbones: This command will remove all purchased waifus from all users. Do you want to proceed? Type `confirm` in 15s."
+        ":skull_crossbones: This command will remove all purchased waifus from all users. "
+        "Do you want to proceed? Type `confirm` in 15s."
     )
 
     def check(m):
@@ -362,7 +365,8 @@ async def purge_waifus(client, message, *args):
         )
     user = message.mentions[0]
     await message.channel.send(
-        f":skull_crossbones: This command will remove all purchased waifus from {str(user)}. Do you want to proceed? Type `confirm` in 15s."
+        f":skull_crossbones: This command will remove all purchased waifus from {str(user)}. "
+        "Do you want to proceed? Type `confirm` in 15s."
     )
 
     def check(m):
@@ -398,15 +402,18 @@ admin_functions = {
     "setpaidroles": (set_paid_roles, "`{P}setpaidroles`: Set up paid roles."),
     "setwlchannel": (
         set_welcome_leave_channel,
-        "`{P}setwlchannel`: Set up welcome/leave message channel, or disable it. Default: disabled.",
+        "`{P}setwlchannel`: Set up welcome/leave message channel, "
+        "or disable it. Default: disabled.",
     ),
     "setwelcome": (
         set_welcome_msg,
-        "`{P}setwelcome <new string>`: Change the default welcome string, or disable it by `{P}setwelcome None`.",
+        "`{P}setwelcome <new string>`: Change the default welcome string, "
+        "or disable it by `{P}setwelcome None`.",
     ),
     "setleave": (
         set_leave_msg,
-        "`{P}setleave <new string>`: Change the default leave string, or disable it by `{P}setleave None`.",
+        "`{P}setleave <new string>`: Change the default leave string, "
+        "or disable it by `{P}setleave None`.",
     ),
     "setcustomroles": (
         set_custom_roles,
@@ -422,7 +429,8 @@ admin_functions = {
     ),
     "coindrops": (
         set_coin_drops,
-        "`{P}coindrops <disable/enable>`: Enable/Disable coin drops for a server. Default: disabled.",
+        "`{P}coindrops <disable/enable>`: Enable/Disable coin drops "
+        "for a server. Default: disabled.",
     ),
     "rescuewaifus": (
         remove_abandoned_waifus,
@@ -434,6 +442,7 @@ admin_functions = {
     ),
     "forcedivorcewaifus": (
         purge_waifus,
-        "`{P}forcedivorcewaifus <@user>`: Force divorce all waifus for a particular user. Red alert.",
+        "`{P}forcedivorcewaifus <@user>`: Force divorce all waifus "
+        "for a particular user. Red alert.",
     ),
 }

@@ -130,12 +130,14 @@ async def dailies(client, message, *args):
         if member_tier >= variables.DONATOR_TIER_2:
             await _add_money(message.author, DAILIES_AMOUNT * 4)
             await message.channel.send(
-                f"Recieved {DAILIES_AMOUNT * 4} <:PIC:668725298388271105>! 4 times the usual amount for being a donator! <:uwu:575372762583924757>"
+                f"Recieved {DAILIES_AMOUNT * 4} <:PIC:668725298388271105>! 4 times the usual amount "
+                "for being a Tier 2 donator! <:uwu:575372762583924757>"
             )
         elif member_tier >= variables.DONATOR_TIER_1:
             await _add_money(message.author, DAILIES_AMOUNT * 2)
             await message.channel.send(
-                f"Recieved {DAILIES_AMOUNT * 2} <:PIC:668725298388271105>! Twice the usual amount for being a donator! <:uwu:575372762583924757>"
+                f"Recieved {DAILIES_AMOUNT * 2} <:PIC:668725298388271105>! Twice the usual amount "
+                "for being a Tier 1 donator! <:uwu:575372762583924757>"
             )
         else:
             await _add_money(message.author, DAILIES_AMOUNT)
@@ -147,7 +149,8 @@ async def dailies(client, message, *args):
         tdelta_hours = (next_reset.seconds) // 3600
         tdelta_mins = (next_reset.seconds) // 60 - (tdelta_hours * 60)
         await message.channel.send(
-            f"Please wait {tdelta_hours:>02d} hours and {tdelta_mins:>02d} minutes more to get dailies."
+            f"Please wait {tdelta_hours:>02d} hours and "
+            f"{tdelta_mins:>02d} minutes more to get dailies."
         )
 
 
@@ -193,7 +196,10 @@ See `{PREFIX}discoin` for more info.
     embed.add_field(
         name="Transaction Receipt",
         inline=False,
-        value=f"[```{transaction.id}```](https://dash.discoin.zws.im/#/transactions/{transaction.id}/show)Keep this code in case Agent Wumpus fails to deliver the coins.",
+        value=(
+            f"[```{transaction.id}```](https://dash.discoin.zws.im/#/transactions/{transaction.id}/show)"
+            "Keep this code in case Agent Wumpus fails to deliver the coins.",
+        ),
     )
     embed.set_footer(
         text=f"{message.author.name}#{message.author.discriminator}",

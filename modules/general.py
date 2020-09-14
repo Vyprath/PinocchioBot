@@ -15,11 +15,10 @@ from .utils import num_to_emote, num_to_uni_emote
 
 async def donate(client, message, *args):
     await message.channel.send(
-        f"""
-Please go to this site to donate: https://www.patreon.com/RandomGhost (PayPal only).
-I also accept Bitcoin and other crypto payments. Please contact me (RandomGhost#0666) or on the support server (`{PREFIX}support`) for other payment methods.
-Thanks! <a:thanks:699004469610020964>
-    """
+        "Please go to this site to donate: https://www.patreon.com/RandomGhost (PayPal only)."
+        "I also accept Bitcoin and other crypto payments. Please contact me (RandomGhost#0666) "
+        f"or on the support server (`{PREFIX}support`) for other payment methods."
+        "Thanks! <a:thanks:699004469610020964>"
     )
 
 
@@ -52,7 +51,7 @@ You get 2x rewards for voting on weekends.
 
 
 async def claim_rewards(client, message, *args):
-    voted = await dborg.dbl_api.has_voted(message.author.id)
+    voted = await dborg.DBL_API.has_voted(message.author.id)
     db_verified = False
     engine = await database.prepare_engine()
     fetch_query = database.Member.select().where(
@@ -64,26 +63,27 @@ async def claim_rewards(client, message, *args):
     if not last_reward:
         db_verified = True
     else:
-        if (datetime.datetime.now() - last_reward).total_seconds() > 3600 * 12:
-            db_verified = True
-        else:
-            db_verified = False
+        db_verified = bool(
+            (datetime.datetime.now() - last_reward).total_seconds() > 3600 * 12
+        )
     if voted and db_verified:
         msgtxts = ["Thanks for voting! Here, have some coins."]
         coins = VOTE_REWARD
-        is_weekend = await dborg.dbl_api.is_weekend()
+        is_weekend = await dborg.DBL_API.is_weekend()
         if is_weekend:
             coins *= 2
             msgtxts.append("Thanks for voting on weekend! You get 2x coins.")
         if member_tier >= variables.DONATOR_TIER_2:
             coins *= 4
             msgtxts.append(
-                "You get 4 times the usual amount for being a tier 2 donator! <:AilunaHug:575373643551473665>"
+                "You get 4 times the usual amount for being a tier 2 donator! "
+                "<:AilunaHug:575373643551473665>"
             )
         elif member_tier >= variables.DONATOR_TIER_1:
             coins *= 2
             msgtxts.append(
-                "You get 2 times the usual amount for being a tier 1 donator! <:AilunaHug:575373643551473665>"
+                "You get 2 times the usual amount for being a tier 1 donator! "
+                "<:AilunaHug:575373643551473665>"
             )
         engine = await database.prepare_engine()
         update_query = (
@@ -98,11 +98,13 @@ async def claim_rewards(client, message, *args):
         )
         await message.channel.send("\n".join(msgtxts))
     else:
+        vote_string = (
+            "You have not yet voted"
+            if not voted
+            else "You have voted but it has not been 12 hours since last claim"
+        )
         await message.channel.send(
-            f"""
-{'You have not yet voted' if not voted else 'You have voted but it has not been 12 hours since last claim.'}
-Vote with `{PREFIX}vote` and then claim your rewards every 12 hours!
-        """
+            f"{vote_string}\nVote with `{PREFIX}vote` and then claim your rewards every 12 hours!"
         )
 
 
@@ -165,7 +167,7 @@ async def whois(client, message, *args):
         inline=False,
         value=f"{tdelta.days} days, {tdelta.seconds//3600} hours",
     )
-    PERMS_LIST = [
+    perms_list = [
         "kick_members",
         "ban_members",
         "manage_channels",
@@ -194,7 +196,7 @@ async def whois(client, message, *args):
         "manage_emojis",
     ]
     perms = []
-    for i in PERMS_LIST:
+    for i in perms_list:
         if getattr(_perms, i):
             perms += [i.replace("_", " ").capitalize()]
     if perms == []:
@@ -215,7 +217,7 @@ Usage: `{PREFIX}exchange <Pinocchio Coins> <Currency>`
 where `currency` is the receiving bot's currency name.
         """,
     )
-    currencies = await variables.discoin_client.fetch_currencies()
+    currencies = await variables.DISCOIN_CLIENT.fetch_currencies()
     currencies = [
         f"{i.name:<19}({i.id}) - {float(i.value):07.4f} - {i.reserve}"
         for i in currencies
@@ -246,11 +248,13 @@ def _leaderboard_text(client, results):
             elif i == 3:
                 medal = ":third_place:"
             rtxt.append(
-                f"**[{str(i).zfill(2)}] __{user.name}__ {medal}**\nWallet: {j['wallet']}, Waifu Value: {j['waifu_sum']}, **Total: {j['total']}**"
+                f"**[{str(i).zfill(2)}] __{user.name}__ {medal}**\nWallet: "
+                "{j['wallet']}, Waifu Value: {j['waifu_sum']}, **Total: {j['total']}**"
             )  # noqa
         else:
             rtxt.append(
-                f"**[{str(i).zfill(2)}] {user.name}**\nWallet: {j['wallet']}, Waifu Value: {j['waifu_sum']}, **Total: {j['total']}**"
+                f"**[{str(i).zfill(2)}] {user.name}**\nWallet: {j['wallet']}, "
+                "Waifu Value: {j['waifu_sum']}, **Total: {j['total']}**"
             )  # noqa
         i += 1
         if i == 11:
@@ -358,18 +362,21 @@ general_functions = {
     "donate": (donate, "`{P}donate`: Donate to this bot UwU."),
     "creator": (
         creator,
-        "`{P}creator`: Get to know the creator of this bot, so you can annoy him to fix the damned bugs.",
+        "`{P}creator`: Get to know the creator of this bot, "
+        "so you can annoy him to fix the damned bugs.",
     ),
     "support": (creator, "`{P}support`: Support server link. You can add waifus here!"),
     "invite": (invite, "`{P}invite`: Get the invite link for this server."),
     "poll": (
         poll,
-        '`{P}poll "Title of Poll" "Option 1" "Option 2" ["Option 3"...]`: Create a reaction poll.',
+        '`{P}poll "Title of Poll" "Option 1" "Option 2" '
+        '["Option 3"...]`: Create a reaction poll.',
     ),
     "whois": (whois, "`{P}whois <@user mention>`: Get information about a user."),
     "discoin": (
         discoin,
-        "`{P}discoin`: Get information about how to exchange currency with other bots using <:Discoin:357656754642747403> Discoin.",
+        "`{P}discoin`: Get information about how to exchange currency "
+        "with other bots using <:Discoin:357656754642747403> Discoin.",
     ),
     "guildleaderboard": (
         guild_leaderboard,

@@ -19,10 +19,10 @@ async def avatar_url(client, message, *args):
         member = message.author
     else:
         member = message.mentions[0]
-    avatar_url = str(member.avatar_url)
+    url = str(member.avatar_url)
     embed = discord.Embed(
         title=f"{member.name}#{member.discriminator}'s Avatar",
-        url=avatar_url,
+        url=url,
         colour=member.colour,
     )
     embed.set_image(url=avatar_url)
@@ -34,8 +34,7 @@ async def _fetch_text(url, headers={}, json=False):
         async with session.get(url, headers=headers) as resp:
             if json:
                 return await resp.json()
-            else:
-                return await resp.text()
+            return await resp.text()
 
 
 async def chuck_norris(client, message, *args):
@@ -58,19 +57,18 @@ async def cat_fact(client, message, *args):
     await message.channel.send(fact)
 
 
-latest_xkcd_id = -1
-last_xkcd_latest_store = None
+LATEST_XKCD_ID = -1
+LAST_XKCD_LATEST_STORE = None
 
 
 async def xkcd(client, message, *args):
-    global latest_xkcd_id
-    global last_xkcd_latest_store
+    global LATEST_XKCD_ID
+    global LAST_XKCD_LATEST_STORE
     now = datetime.datetime.now()
-    if latest_xkcd_id == -1 or (now - last_xkcd_latest_store).days > 1:
+    if LATEST_XKCD_ID == -1 or (now - LAST_XKCD_LATEST_STORE).days > 1:
         latest = await _fetch_text("https://xkcd.com/info.0.json")
         last = json.loads(latest)["num"]
         latest_xkcd_id = last
-        last_xkcd_latest_store = now
     rand_id = randint(1, latest_xkcd_id)
     random = await _fetch_text(f"https://xkcd.com/{rand_id}/info.0.json")
     img_url = json.loads(random)["img"]
@@ -233,8 +231,8 @@ async def _get_img_bytes_from_url(url):
             return image_bytes
 
 
-def _cowsay(str, length=40):
-    return build_bubble(str, length) + build_cow()
+def _cowsay(string, length=40):
+    return build_bubble(string, length) + build_cow()
 
 
 def build_cow():
@@ -247,9 +245,9 @@ def build_cow():
     """
 
 
-def build_bubble(str, length=40):
+def build_bubble(string, length=40):
     bubble = []
-    lines = normalize_text(str, length)
+    lines = normalize_text(string, length)
     bordersize = len(lines[0])
     bubble.append("  " + "-" * bordersize)
     for index, line in enumerate(lines):
@@ -259,8 +257,8 @@ def build_bubble(str, length=40):
     return "\n".join(bubble)
 
 
-def normalize_text(str, length):
-    lines = textwrap.wrap(str, length)
+def normalize_text(string, length):
+    lines = textwrap.wrap(string, length)
     maxlen = len(max(lines, key=len))
     return [line.ljust(maxlen) for line in lines]
 
@@ -272,8 +270,7 @@ def get_border(lines, index):
         return ["/", "\\"]
     elif index == len(lines) - 1:
         return ["\\", "/"]
-    else:
-        return ["|", "|"]
+    return ["|", "|"]
 
 
 fun_functions = {  # Kek, this feels like I am stuttering to say functions.
