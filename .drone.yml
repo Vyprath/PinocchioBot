@@ -10,8 +10,8 @@ steps:
   - scripts/test
 
 trigger:
-  ref:
-    - refs/heads/master
-    - refs/pull/**
-    - refs/tags/**
-
+  branch:
+    - master
+  event:
+    exclude:
+    - push

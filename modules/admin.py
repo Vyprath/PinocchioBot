@@ -13,10 +13,12 @@ async def clean(client, message, *args):
             "This command is restricted, to be used only by admins."
         )
         return
-    if len(args) != 1 or not args[0].isdigit() or not 1 <= int(args[0]) <= 100:
-        await message.channel.send(f"Usage: {PREFIX}purge <limit between 1 to 100>")
+    if len(args) != 1 or not args[0].isdigit():
+        await message.channel.send(
+            f"Usage: {PREFIX}purge <number of messages to delete>"
+        )
         return
-    limit = int(args[0])
+    limit = int(args[0]) + 1
     await message.channel.purge(limit=limit)
     msg = await message.channel.send(
         f"Successfully deleted {limit} messages. :thumbsup:"
